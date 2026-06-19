@@ -154,7 +154,7 @@ button{
 }
 .primary{background:linear-gradient(135deg,var(--gold),#c6942e);color:#fff}
 .secondary{background:linear-gradient(135deg,var(--dark),var(--dark2));color:#fff}
-.ok,.err{
+.ok,.err,.ocrStatus{
   display:none;
   margin-top:12px;
   padding:12px;
@@ -165,6 +165,7 @@ button{
 }
 .ok{background:#eaf8ef;color:#176734;border:1px solid #8bd5a5}
 .err{background:#fff0ee;color:#b92525;border:1px solid #e5aaa0}
+.ocrStatus{background:#fff7db;color:#6b4d00;border:1px solid #e6ca70}
 .footer{
   text-align:center;
   color:#3a3122;
@@ -201,8 +202,7 @@ button{
 
 <main class="wrap">
   <div class="notice">
-    مرحباً بك في صفحة المتدرب الصحية.
-يرجى إدخال بياناتك الصحية اليومية ومتابعة التحديث بشكل مستمر.
+    هذه الصفحة مخصصة للمتدرب فقط لتحديث بياناته الصحية. لن تظهر هنا قاعدة بيانات المتدربين أو الإحصائيات أو لوحة الإدارة.
   </div>
 
   <section class="card">
@@ -270,6 +270,11 @@ button{
       </div>
 
       <div class="field">
+        <label for="stepsImage">قراءة الخطوات من صورة</label>
+        <input id="stepsImage" type="file" accept="image/*" onchange="readStepsImage(event)">
+      </div>
+
+      <div class="field">
         <label for="activity">نوع النشاط</label>
         <select id="activity">
           <option>مشي</option>
@@ -301,6 +306,7 @@ button{
 
     <div class="ok" id="ok">✅ تم إرسال البيانات بنجاح.</div>
     <div class="err" id="err">⚠️ حدث خطأ. حاول مرة أخرى.</div>
+    <div class="ocrStatus" id="ocrStatus">جاري قراءة صورة الخطوات...</div>
   </section>
 
   <div class="footer">
@@ -309,6 +315,7 @@ button{
   </div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbybWJojwim5XvobhqKqbFc-XhiUNNXN0ExxFxSJUKhTLa-dJw1y8KS8s1UCD4dLYcSV/exec';
 const LOCAL_KEY = 'brave_fighter_trainee_health_private_v1';
@@ -436,6 +443,41 @@ function clearForm(){
   document.getElementById('activity').value='مشي';
   calculate();
   hideMessages();
+}
+
+
+async function readStepsImage(event){
+  const file = event.target.files && event.target.files[0];
+  if(!file) return;
+
+  const status = document.getElementById('ocrStatus');
+  status.style.display = 'block';
+  status.textContent = 'جاري قراءة صورة الخطوات... انتظر قليلاً';
+
+  try{
+    if(typeof Tesseract === 'undefined'){
+      status.textContent = '⚠️ تعذر تحميل قارئ الصورة. أدخل الخطوات يدوياً.';
+      return;
+    }
+
+    const result = await Tesseract.recognize(file, 'eng');
+    const text = (result && result.data && result.data.text) ? result.data.text : '';
+
+    const numbers = (text.match(/\d[\d,\s]{2,}/g) || [])
+      .map(x => parseInt(x.replace(/[^\d]/g,''), 10))
+      .filter(n => n >= 100 && n <= 100000);
+
+    if(numbers.length){
+      const steps = Math.max(...numbers);
+      document.getElementById('steps').value = steps;
+      calculate();
+      status.textContent = '✅ تم قراءة عدد الخطوات من الصورة: ' + steps.toLocaleString('en-US');
+    }else{
+      status.textContent = '⚠️ لم أتمكن من قراءة الخطوات بوضوح. أدخل الرقم يدوياً.';
+    }
+  }catch(e){
+    status.textContent = '⚠️ تعذر قراءة الصورة. أدخل الخطوات يدوياً.';
+  }
 }
 
 document.getElementById('date').value = today();
