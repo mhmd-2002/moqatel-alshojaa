@@ -2480,6 +2480,371 @@ tr:hover td{background:rgba(255,247,226,.55)!important}
 @media(max-width:1000px){.leaderCards{grid-template-columns:repeat(2,1fr)}.leaderGrid,.scheduleForm{grid-template-columns:1fr}.leaderActions{flex-direction:column}}
 </style>
 
+
+<style id="bfMobileCompatibilityFinal">
+/* ===== Mobile compatibility only - desktop layout is preserved ===== */
+@media (max-width: 900px){
+
+  html, body{
+    width:100% !important;
+    max-width:100% !important;
+    overflow-x:hidden !important;
+  }
+
+  body{
+    -webkit-text-size-adjust:100% !important;
+  }
+
+  .app{
+    display:block !important;
+    grid-template-columns:1fr !important;
+    width:100% !important;
+    min-width:0 !important;
+  }
+
+  .side{
+    position:relative !important;
+    top:auto !important;
+    right:auto !important;
+    left:auto !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    padding:10px 10px 8px !important;
+    border-left:0 !important;
+    box-shadow:0 6px 18px rgba(0,0,0,.16) !important;
+    z-index:5 !important;
+  }
+
+  .emblem{
+    width:54px !important;
+    height:54px !important;
+    font-size:30px !important;
+    margin:0 auto 5px !important;
+  }
+
+  .side h2{
+    font-size:12px !important;
+    margin:0 0 8px !important;
+    line-height:1.5 !important;
+  }
+
+  .nav{
+    display:flex !important;
+    gap:7px !important;
+    overflow-x:auto !important;
+    padding:3px 0 5px !important;
+    scroll-snap-type:x proximity !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+
+  .nav button{
+    width:auto !important;
+    min-width:112px !important;
+    height:38px !important;
+    margin:0 !important;
+    padding:0 10px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    font-size:12px !important;
+    border-radius:10px !important;
+    flex:0 0 auto !important;
+    scroll-snap-align:start !important;
+  }
+
+  .main{
+    width:100% !important;
+    min-width:0 !important;
+    padding:10px 8px 96px !important;
+  }
+
+  .header{
+    display:block !important;
+    text-align:center !important;
+    margin-bottom:8px !important;
+    min-width:0 !important;
+  }
+
+  .header h1{
+    font-size:20px !important;
+    line-height:1.55 !important;
+    margin:4px 0 8px !important;
+    padding:0 4px !important;
+  }
+
+  .update{
+    position:static !important;
+    width:100% !important;
+    max-width:360px !important;
+    margin:0 auto 8px !important;
+    padding:8px 10px !important;
+    font-size:11px !important;
+  }
+
+  .cards,
+  .failCards,
+  .health,
+  .statsTop{
+    display:grid !important;
+    grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+    gap:8px !important;
+    margin:8px 0 !important;
+  }
+
+  .card,
+  .statsMini{
+    min-width:0 !important;
+    min-height:78px !important;
+    padding:8px 5px !important;
+    border-radius:12px !important;
+  }
+
+  .card .ico{
+    height:auto !important;
+    font-size:17px !important;
+    margin-bottom:2px !important;
+  }
+
+  .card b,
+  .statsMini b{
+    font-size:18px !important;
+    line-height:1.25 !important;
+  }
+
+  .card span,
+  .card small,
+  .statsMini span{
+    font-size:10px !important;
+    line-height:1.45 !important;
+  }
+
+  .percent{
+    gap:5px !important;
+    flex-direction:column !important;
+  }
+
+  .ring{
+    width:46px !important;
+    height:46px !important;
+  }
+
+  .ring:after{
+    width:34px !important;
+    height:34px !important;
+  }
+
+  .panel{
+    padding:9px !important;
+    border-radius:14px !important;
+    min-width:0 !important;
+  }
+
+  .panelTitle{
+    font-size:15px !important;
+  }
+
+  .toolbar{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:7px !important;
+    align-items:stretch !important;
+  }
+
+  .toolbar button,
+  .toolbar .btn,
+  .toolbar .btn2,
+  .toolbar select{
+    width:100% !important;
+    min-width:0 !important;
+    height:40px !important;
+    padding:8px 7px !important;
+    font-size:11px !important;
+  }
+
+  .toolbar .search{
+    grid-column:1 / -1 !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    margin:0 !important;
+  }
+
+  .search input{
+    min-width:0 !important;
+    font-size:12px !important;
+  }
+
+  .tableWrap,
+  .bfLeaderTableWrap,
+  .bfHealthHistory,
+  .commRecipients,
+  .commQueueList{
+    width:100% !important;
+    max-width:100% !important;
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+
+  table,
+  .bfLeaderTable,
+  .bfHealthHistory table{
+    min-width:900px !important;
+    width:max-content !important;
+  }
+
+  th, td{
+    padding:7px 6px !important;
+    font-size:11px !important;
+    white-space:nowrap !important;
+  }
+
+  .form,
+  .commCenterBox,
+  .commQueueBox,
+  .leaderBox,
+  .scheduleBox,
+  .bfLeaderWindow,
+  .bfHealthWindow,
+  .bfCodeBox{
+    width:96vw !important;
+    max-width:96vw !important;
+    max-height:92vh !important;
+    border-radius:16px !important;
+  }
+
+  .formGrid,
+  .formActions,
+  .commCommanderCards,
+  .commSelectors,
+  .commActionBtns,
+  .commMainGrid,
+  .commQueueActions,
+  .leaderCards,
+  .leaderGrid,
+  .scheduleForm,
+  .leaderActions,
+  .bfLeaderCards,
+  .bfLeaderGrid,
+  .bfLeaderActions,
+  .bfHealthGrid,
+  .bfHealthSummary,
+  .bfHealthActions,
+  .bfHealthOcrRow,
+  .tasksGrid{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+  }
+
+  .commCenterHeader,
+  .leaderHeader,
+  .bfLeaderTop,
+  .bfHealthTop,
+  .bfCodeHead{
+    align-items:flex-start !important;
+    flex-direction:column !important;
+    gap:8px !important;
+  }
+
+  .commCenterHeader h2,
+  .leaderHeader h2,
+  .bfLeaderTop h2,
+  .bfHealthTop h2,
+  .bfCodeHead h3{
+    font-size:17px !important;
+    line-height:1.5 !important;
+  }
+
+  .commCenterBody,
+  .leaderBody,
+  .bfLeaderContent,
+  .bfHealthContent,
+  .bfCodeContent{
+    padding:10px !important;
+  }
+
+  #commPhones,
+  #commMessage,
+  #broadcastPhones,
+  .bfMsgBox,
+  .bfCodeContent textarea{
+    font-size:12px !important;
+  }
+
+  .statsHero{
+    padding:8px 4px 12px !important;
+  }
+
+  .statsHero h2{
+    font-size:21px !important;
+    line-height:1.5 !important;
+  }
+
+  .goldDivider{
+    margin:6px 0 12px !important;
+  }
+
+  .goldDivider span{
+    width:44px !important;
+  }
+
+  #bfLeaderHealthFloat,
+  #bfHealthFloatingBtn,
+  .commFloatingBtn,
+  .leaderFloatingBtn{
+    left:8px !important;
+    right:auto !important;
+    width:120px !important;
+    min-width:120px !important;
+    max-width:120px !important;
+    height:38px !important;
+    font-size:10px !important;
+    z-index:9997 !important;
+  }
+
+  .commFloatingBtn button,
+  .leaderFloatingBtn button{
+    width:120px !important;
+    height:38px !important;
+    padding:0 6px !important;
+    font-size:10px !important;
+    white-space:normal !important;
+    line-height:1.2 !important;
+  }
+
+  #bfLeaderHealthFloat{bottom:132px !important;}
+  #bfHealthFloatingBtn{bottom:88px !important;}
+  .leaderFloatingBtn{bottom:44px !important;}
+  .commFloatingBtn{bottom:6px !important;}
+
+}
+
+@media (max-width: 420px){
+  .cards,
+  .failCards,
+  .health,
+  .statsTop{
+    grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .header h1{
+    font-size:18px !important;
+  }
+
+  .card b,
+  .statsMini b{
+    font-size:16px !important;
+  }
+
+  .toolbar{
+    grid-template-columns:1fr !important;
+  }
+}
+</style>
+
 </head>
 <body>
 
