@@ -2637,7 +2637,37 @@ const seed=[
 {name:'زيد زايد العوفي',rank:'رقيب أول',id:'654785',age:24,height:175,weight:72,duty:'اجتاز',skills:'اجتاز',fit:'اجتاز',march:'اجتاز',shoot:'اجتاز',cross:'اجتاز',notes:''},
 {name:'نواف سلمان الحارثي',rank:'جندي',id:'523146',age:32,height:173,weight:86,duty:'لم يجتاز',skills:'لم يجتاز',fit:'لم يجتاز',march:'اجتاز',shoot:'لم يجتاز',cross:'اجتاز',notes:''}
 ];
-let data=JSON.parse(localStorage.getItem('brave_fighter_final_v1')||'null')||seed;
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzwVW0LO-6jC6TErVbDrtRpoP5j7H-W50F42lT5Tqqln7HqxZmtSnwnxCcjcTroBiIA/exec';
+
+let data = JSON.parse(localStorage.getItem('brave_fighter_final_v1') || 'null') || seed;
+
+async function loadFromSheets(){
+  try{
+    const res = await fetch(GOOGLE_SHEETS_URL);
+    const rows = await res.json();
+
+    if(Array.isArray(rows) && rows.length){
+      data = rows.map(r => ({
+        id: r["الرقم العسكري"] || r["الرقم_العسكري"] || "",
+        name: r["الاسم"] || "",
+        rank: r["الرتبة"] || "",
+        date: r["التاريخ"] || "",
+        steps: r["عدد الخطوات"] || r["عدد_الخطوات"] || 0,
+        km: r["المسافة كم"] || r["المسافة_كم"] || "",
+        cal: r["السعرات الحرارية"] || r["السعرات_الحرارية"] || "",
+        weight: r["الوزن"] || "",
+        activity: r["حالة النشاط"] || r["حالة_النشاط"] || "",
+        weightStatus: r["حالة الوزن"] || r["حالة_الوزن"] || "",
+        notes: r["ملاحظات"] || ""
+      }));
+
+      save();
+      render();
+    }
+  }catch(e){
+    console.log("تعذر تحميل بيانات Google Sheets", e);
+  }
+}
 let editIndex=null;
 const $=id=>document.getElementById(id);
 const pass=v=>v==='اجتاز';
@@ -3477,7 +3507,10 @@ function printDatabaseReport(){
 
 function backupJSON(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='backup_brave_fighter_final.json';a.click()}
 function restoreJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();render()}catch{alert('ملف غير صالح')}};r.readAsText(f)}
-render();setInterval(render,60000);
+
+  render();
+loadFromSheets();
+setInterval(loadFromSheets,60000);
 
 let commQueue = [];
 let commQueueIndex = 0;
