@@ -681,46 +681,111 @@ function printUnitTable(unitName){let st=unitStats(unitName);let rows=st.list.ma
 @keyframes examToastIn{from{transform:translate(-50%,-18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 </style>
 
-<!-- PATCH V35: إصلاح نهائي لقراءة وقت الاختبار القادم من Google Sheets على الجوال -->
-<script id="v35-mobile-sheet-time-normalizer">
+
+<!-- PATCH V33: فتح اختبار الجوال من Google Sheets بصيغ تاريخ ووقت نظيفة -->
+<script id="v33-mobile-exam-open-clean-time-final">
 (function(){
-  function toLatin(v){return String(v||'').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)}).replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)});}
-  function nDate(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(20\d{2}|19\d{2})[-\/]\s*(\d{1,2})[-\/]\s*(\d{1,2})/);
-    if(m)return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
-    m=s.match(/(\d{1,2})[-\/]\s*(\d{1,2})[-\/]\s*((?:20|19)\d{2})/);
-    if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
-    var d=new Date(s); if(!isNaN(d.getTime()))return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var APPS_URL=(window.GOOGLE_SCRIPT_URL&&String(window.GOOGLE_SCRIPT_URL).indexOf('/exec')>-1)?window.GOOGLE_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzVQvtAYupkAYBN4ZdtgAcfk2Gyc66os2rRIx1TxDMxYjvAStpXZLzMTN6E6Ku7UFNBFA/exec';
+  window.GOOGLE_SCRIPT_URL=APPS_URL;
+
+  function pad2(n){n=Number(n)||0;return (n<10?'0':'')+n;}
+  function esc(s){try{if(typeof escapeHtml==='function')return escapeHtml(s||'');}catch(e){}return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function unitName(unitId){try{if(typeof unitNameById==='function')return unitNameById(unitId);}catch(e){}var m={maintenance:'الصيانة',supply:'الإمداد',transport:'النقل',signal:'الإشارة'};return m[unitId]||unitId;}
+  function normalizeUnit(unitId){
+    var s=String(unitId||'').trim();
+    var map={'الصيانة':'maintenance','MAINTENANCE':'maintenance','maintenance':'maintenance','الإمداد':'supply','الامداد':'supply','SUPPLY':'supply','supply':'supply','النقل':'transport','TRANSPORT':'transport','transport':'transport','الإشارة':'signal','الاشارة':'signal','SIGNAL':'signal','signal':'signal'};
+    try{if(typeof normalizeUnitSafe==='function')return normalizeUnitSafe(s);}catch(e){}
+    return map[s]||s||'maintenance';
+  }
+  function ymdFromDate(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+  function hmFromDate(d){return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+  function cleanDate(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return ymdFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    // ISO أولاً حتى لا نأخذ تاريخ UTC ناقص يوم
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime())&&d.getFullYear()>2000)return ymdFromDate(d);}
+    var m=s.match(/(20\d{2})[\/\-](\d{1,2})[\/\-](\d{1,2})/); if(m)return m[1]+'-'+pad2(m[2])+'-'+pad2(m[3]);
+    m=s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](20\d{2})/); if(m)return m[3]+'-'+pad2(m[2])+'-'+pad2(m[1]);
+    var d2=new Date(s); if(!isNaN(d2.getTime())&&d2.getFullYear()>2000)return ymdFromDate(d2);
     return s;
   }
-  function nTime(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(?:T|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(!m)m=s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(m)return String(m[1]).padStart(2,'0')+':'+m[2];
-    var d=new Date(s); if(!isNaN(d.getTime()))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  function cleanTime(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return hmFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime()))return hmFromDate(d);}
+    if(/^\d+(\.\d+)?$/.test(s)){var num=Number(s);if(num>0&&num<1){var mins=Math.round(num*24*60);return pad2(Math.floor(mins/60))+':'+pad2(mins%60);}}
+    var pm=/م|مساء|PM/i.test(s), am=/ص|صباح|AM/i.test(s);
+    var m=s.match(/(\d{1,2}):(\d{2})/); if(m){var h=Number(m[1]), mm=Number(m[2]);if(pm&&h<12)h+=12;if(am&&h===12)h=0;return pad2(h)+':'+pad2(mm);}
+    m=s.match(/(\d{1,2})[^\d]+(\d{2})/); if(m){var hh=Number(m[1]), mn=Number(m[2]);if(pm&&hh<12)hh+=12;if(am&&hh===12)hh=0;return pad2(hh)+':'+pad2(mn);}
     return s;
   }
-  window.normalizeExamDateForMobile=nDate;
-  window.normalizeExamTimeForMobile=nTime;
-  window.examStartMsSafe=function(exam){
-    var d=nDate(exam&&exam.startDate),t=nTime(exam&&exam.startTime);
-    if(!d||!t)return NaN;
-    if(t.length===5)t+=':00';
-    var ms=new Date(d+'T'+t).getTime();
-    return isNaN(ms)?NaN:ms;
-  };
-  window.examStatus=function(exam){
-    if(!exam||!exam.startDate||!exam.startTime)return exam&&exam.sent?'جاهز':'قيد الإعداد';
-    var st=window.examStartMsSafe(exam);
-    if(isNaN(st))return exam.sent?'جاهز':'قيد الإعداد';
-    var en=st+(Number(exam.duration)||30)*60000,now=Date.now();
-    if(now<st)return 'قادم';
-    if(now>=st&&now<en)return 'مفتوح الآن';
+  function normalizeQuestion(q,i){
+    q=q||{}; var id=String(q.id||q.qid||('Q_'+i));
+    var text=String(q.text||q.q||q.question||'سؤال');
+    var opts=Array.isArray(q.options)?q.options:(Array.isArray(q.opts)?q.opts:['صح','خطأ']);
+    var answer=(q.answer!==undefined?q.answer:(q.correct!==undefined?q.correct:''));
+    return {id:id,type:q.type||'mcq',text:text,options:opts,answer:String(answer)};
+  }
+  function normalizeExam(data,unitId,examId){
+    data=data||{}; unitId=normalizeUnit(data.unit||unitId);
+    var qs=data.questions||[]; if(typeof qs==='string'){try{qs=JSON.parse(qs||'[]')}catch(e){qs=[];}}
+    if(!Array.isArray(qs))qs=[]; qs=qs.map(normalizeQuestion);
+    return {id:String(data.examId||data.id||examId||''),unitId:unitId,unit:unitId,title:String(data.examTitle||data.title||'اختبار'),examTitle:String(data.examTitle||data.title||'اختبار'),sent:true,status:'جاهز',startDate:cleanDate(data.startDate),startTime:cleanTime(data.startTime),duration:Number(data.duration||30),passScore:Number(data.passScore||60),questions:qs,results:[]};
+  }
+  function getStatus(exam){
+    var sd=cleanDate(exam.startDate), st=cleanTime(exam.startTime);
+    exam.startDate=sd; exam.startTime=st;
+    if(!sd||!st)return 'جاهز';
+    var start=new Date(sd+'T'+st+':00');
+    if(isNaN(start.getTime()))return 'جاهز';
+    var end=new Date(start.getTime()+(Number(exam.duration)||30)*60000);
+    var now=new Date();
+    if(now<start)return 'قادم';
+    if(now>=start&&now<=end)return 'مفتوح الآن';
     return 'منتهي';
+  }
+  window.examStatus=function(exam){return getStatus(exam||{});};
+  function saveLocal(unitId,exam){
+    try{unitId=normalizeUnit(unitId); if(!window.unitTestsStore)window.unitTestsStore={}; if(!unitTestsStore[unitId])unitTestsStore[unitId]=[]; var idx=unitTestsStore[unitId].findIndex(function(x){return String(x.id)===String(exam.id)}); if(idx>=0)unitTestsStore[unitId][idx]=Object.assign({},unitTestsStore[unitId][idx],exam); else unitTestsStore[unitId].push(exam); if(typeof saveExamStore==='function')saveExamStore();}catch(e){}
+  }
+  function fetchExam(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var url=APPS_URL+'?type=exam&unit='+encodeURIComponent(unitId)+'&examId='+encodeURIComponent(examId)+'&t='+Date.now();
+    return fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)return null;var ex=normalizeExam(d,unitId,examId);saveLocal(unitId,ex);return ex;}).catch(function(e){console.warn('V33 fetch failed',e);return null;});
+  }
+  function renderExam(unitId,exam){
+    unitId=normalizeUnit(unitId); exam=normalizeExam(exam,unitId,exam&&exam.id);
+    var status=getStatus(exam), allow=status==='مفتوح الآن'||(!exam.startDate&&!exam.startTime);
+    var modal=document.getElementById('addModal'); if(!modal)return;
+    modal.className='modalOverlay active examFullScreen'; modal.style.display='block';
+    var closedMsg=status==='قادم'?'الاختبار لم يبدأ بعد':'انتهى وقت الاختبار';
+    var when=(exam.startDate||'لم يحدد')+' '+(exam.startTime||'لم يحدد');
+    if(!allow){modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><div class="card" style="text-align:center"><h3 style="color:var(--gold2);font-size:26px">'+closedMsg+'</h3><p style="font-size:18px;color:var(--paper)">موعد الاختبار: '+esc(when)+'</p></div></div>'; return;}
+    var ranks=['لواء','عميد','عقيد','مقدم','رائد','نقيب','ملازم أول','ملازم','رئيس رقباء','رقيب أول','رقيب','وكيل رقيب','عريف','جندي أول','جندي'];
+    modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p><p style="color:var(--muted)">موعد الاختبار: '+esc(when)+' - المدة: '+esc(exam.duration)+' دقيقة</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><form class="card" onsubmit="submitTraineeExam(event,\''+unitId+'\',\''+esc(exam.id)+'\')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>'+ranks.map(function(r){return '<option>'+r+'</option>'}).join('')+'</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="'+esc(unitName(unitId))+'"></div></div><div class="examTimer" id="examTimer">الوقت المحدد: '+esc(exam.duration)+' دقيقة</div>'+exam.questions.map(function(q,i){return '<div class="savedQuestion"><b>'+(i+1)+'. '+esc(q.text)+'</b>'+q.options.map(function(op){return '<label class="examAnswer"><input type="radio" name="q_'+esc(q.id)+'" value="'+esc(op)+'" required> '+esc(op)+'</label>'}).join('')+'</div>'}).join('')+'<button class="btn primary" style="width:100%;margin-top:15px">تسليم الاختبار</button></form></div>';
+  }
+  window.openTraineeExam=function(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var modal=document.getElementById('addModal'); if(modal){modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML='<div class="examEditorPanel"><div class="card" style="text-align:center"><h2 style="color:var(--gold2)">جاري تحميل الاختبار...</h2><p style="color:var(--muted)">يتم جلب الاختبار من Google Sheets</p></div></div>';}
+    fetchExam(unitId,examId).then(function(exam){
+      if(exam){renderExam(unitId,exam);return;}
+      try{if(typeof getExam==='function'){var local=getExam(unitId,examId);if(local){renderExam(unitId,local);return;}}}catch(e){}
+      if(modal){modal.style.display='none';modal.innerHTML='';} alert('لم يتم العثور على الاختبار في Google Sheets. احفظ الاختبار ثم أرسله للوحدة مرة أخرى.');
+    });
+  };
+  window.submitTraineeExam=function(ev,unitId,examId){
+    ev.preventDefault(); unitId=normalizeUnit(unitId);
+    var e=null; try{if(typeof getExam==='function')e=getExam(unitId,examId);}catch(err){}
+    if(!e){alert('لم يتم العثور على الاختبار. أعد فتح الرابط.');return;}
+    e=normalizeExam(e,unitId,examId);
+    var fd=new FormData(ev.target), num=(fd.get('num')||'').trim();
+    var total=e.questions.length, correct=0; e.questions.forEach(function(q){if(String(fd.get('q_'+q.id))===String(q.answer))correct++;});
+    var percent=total?Math.round((correct/total)*100):0, passed=percent>=Number(e.passScore||60);
+    var payload={type:'exam_result',name:fd.get('name')||'',rank:fd.get('rank')||'',militaryId:num,unit:fd.get('unit')||unitName(unitId),examTitle:e.title,score:correct+' / '+total,percent:percent,status:passed?'ناجح':'راسب'};
+    try{fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});}catch(_e){}
+    var modal=document.getElementById('addModal'); if(modal)modal.innerHTML='<div class="examEditorPanel"><div class="card certificate"><h2>نتيجة الاختبار</h2><h3>'+esc(payload.name)+'</h3><p>الدرجة: '+correct+' من '+total+' - النسبة '+percent+'%</p><p class="'+(passed?'certPass':'certFail')+'">'+(passed?'ناجح':'راسب')+'</p><div class="actionRow"><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div></div></div>';
   };
 })();
 </script>
@@ -1092,46 +1157,111 @@ function printHealthTable(unitName){
 @keyframes examToastIn{from{transform:translate(-50%,-18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 </style>
 
-<!-- PATCH V35: إصلاح نهائي لقراءة وقت الاختبار القادم من Google Sheets على الجوال -->
-<script id="v35-mobile-sheet-time-normalizer">
+
+<!-- PATCH V33: فتح اختبار الجوال من Google Sheets بصيغ تاريخ ووقت نظيفة -->
+<script id="v33-mobile-exam-open-clean-time-final">
 (function(){
-  function toLatin(v){return String(v||'').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)}).replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)});}
-  function nDate(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(20\d{2}|19\d{2})[-\/]\s*(\d{1,2})[-\/]\s*(\d{1,2})/);
-    if(m)return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
-    m=s.match(/(\d{1,2})[-\/]\s*(\d{1,2})[-\/]\s*((?:20|19)\d{2})/);
-    if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
-    var d=new Date(s); if(!isNaN(d.getTime()))return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var APPS_URL=(window.GOOGLE_SCRIPT_URL&&String(window.GOOGLE_SCRIPT_URL).indexOf('/exec')>-1)?window.GOOGLE_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzVQvtAYupkAYBN4ZdtgAcfk2Gyc66os2rRIx1TxDMxYjvAStpXZLzMTN6E6Ku7UFNBFA/exec';
+  window.GOOGLE_SCRIPT_URL=APPS_URL;
+
+  function pad2(n){n=Number(n)||0;return (n<10?'0':'')+n;}
+  function esc(s){try{if(typeof escapeHtml==='function')return escapeHtml(s||'');}catch(e){}return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function unitName(unitId){try{if(typeof unitNameById==='function')return unitNameById(unitId);}catch(e){}var m={maintenance:'الصيانة',supply:'الإمداد',transport:'النقل',signal:'الإشارة'};return m[unitId]||unitId;}
+  function normalizeUnit(unitId){
+    var s=String(unitId||'').trim();
+    var map={'الصيانة':'maintenance','MAINTENANCE':'maintenance','maintenance':'maintenance','الإمداد':'supply','الامداد':'supply','SUPPLY':'supply','supply':'supply','النقل':'transport','TRANSPORT':'transport','transport':'transport','الإشارة':'signal','الاشارة':'signal','SIGNAL':'signal','signal':'signal'};
+    try{if(typeof normalizeUnitSafe==='function')return normalizeUnitSafe(s);}catch(e){}
+    return map[s]||s||'maintenance';
+  }
+  function ymdFromDate(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+  function hmFromDate(d){return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+  function cleanDate(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return ymdFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    // ISO أولاً حتى لا نأخذ تاريخ UTC ناقص يوم
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime())&&d.getFullYear()>2000)return ymdFromDate(d);}
+    var m=s.match(/(20\d{2})[\/\-](\d{1,2})[\/\-](\d{1,2})/); if(m)return m[1]+'-'+pad2(m[2])+'-'+pad2(m[3]);
+    m=s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](20\d{2})/); if(m)return m[3]+'-'+pad2(m[2])+'-'+pad2(m[1]);
+    var d2=new Date(s); if(!isNaN(d2.getTime())&&d2.getFullYear()>2000)return ymdFromDate(d2);
     return s;
   }
-  function nTime(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(?:T|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(!m)m=s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(m)return String(m[1]).padStart(2,'0')+':'+m[2];
-    var d=new Date(s); if(!isNaN(d.getTime()))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  function cleanTime(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return hmFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime()))return hmFromDate(d);}
+    if(/^\d+(\.\d+)?$/.test(s)){var num=Number(s);if(num>0&&num<1){var mins=Math.round(num*24*60);return pad2(Math.floor(mins/60))+':'+pad2(mins%60);}}
+    var pm=/م|مساء|PM/i.test(s), am=/ص|صباح|AM/i.test(s);
+    var m=s.match(/(\d{1,2}):(\d{2})/); if(m){var h=Number(m[1]), mm=Number(m[2]);if(pm&&h<12)h+=12;if(am&&h===12)h=0;return pad2(h)+':'+pad2(mm);}
+    m=s.match(/(\d{1,2})[^\d]+(\d{2})/); if(m){var hh=Number(m[1]), mn=Number(m[2]);if(pm&&hh<12)hh+=12;if(am&&hh===12)hh=0;return pad2(hh)+':'+pad2(mn);}
     return s;
   }
-  window.normalizeExamDateForMobile=nDate;
-  window.normalizeExamTimeForMobile=nTime;
-  window.examStartMsSafe=function(exam){
-    var d=nDate(exam&&exam.startDate),t=nTime(exam&&exam.startTime);
-    if(!d||!t)return NaN;
-    if(t.length===5)t+=':00';
-    var ms=new Date(d+'T'+t).getTime();
-    return isNaN(ms)?NaN:ms;
-  };
-  window.examStatus=function(exam){
-    if(!exam||!exam.startDate||!exam.startTime)return exam&&exam.sent?'جاهز':'قيد الإعداد';
-    var st=window.examStartMsSafe(exam);
-    if(isNaN(st))return exam.sent?'جاهز':'قيد الإعداد';
-    var en=st+(Number(exam.duration)||30)*60000,now=Date.now();
-    if(now<st)return 'قادم';
-    if(now>=st&&now<en)return 'مفتوح الآن';
+  function normalizeQuestion(q,i){
+    q=q||{}; var id=String(q.id||q.qid||('Q_'+i));
+    var text=String(q.text||q.q||q.question||'سؤال');
+    var opts=Array.isArray(q.options)?q.options:(Array.isArray(q.opts)?q.opts:['صح','خطأ']);
+    var answer=(q.answer!==undefined?q.answer:(q.correct!==undefined?q.correct:''));
+    return {id:id,type:q.type||'mcq',text:text,options:opts,answer:String(answer)};
+  }
+  function normalizeExam(data,unitId,examId){
+    data=data||{}; unitId=normalizeUnit(data.unit||unitId);
+    var qs=data.questions||[]; if(typeof qs==='string'){try{qs=JSON.parse(qs||'[]')}catch(e){qs=[];}}
+    if(!Array.isArray(qs))qs=[]; qs=qs.map(normalizeQuestion);
+    return {id:String(data.examId||data.id||examId||''),unitId:unitId,unit:unitId,title:String(data.examTitle||data.title||'اختبار'),examTitle:String(data.examTitle||data.title||'اختبار'),sent:true,status:'جاهز',startDate:cleanDate(data.startDate),startTime:cleanTime(data.startTime),duration:Number(data.duration||30),passScore:Number(data.passScore||60),questions:qs,results:[]};
+  }
+  function getStatus(exam){
+    var sd=cleanDate(exam.startDate), st=cleanTime(exam.startTime);
+    exam.startDate=sd; exam.startTime=st;
+    if(!sd||!st)return 'جاهز';
+    var start=new Date(sd+'T'+st+':00');
+    if(isNaN(start.getTime()))return 'جاهز';
+    var end=new Date(start.getTime()+(Number(exam.duration)||30)*60000);
+    var now=new Date();
+    if(now<start)return 'قادم';
+    if(now>=start&&now<=end)return 'مفتوح الآن';
     return 'منتهي';
+  }
+  window.examStatus=function(exam){return getStatus(exam||{});};
+  function saveLocal(unitId,exam){
+    try{unitId=normalizeUnit(unitId); if(!window.unitTestsStore)window.unitTestsStore={}; if(!unitTestsStore[unitId])unitTestsStore[unitId]=[]; var idx=unitTestsStore[unitId].findIndex(function(x){return String(x.id)===String(exam.id)}); if(idx>=0)unitTestsStore[unitId][idx]=Object.assign({},unitTestsStore[unitId][idx],exam); else unitTestsStore[unitId].push(exam); if(typeof saveExamStore==='function')saveExamStore();}catch(e){}
+  }
+  function fetchExam(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var url=APPS_URL+'?type=exam&unit='+encodeURIComponent(unitId)+'&examId='+encodeURIComponent(examId)+'&t='+Date.now();
+    return fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)return null;var ex=normalizeExam(d,unitId,examId);saveLocal(unitId,ex);return ex;}).catch(function(e){console.warn('V33 fetch failed',e);return null;});
+  }
+  function renderExam(unitId,exam){
+    unitId=normalizeUnit(unitId); exam=normalizeExam(exam,unitId,exam&&exam.id);
+    var status=getStatus(exam), allow=status==='مفتوح الآن'||(!exam.startDate&&!exam.startTime);
+    var modal=document.getElementById('addModal'); if(!modal)return;
+    modal.className='modalOverlay active examFullScreen'; modal.style.display='block';
+    var closedMsg=status==='قادم'?'الاختبار لم يبدأ بعد':'انتهى وقت الاختبار';
+    var when=(exam.startDate||'لم يحدد')+' '+(exam.startTime||'لم يحدد');
+    if(!allow){modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><div class="card" style="text-align:center"><h3 style="color:var(--gold2);font-size:26px">'+closedMsg+'</h3><p style="font-size:18px;color:var(--paper)">موعد الاختبار: '+esc(when)+'</p></div></div>'; return;}
+    var ranks=['لواء','عميد','عقيد','مقدم','رائد','نقيب','ملازم أول','ملازم','رئيس رقباء','رقيب أول','رقيب','وكيل رقيب','عريف','جندي أول','جندي'];
+    modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p><p style="color:var(--muted)">موعد الاختبار: '+esc(when)+' - المدة: '+esc(exam.duration)+' دقيقة</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><form class="card" onsubmit="submitTraineeExam(event,\''+unitId+'\',\''+esc(exam.id)+'\')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>'+ranks.map(function(r){return '<option>'+r+'</option>'}).join('')+'</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="'+esc(unitName(unitId))+'"></div></div><div class="examTimer" id="examTimer">الوقت المحدد: '+esc(exam.duration)+' دقيقة</div>'+exam.questions.map(function(q,i){return '<div class="savedQuestion"><b>'+(i+1)+'. '+esc(q.text)+'</b>'+q.options.map(function(op){return '<label class="examAnswer"><input type="radio" name="q_'+esc(q.id)+'" value="'+esc(op)+'" required> '+esc(op)+'</label>'}).join('')+'</div>'}).join('')+'<button class="btn primary" style="width:100%;margin-top:15px">تسليم الاختبار</button></form></div>';
+  }
+  window.openTraineeExam=function(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var modal=document.getElementById('addModal'); if(modal){modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML='<div class="examEditorPanel"><div class="card" style="text-align:center"><h2 style="color:var(--gold2)">جاري تحميل الاختبار...</h2><p style="color:var(--muted)">يتم جلب الاختبار من Google Sheets</p></div></div>';}
+    fetchExam(unitId,examId).then(function(exam){
+      if(exam){renderExam(unitId,exam);return;}
+      try{if(typeof getExam==='function'){var local=getExam(unitId,examId);if(local){renderExam(unitId,local);return;}}}catch(e){}
+      if(modal){modal.style.display='none';modal.innerHTML='';} alert('لم يتم العثور على الاختبار في Google Sheets. احفظ الاختبار ثم أرسله للوحدة مرة أخرى.');
+    });
+  };
+  window.submitTraineeExam=function(ev,unitId,examId){
+    ev.preventDefault(); unitId=normalizeUnit(unitId);
+    var e=null; try{if(typeof getExam==='function')e=getExam(unitId,examId);}catch(err){}
+    if(!e){alert('لم يتم العثور على الاختبار. أعد فتح الرابط.');return;}
+    e=normalizeExam(e,unitId,examId);
+    var fd=new FormData(ev.target), num=(fd.get('num')||'').trim();
+    var total=e.questions.length, correct=0; e.questions.forEach(function(q){if(String(fd.get('q_'+q.id))===String(q.answer))correct++;});
+    var percent=total?Math.round((correct/total)*100):0, passed=percent>=Number(e.passScore||60);
+    var payload={type:'exam_result',name:fd.get('name')||'',rank:fd.get('rank')||'',militaryId:num,unit:fd.get('unit')||unitName(unitId),examTitle:e.title,score:correct+' / '+total,percent:percent,status:passed?'ناجح':'راسب'};
+    try{fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});}catch(_e){}
+    var modal=document.getElementById('addModal'); if(modal)modal.innerHTML='<div class="examEditorPanel"><div class="card certificate"><h2>نتيجة الاختبار</h2><h3>'+esc(payload.name)+'</h3><p>الدرجة: '+correct+' من '+total+' - النسبة '+percent+'%</p><p class="'+(passed?'certPass':'certFail')+'">'+(passed?'ناجح':'راسب')+'</p><div class="actionRow"><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div></div></div>';
   };
 })();
 </script>
@@ -1324,46 +1454,111 @@ function printStudentReport(){let html=document.getElementById('studentReport').
 @keyframes examToastIn{from{transform:translate(-50%,-18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 </style>
 
-<!-- PATCH V35: إصلاح نهائي لقراءة وقت الاختبار القادم من Google Sheets على الجوال -->
-<script id="v35-mobile-sheet-time-normalizer">
+
+<!-- PATCH V33: فتح اختبار الجوال من Google Sheets بصيغ تاريخ ووقت نظيفة -->
+<script id="v33-mobile-exam-open-clean-time-final">
 (function(){
-  function toLatin(v){return String(v||'').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)}).replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)});}
-  function nDate(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(20\d{2}|19\d{2})[-\/]\s*(\d{1,2})[-\/]\s*(\d{1,2})/);
-    if(m)return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
-    m=s.match(/(\d{1,2})[-\/]\s*(\d{1,2})[-\/]\s*((?:20|19)\d{2})/);
-    if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
-    var d=new Date(s); if(!isNaN(d.getTime()))return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var APPS_URL=(window.GOOGLE_SCRIPT_URL&&String(window.GOOGLE_SCRIPT_URL).indexOf('/exec')>-1)?window.GOOGLE_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzVQvtAYupkAYBN4ZdtgAcfk2Gyc66os2rRIx1TxDMxYjvAStpXZLzMTN6E6Ku7UFNBFA/exec';
+  window.GOOGLE_SCRIPT_URL=APPS_URL;
+
+  function pad2(n){n=Number(n)||0;return (n<10?'0':'')+n;}
+  function esc(s){try{if(typeof escapeHtml==='function')return escapeHtml(s||'');}catch(e){}return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function unitName(unitId){try{if(typeof unitNameById==='function')return unitNameById(unitId);}catch(e){}var m={maintenance:'الصيانة',supply:'الإمداد',transport:'النقل',signal:'الإشارة'};return m[unitId]||unitId;}
+  function normalizeUnit(unitId){
+    var s=String(unitId||'').trim();
+    var map={'الصيانة':'maintenance','MAINTENANCE':'maintenance','maintenance':'maintenance','الإمداد':'supply','الامداد':'supply','SUPPLY':'supply','supply':'supply','النقل':'transport','TRANSPORT':'transport','transport':'transport','الإشارة':'signal','الاشارة':'signal','SIGNAL':'signal','signal':'signal'};
+    try{if(typeof normalizeUnitSafe==='function')return normalizeUnitSafe(s);}catch(e){}
+    return map[s]||s||'maintenance';
+  }
+  function ymdFromDate(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+  function hmFromDate(d){return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+  function cleanDate(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return ymdFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    // ISO أولاً حتى لا نأخذ تاريخ UTC ناقص يوم
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime())&&d.getFullYear()>2000)return ymdFromDate(d);}
+    var m=s.match(/(20\d{2})[\/\-](\d{1,2})[\/\-](\d{1,2})/); if(m)return m[1]+'-'+pad2(m[2])+'-'+pad2(m[3]);
+    m=s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](20\d{2})/); if(m)return m[3]+'-'+pad2(m[2])+'-'+pad2(m[1]);
+    var d2=new Date(s); if(!isNaN(d2.getTime())&&d2.getFullYear()>2000)return ymdFromDate(d2);
     return s;
   }
-  function nTime(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(?:T|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(!m)m=s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(m)return String(m[1]).padStart(2,'0')+':'+m[2];
-    var d=new Date(s); if(!isNaN(d.getTime()))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  function cleanTime(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return hmFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime()))return hmFromDate(d);}
+    if(/^\d+(\.\d+)?$/.test(s)){var num=Number(s);if(num>0&&num<1){var mins=Math.round(num*24*60);return pad2(Math.floor(mins/60))+':'+pad2(mins%60);}}
+    var pm=/م|مساء|PM/i.test(s), am=/ص|صباح|AM/i.test(s);
+    var m=s.match(/(\d{1,2}):(\d{2})/); if(m){var h=Number(m[1]), mm=Number(m[2]);if(pm&&h<12)h+=12;if(am&&h===12)h=0;return pad2(h)+':'+pad2(mm);}
+    m=s.match(/(\d{1,2})[^\d]+(\d{2})/); if(m){var hh=Number(m[1]), mn=Number(m[2]);if(pm&&hh<12)hh+=12;if(am&&hh===12)hh=0;return pad2(hh)+':'+pad2(mn);}
     return s;
   }
-  window.normalizeExamDateForMobile=nDate;
-  window.normalizeExamTimeForMobile=nTime;
-  window.examStartMsSafe=function(exam){
-    var d=nDate(exam&&exam.startDate),t=nTime(exam&&exam.startTime);
-    if(!d||!t)return NaN;
-    if(t.length===5)t+=':00';
-    var ms=new Date(d+'T'+t).getTime();
-    return isNaN(ms)?NaN:ms;
-  };
-  window.examStatus=function(exam){
-    if(!exam||!exam.startDate||!exam.startTime)return exam&&exam.sent?'جاهز':'قيد الإعداد';
-    var st=window.examStartMsSafe(exam);
-    if(isNaN(st))return exam.sent?'جاهز':'قيد الإعداد';
-    var en=st+(Number(exam.duration)||30)*60000,now=Date.now();
-    if(now<st)return 'قادم';
-    if(now>=st&&now<en)return 'مفتوح الآن';
+  function normalizeQuestion(q,i){
+    q=q||{}; var id=String(q.id||q.qid||('Q_'+i));
+    var text=String(q.text||q.q||q.question||'سؤال');
+    var opts=Array.isArray(q.options)?q.options:(Array.isArray(q.opts)?q.opts:['صح','خطأ']);
+    var answer=(q.answer!==undefined?q.answer:(q.correct!==undefined?q.correct:''));
+    return {id:id,type:q.type||'mcq',text:text,options:opts,answer:String(answer)};
+  }
+  function normalizeExam(data,unitId,examId){
+    data=data||{}; unitId=normalizeUnit(data.unit||unitId);
+    var qs=data.questions||[]; if(typeof qs==='string'){try{qs=JSON.parse(qs||'[]')}catch(e){qs=[];}}
+    if(!Array.isArray(qs))qs=[]; qs=qs.map(normalizeQuestion);
+    return {id:String(data.examId||data.id||examId||''),unitId:unitId,unit:unitId,title:String(data.examTitle||data.title||'اختبار'),examTitle:String(data.examTitle||data.title||'اختبار'),sent:true,status:'جاهز',startDate:cleanDate(data.startDate),startTime:cleanTime(data.startTime),duration:Number(data.duration||30),passScore:Number(data.passScore||60),questions:qs,results:[]};
+  }
+  function getStatus(exam){
+    var sd=cleanDate(exam.startDate), st=cleanTime(exam.startTime);
+    exam.startDate=sd; exam.startTime=st;
+    if(!sd||!st)return 'جاهز';
+    var start=new Date(sd+'T'+st+':00');
+    if(isNaN(start.getTime()))return 'جاهز';
+    var end=new Date(start.getTime()+(Number(exam.duration)||30)*60000);
+    var now=new Date();
+    if(now<start)return 'قادم';
+    if(now>=start&&now<=end)return 'مفتوح الآن';
     return 'منتهي';
+  }
+  window.examStatus=function(exam){return getStatus(exam||{});};
+  function saveLocal(unitId,exam){
+    try{unitId=normalizeUnit(unitId); if(!window.unitTestsStore)window.unitTestsStore={}; if(!unitTestsStore[unitId])unitTestsStore[unitId]=[]; var idx=unitTestsStore[unitId].findIndex(function(x){return String(x.id)===String(exam.id)}); if(idx>=0)unitTestsStore[unitId][idx]=Object.assign({},unitTestsStore[unitId][idx],exam); else unitTestsStore[unitId].push(exam); if(typeof saveExamStore==='function')saveExamStore();}catch(e){}
+  }
+  function fetchExam(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var url=APPS_URL+'?type=exam&unit='+encodeURIComponent(unitId)+'&examId='+encodeURIComponent(examId)+'&t='+Date.now();
+    return fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)return null;var ex=normalizeExam(d,unitId,examId);saveLocal(unitId,ex);return ex;}).catch(function(e){console.warn('V33 fetch failed',e);return null;});
+  }
+  function renderExam(unitId,exam){
+    unitId=normalizeUnit(unitId); exam=normalizeExam(exam,unitId,exam&&exam.id);
+    var status=getStatus(exam), allow=status==='مفتوح الآن'||(!exam.startDate&&!exam.startTime);
+    var modal=document.getElementById('addModal'); if(!modal)return;
+    modal.className='modalOverlay active examFullScreen'; modal.style.display='block';
+    var closedMsg=status==='قادم'?'الاختبار لم يبدأ بعد':'انتهى وقت الاختبار';
+    var when=(exam.startDate||'لم يحدد')+' '+(exam.startTime||'لم يحدد');
+    if(!allow){modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><div class="card" style="text-align:center"><h3 style="color:var(--gold2);font-size:26px">'+closedMsg+'</h3><p style="font-size:18px;color:var(--paper)">موعد الاختبار: '+esc(when)+'</p></div></div>'; return;}
+    var ranks=['لواء','عميد','عقيد','مقدم','رائد','نقيب','ملازم أول','ملازم','رئيس رقباء','رقيب أول','رقيب','وكيل رقيب','عريف','جندي أول','جندي'];
+    modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p><p style="color:var(--muted)">موعد الاختبار: '+esc(when)+' - المدة: '+esc(exam.duration)+' دقيقة</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><form class="card" onsubmit="submitTraineeExam(event,\''+unitId+'\',\''+esc(exam.id)+'\')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>'+ranks.map(function(r){return '<option>'+r+'</option>'}).join('')+'</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="'+esc(unitName(unitId))+'"></div></div><div class="examTimer" id="examTimer">الوقت المحدد: '+esc(exam.duration)+' دقيقة</div>'+exam.questions.map(function(q,i){return '<div class="savedQuestion"><b>'+(i+1)+'. '+esc(q.text)+'</b>'+q.options.map(function(op){return '<label class="examAnswer"><input type="radio" name="q_'+esc(q.id)+'" value="'+esc(op)+'" required> '+esc(op)+'</label>'}).join('')+'</div>'}).join('')+'<button class="btn primary" style="width:100%;margin-top:15px">تسليم الاختبار</button></form></div>';
+  }
+  window.openTraineeExam=function(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var modal=document.getElementById('addModal'); if(modal){modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML='<div class="examEditorPanel"><div class="card" style="text-align:center"><h2 style="color:var(--gold2)">جاري تحميل الاختبار...</h2><p style="color:var(--muted)">يتم جلب الاختبار من Google Sheets</p></div></div>';}
+    fetchExam(unitId,examId).then(function(exam){
+      if(exam){renderExam(unitId,exam);return;}
+      try{if(typeof getExam==='function'){var local=getExam(unitId,examId);if(local){renderExam(unitId,local);return;}}}catch(e){}
+      if(modal){modal.style.display='none';modal.innerHTML='';} alert('لم يتم العثور على الاختبار في Google Sheets. احفظ الاختبار ثم أرسله للوحدة مرة أخرى.');
+    });
+  };
+  window.submitTraineeExam=function(ev,unitId,examId){
+    ev.preventDefault(); unitId=normalizeUnit(unitId);
+    var e=null; try{if(typeof getExam==='function')e=getExam(unitId,examId);}catch(err){}
+    if(!e){alert('لم يتم العثور على الاختبار. أعد فتح الرابط.');return;}
+    e=normalizeExam(e,unitId,examId);
+    var fd=new FormData(ev.target), num=(fd.get('num')||'').trim();
+    var total=e.questions.length, correct=0; e.questions.forEach(function(q){if(String(fd.get('q_'+q.id))===String(q.answer))correct++;});
+    var percent=total?Math.round((correct/total)*100):0, passed=percent>=Number(e.passScore||60);
+    var payload={type:'exam_result',name:fd.get('name')||'',rank:fd.get('rank')||'',militaryId:num,unit:fd.get('unit')||unitName(unitId),examTitle:e.title,score:correct+' / '+total,percent:percent,status:passed?'ناجح':'راسب'};
+    try{fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});}catch(_e){}
+    var modal=document.getElementById('addModal'); if(modal)modal.innerHTML='<div class="examEditorPanel"><div class="card certificate"><h2>نتيجة الاختبار</h2><h3>'+esc(payload.name)+'</h3><p>الدرجة: '+correct+' من '+total+' - النسبة '+percent+'%</p><p class="'+(passed?'certPass':'certFail')+'">'+(passed?'ناجح':'راسب')+'</p><div class="actionRow"><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div></div></div>';
   };
 })();
 </script>
@@ -1536,46 +1731,111 @@ function printForceReport(){let rows=units.map(u=>{let st=unitStats(u.name);retu
 @keyframes examToastIn{from{transform:translate(-50%,-18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 </style>
 
-<!-- PATCH V35: إصلاح نهائي لقراءة وقت الاختبار القادم من Google Sheets على الجوال -->
-<script id="v35-mobile-sheet-time-normalizer">
+
+<!-- PATCH V33: فتح اختبار الجوال من Google Sheets بصيغ تاريخ ووقت نظيفة -->
+<script id="v33-mobile-exam-open-clean-time-final">
 (function(){
-  function toLatin(v){return String(v||'').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)}).replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)});}
-  function nDate(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(20\d{2}|19\d{2})[-\/]\s*(\d{1,2})[-\/]\s*(\d{1,2})/);
-    if(m)return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
-    m=s.match(/(\d{1,2})[-\/]\s*(\d{1,2})[-\/]\s*((?:20|19)\d{2})/);
-    if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
-    var d=new Date(s); if(!isNaN(d.getTime()))return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var APPS_URL=(window.GOOGLE_SCRIPT_URL&&String(window.GOOGLE_SCRIPT_URL).indexOf('/exec')>-1)?window.GOOGLE_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzVQvtAYupkAYBN4ZdtgAcfk2Gyc66os2rRIx1TxDMxYjvAStpXZLzMTN6E6Ku7UFNBFA/exec';
+  window.GOOGLE_SCRIPT_URL=APPS_URL;
+
+  function pad2(n){n=Number(n)||0;return (n<10?'0':'')+n;}
+  function esc(s){try{if(typeof escapeHtml==='function')return escapeHtml(s||'');}catch(e){}return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function unitName(unitId){try{if(typeof unitNameById==='function')return unitNameById(unitId);}catch(e){}var m={maintenance:'الصيانة',supply:'الإمداد',transport:'النقل',signal:'الإشارة'};return m[unitId]||unitId;}
+  function normalizeUnit(unitId){
+    var s=String(unitId||'').trim();
+    var map={'الصيانة':'maintenance','MAINTENANCE':'maintenance','maintenance':'maintenance','الإمداد':'supply','الامداد':'supply','SUPPLY':'supply','supply':'supply','النقل':'transport','TRANSPORT':'transport','transport':'transport','الإشارة':'signal','الاشارة':'signal','SIGNAL':'signal','signal':'signal'};
+    try{if(typeof normalizeUnitSafe==='function')return normalizeUnitSafe(s);}catch(e){}
+    return map[s]||s||'maintenance';
+  }
+  function ymdFromDate(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+  function hmFromDate(d){return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+  function cleanDate(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return ymdFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    // ISO أولاً حتى لا نأخذ تاريخ UTC ناقص يوم
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime())&&d.getFullYear()>2000)return ymdFromDate(d);}
+    var m=s.match(/(20\d{2})[\/\-](\d{1,2})[\/\-](\d{1,2})/); if(m)return m[1]+'-'+pad2(m[2])+'-'+pad2(m[3]);
+    m=s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](20\d{2})/); if(m)return m[3]+'-'+pad2(m[2])+'-'+pad2(m[1]);
+    var d2=new Date(s); if(!isNaN(d2.getTime())&&d2.getFullYear()>2000)return ymdFromDate(d2);
     return s;
   }
-  function nTime(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(?:T|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(!m)m=s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(m)return String(m[1]).padStart(2,'0')+':'+m[2];
-    var d=new Date(s); if(!isNaN(d.getTime()))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  function cleanTime(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return hmFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime()))return hmFromDate(d);}
+    if(/^\d+(\.\d+)?$/.test(s)){var num=Number(s);if(num>0&&num<1){var mins=Math.round(num*24*60);return pad2(Math.floor(mins/60))+':'+pad2(mins%60);}}
+    var pm=/م|مساء|PM/i.test(s), am=/ص|صباح|AM/i.test(s);
+    var m=s.match(/(\d{1,2}):(\d{2})/); if(m){var h=Number(m[1]), mm=Number(m[2]);if(pm&&h<12)h+=12;if(am&&h===12)h=0;return pad2(h)+':'+pad2(mm);}
+    m=s.match(/(\d{1,2})[^\d]+(\d{2})/); if(m){var hh=Number(m[1]), mn=Number(m[2]);if(pm&&hh<12)hh+=12;if(am&&hh===12)hh=0;return pad2(hh)+':'+pad2(mn);}
     return s;
   }
-  window.normalizeExamDateForMobile=nDate;
-  window.normalizeExamTimeForMobile=nTime;
-  window.examStartMsSafe=function(exam){
-    var d=nDate(exam&&exam.startDate),t=nTime(exam&&exam.startTime);
-    if(!d||!t)return NaN;
-    if(t.length===5)t+=':00';
-    var ms=new Date(d+'T'+t).getTime();
-    return isNaN(ms)?NaN:ms;
-  };
-  window.examStatus=function(exam){
-    if(!exam||!exam.startDate||!exam.startTime)return exam&&exam.sent?'جاهز':'قيد الإعداد';
-    var st=window.examStartMsSafe(exam);
-    if(isNaN(st))return exam.sent?'جاهز':'قيد الإعداد';
-    var en=st+(Number(exam.duration)||30)*60000,now=Date.now();
-    if(now<st)return 'قادم';
-    if(now>=st&&now<en)return 'مفتوح الآن';
+  function normalizeQuestion(q,i){
+    q=q||{}; var id=String(q.id||q.qid||('Q_'+i));
+    var text=String(q.text||q.q||q.question||'سؤال');
+    var opts=Array.isArray(q.options)?q.options:(Array.isArray(q.opts)?q.opts:['صح','خطأ']);
+    var answer=(q.answer!==undefined?q.answer:(q.correct!==undefined?q.correct:''));
+    return {id:id,type:q.type||'mcq',text:text,options:opts,answer:String(answer)};
+  }
+  function normalizeExam(data,unitId,examId){
+    data=data||{}; unitId=normalizeUnit(data.unit||unitId);
+    var qs=data.questions||[]; if(typeof qs==='string'){try{qs=JSON.parse(qs||'[]')}catch(e){qs=[];}}
+    if(!Array.isArray(qs))qs=[]; qs=qs.map(normalizeQuestion);
+    return {id:String(data.examId||data.id||examId||''),unitId:unitId,unit:unitId,title:String(data.examTitle||data.title||'اختبار'),examTitle:String(data.examTitle||data.title||'اختبار'),sent:true,status:'جاهز',startDate:cleanDate(data.startDate),startTime:cleanTime(data.startTime),duration:Number(data.duration||30),passScore:Number(data.passScore||60),questions:qs,results:[]};
+  }
+  function getStatus(exam){
+    var sd=cleanDate(exam.startDate), st=cleanTime(exam.startTime);
+    exam.startDate=sd; exam.startTime=st;
+    if(!sd||!st)return 'جاهز';
+    var start=new Date(sd+'T'+st+':00');
+    if(isNaN(start.getTime()))return 'جاهز';
+    var end=new Date(start.getTime()+(Number(exam.duration)||30)*60000);
+    var now=new Date();
+    if(now<start)return 'قادم';
+    if(now>=start&&now<=end)return 'مفتوح الآن';
     return 'منتهي';
+  }
+  window.examStatus=function(exam){return getStatus(exam||{});};
+  function saveLocal(unitId,exam){
+    try{unitId=normalizeUnit(unitId); if(!window.unitTestsStore)window.unitTestsStore={}; if(!unitTestsStore[unitId])unitTestsStore[unitId]=[]; var idx=unitTestsStore[unitId].findIndex(function(x){return String(x.id)===String(exam.id)}); if(idx>=0)unitTestsStore[unitId][idx]=Object.assign({},unitTestsStore[unitId][idx],exam); else unitTestsStore[unitId].push(exam); if(typeof saveExamStore==='function')saveExamStore();}catch(e){}
+  }
+  function fetchExam(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var url=APPS_URL+'?type=exam&unit='+encodeURIComponent(unitId)+'&examId='+encodeURIComponent(examId)+'&t='+Date.now();
+    return fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)return null;var ex=normalizeExam(d,unitId,examId);saveLocal(unitId,ex);return ex;}).catch(function(e){console.warn('V33 fetch failed',e);return null;});
+  }
+  function renderExam(unitId,exam){
+    unitId=normalizeUnit(unitId); exam=normalizeExam(exam,unitId,exam&&exam.id);
+    var status=getStatus(exam), allow=status==='مفتوح الآن'||(!exam.startDate&&!exam.startTime);
+    var modal=document.getElementById('addModal'); if(!modal)return;
+    modal.className='modalOverlay active examFullScreen'; modal.style.display='block';
+    var closedMsg=status==='قادم'?'الاختبار لم يبدأ بعد':'انتهى وقت الاختبار';
+    var when=(exam.startDate||'لم يحدد')+' '+(exam.startTime||'لم يحدد');
+    if(!allow){modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><div class="card" style="text-align:center"><h3 style="color:var(--gold2);font-size:26px">'+closedMsg+'</h3><p style="font-size:18px;color:var(--paper)">موعد الاختبار: '+esc(when)+'</p></div></div>'; return;}
+    var ranks=['لواء','عميد','عقيد','مقدم','رائد','نقيب','ملازم أول','ملازم','رئيس رقباء','رقيب أول','رقيب','وكيل رقيب','عريف','جندي أول','جندي'];
+    modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p><p style="color:var(--muted)">موعد الاختبار: '+esc(when)+' - المدة: '+esc(exam.duration)+' دقيقة</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><form class="card" onsubmit="submitTraineeExam(event,\''+unitId+'\',\''+esc(exam.id)+'\')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>'+ranks.map(function(r){return '<option>'+r+'</option>'}).join('')+'</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="'+esc(unitName(unitId))+'"></div></div><div class="examTimer" id="examTimer">الوقت المحدد: '+esc(exam.duration)+' دقيقة</div>'+exam.questions.map(function(q,i){return '<div class="savedQuestion"><b>'+(i+1)+'. '+esc(q.text)+'</b>'+q.options.map(function(op){return '<label class="examAnswer"><input type="radio" name="q_'+esc(q.id)+'" value="'+esc(op)+'" required> '+esc(op)+'</label>'}).join('')+'</div>'}).join('')+'<button class="btn primary" style="width:100%;margin-top:15px">تسليم الاختبار</button></form></div>';
+  }
+  window.openTraineeExam=function(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var modal=document.getElementById('addModal'); if(modal){modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML='<div class="examEditorPanel"><div class="card" style="text-align:center"><h2 style="color:var(--gold2)">جاري تحميل الاختبار...</h2><p style="color:var(--muted)">يتم جلب الاختبار من Google Sheets</p></div></div>';}
+    fetchExam(unitId,examId).then(function(exam){
+      if(exam){renderExam(unitId,exam);return;}
+      try{if(typeof getExam==='function'){var local=getExam(unitId,examId);if(local){renderExam(unitId,local);return;}}}catch(e){}
+      if(modal){modal.style.display='none';modal.innerHTML='';} alert('لم يتم العثور على الاختبار في Google Sheets. احفظ الاختبار ثم أرسله للوحدة مرة أخرى.');
+    });
+  };
+  window.submitTraineeExam=function(ev,unitId,examId){
+    ev.preventDefault(); unitId=normalizeUnit(unitId);
+    var e=null; try{if(typeof getExam==='function')e=getExam(unitId,examId);}catch(err){}
+    if(!e){alert('لم يتم العثور على الاختبار. أعد فتح الرابط.');return;}
+    e=normalizeExam(e,unitId,examId);
+    var fd=new FormData(ev.target), num=(fd.get('num')||'').trim();
+    var total=e.questions.length, correct=0; e.questions.forEach(function(q){if(String(fd.get('q_'+q.id))===String(q.answer))correct++;});
+    var percent=total?Math.round((correct/total)*100):0, passed=percent>=Number(e.passScore||60);
+    var payload={type:'exam_result',name:fd.get('name')||'',rank:fd.get('rank')||'',militaryId:num,unit:fd.get('unit')||unitName(unitId),examTitle:e.title,score:correct+' / '+total,percent:percent,status:passed?'ناجح':'راسب'};
+    try{fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});}catch(_e){}
+    var modal=document.getElementById('addModal'); if(modal)modal.innerHTML='<div class="examEditorPanel"><div class="card certificate"><h2>نتيجة الاختبار</h2><h3>'+esc(payload.name)+'</h3><p>الدرجة: '+correct+' من '+total+' - النسبة '+percent+'%</p><p class="'+(passed?'certPass':'certFail')+'">'+(passed?'ناجح':'راسب')+'</p><div class="actionRow"><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div></div></div>';
   };
 })();
 </script>
@@ -1902,46 +2162,111 @@ function printCertificate(unitId,examId,resultId){let e=getExam(unitId,examId);l
 @keyframes examToastIn{from{transform:translate(-50%,-18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 </style>
 
-<!-- PATCH V35: إصلاح نهائي لقراءة وقت الاختبار القادم من Google Sheets على الجوال -->
-<script id="v35-mobile-sheet-time-normalizer">
+
+<!-- PATCH V33: فتح اختبار الجوال من Google Sheets بصيغ تاريخ ووقت نظيفة -->
+<script id="v33-mobile-exam-open-clean-time-final">
 (function(){
-  function toLatin(v){return String(v||'').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)}).replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)});}
-  function nDate(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(20\d{2}|19\d{2})[-\/]\s*(\d{1,2})[-\/]\s*(\d{1,2})/);
-    if(m)return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
-    m=s.match(/(\d{1,2})[-\/]\s*(\d{1,2})[-\/]\s*((?:20|19)\d{2})/);
-    if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
-    var d=new Date(s); if(!isNaN(d.getTime()))return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var APPS_URL=(window.GOOGLE_SCRIPT_URL&&String(window.GOOGLE_SCRIPT_URL).indexOf('/exec')>-1)?window.GOOGLE_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzVQvtAYupkAYBN4ZdtgAcfk2Gyc66os2rRIx1TxDMxYjvAStpXZLzMTN6E6Ku7UFNBFA/exec';
+  window.GOOGLE_SCRIPT_URL=APPS_URL;
+
+  function pad2(n){n=Number(n)||0;return (n<10?'0':'')+n;}
+  function esc(s){try{if(typeof escapeHtml==='function')return escapeHtml(s||'');}catch(e){}return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function unitName(unitId){try{if(typeof unitNameById==='function')return unitNameById(unitId);}catch(e){}var m={maintenance:'الصيانة',supply:'الإمداد',transport:'النقل',signal:'الإشارة'};return m[unitId]||unitId;}
+  function normalizeUnit(unitId){
+    var s=String(unitId||'').trim();
+    var map={'الصيانة':'maintenance','MAINTENANCE':'maintenance','maintenance':'maintenance','الإمداد':'supply','الامداد':'supply','SUPPLY':'supply','supply':'supply','النقل':'transport','TRANSPORT':'transport','transport':'transport','الإشارة':'signal','الاشارة':'signal','SIGNAL':'signal','signal':'signal'};
+    try{if(typeof normalizeUnitSafe==='function')return normalizeUnitSafe(s);}catch(e){}
+    return map[s]||s||'maintenance';
+  }
+  function ymdFromDate(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+  function hmFromDate(d){return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+  function cleanDate(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return ymdFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    // ISO أولاً حتى لا نأخذ تاريخ UTC ناقص يوم
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime())&&d.getFullYear()>2000)return ymdFromDate(d);}
+    var m=s.match(/(20\d{2})[\/\-](\d{1,2})[\/\-](\d{1,2})/); if(m)return m[1]+'-'+pad2(m[2])+'-'+pad2(m[3]);
+    m=s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](20\d{2})/); if(m)return m[3]+'-'+pad2(m[2])+'-'+pad2(m[1]);
+    var d2=new Date(s); if(!isNaN(d2.getTime())&&d2.getFullYear()>2000)return ymdFromDate(d2);
     return s;
   }
-  function nTime(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(?:T|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(!m)m=s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(m)return String(m[1]).padStart(2,'0')+':'+m[2];
-    var d=new Date(s); if(!isNaN(d.getTime()))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  function cleanTime(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return hmFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime()))return hmFromDate(d);}
+    if(/^\d+(\.\d+)?$/.test(s)){var num=Number(s);if(num>0&&num<1){var mins=Math.round(num*24*60);return pad2(Math.floor(mins/60))+':'+pad2(mins%60);}}
+    var pm=/م|مساء|PM/i.test(s), am=/ص|صباح|AM/i.test(s);
+    var m=s.match(/(\d{1,2}):(\d{2})/); if(m){var h=Number(m[1]), mm=Number(m[2]);if(pm&&h<12)h+=12;if(am&&h===12)h=0;return pad2(h)+':'+pad2(mm);}
+    m=s.match(/(\d{1,2})[^\d]+(\d{2})/); if(m){var hh=Number(m[1]), mn=Number(m[2]);if(pm&&hh<12)hh+=12;if(am&&hh===12)hh=0;return pad2(hh)+':'+pad2(mn);}
     return s;
   }
-  window.normalizeExamDateForMobile=nDate;
-  window.normalizeExamTimeForMobile=nTime;
-  window.examStartMsSafe=function(exam){
-    var d=nDate(exam&&exam.startDate),t=nTime(exam&&exam.startTime);
-    if(!d||!t)return NaN;
-    if(t.length===5)t+=':00';
-    var ms=new Date(d+'T'+t).getTime();
-    return isNaN(ms)?NaN:ms;
-  };
-  window.examStatus=function(exam){
-    if(!exam||!exam.startDate||!exam.startTime)return exam&&exam.sent?'جاهز':'قيد الإعداد';
-    var st=window.examStartMsSafe(exam);
-    if(isNaN(st))return exam.sent?'جاهز':'قيد الإعداد';
-    var en=st+(Number(exam.duration)||30)*60000,now=Date.now();
-    if(now<st)return 'قادم';
-    if(now>=st&&now<en)return 'مفتوح الآن';
+  function normalizeQuestion(q,i){
+    q=q||{}; var id=String(q.id||q.qid||('Q_'+i));
+    var text=String(q.text||q.q||q.question||'سؤال');
+    var opts=Array.isArray(q.options)?q.options:(Array.isArray(q.opts)?q.opts:['صح','خطأ']);
+    var answer=(q.answer!==undefined?q.answer:(q.correct!==undefined?q.correct:''));
+    return {id:id,type:q.type||'mcq',text:text,options:opts,answer:String(answer)};
+  }
+  function normalizeExam(data,unitId,examId){
+    data=data||{}; unitId=normalizeUnit(data.unit||unitId);
+    var qs=data.questions||[]; if(typeof qs==='string'){try{qs=JSON.parse(qs||'[]')}catch(e){qs=[];}}
+    if(!Array.isArray(qs))qs=[]; qs=qs.map(normalizeQuestion);
+    return {id:String(data.examId||data.id||examId||''),unitId:unitId,unit:unitId,title:String(data.examTitle||data.title||'اختبار'),examTitle:String(data.examTitle||data.title||'اختبار'),sent:true,status:'جاهز',startDate:cleanDate(data.startDate),startTime:cleanTime(data.startTime),duration:Number(data.duration||30),passScore:Number(data.passScore||60),questions:qs,results:[]};
+  }
+  function getStatus(exam){
+    var sd=cleanDate(exam.startDate), st=cleanTime(exam.startTime);
+    exam.startDate=sd; exam.startTime=st;
+    if(!sd||!st)return 'جاهز';
+    var start=new Date(sd+'T'+st+':00');
+    if(isNaN(start.getTime()))return 'جاهز';
+    var end=new Date(start.getTime()+(Number(exam.duration)||30)*60000);
+    var now=new Date();
+    if(now<start)return 'قادم';
+    if(now>=start&&now<=end)return 'مفتوح الآن';
     return 'منتهي';
+  }
+  window.examStatus=function(exam){return getStatus(exam||{});};
+  function saveLocal(unitId,exam){
+    try{unitId=normalizeUnit(unitId); if(!window.unitTestsStore)window.unitTestsStore={}; if(!unitTestsStore[unitId])unitTestsStore[unitId]=[]; var idx=unitTestsStore[unitId].findIndex(function(x){return String(x.id)===String(exam.id)}); if(idx>=0)unitTestsStore[unitId][idx]=Object.assign({},unitTestsStore[unitId][idx],exam); else unitTestsStore[unitId].push(exam); if(typeof saveExamStore==='function')saveExamStore();}catch(e){}
+  }
+  function fetchExam(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var url=APPS_URL+'?type=exam&unit='+encodeURIComponent(unitId)+'&examId='+encodeURIComponent(examId)+'&t='+Date.now();
+    return fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)return null;var ex=normalizeExam(d,unitId,examId);saveLocal(unitId,ex);return ex;}).catch(function(e){console.warn('V33 fetch failed',e);return null;});
+  }
+  function renderExam(unitId,exam){
+    unitId=normalizeUnit(unitId); exam=normalizeExam(exam,unitId,exam&&exam.id);
+    var status=getStatus(exam), allow=status==='مفتوح الآن'||(!exam.startDate&&!exam.startTime);
+    var modal=document.getElementById('addModal'); if(!modal)return;
+    modal.className='modalOverlay active examFullScreen'; modal.style.display='block';
+    var closedMsg=status==='قادم'?'الاختبار لم يبدأ بعد':'انتهى وقت الاختبار';
+    var when=(exam.startDate||'لم يحدد')+' '+(exam.startTime||'لم يحدد');
+    if(!allow){modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><div class="card" style="text-align:center"><h3 style="color:var(--gold2);font-size:26px">'+closedMsg+'</h3><p style="font-size:18px;color:var(--paper)">موعد الاختبار: '+esc(when)+'</p></div></div>'; return;}
+    var ranks=['لواء','عميد','عقيد','مقدم','رائد','نقيب','ملازم أول','ملازم','رئيس رقباء','رقيب أول','رقيب','وكيل رقيب','عريف','جندي أول','جندي'];
+    modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p><p style="color:var(--muted)">موعد الاختبار: '+esc(when)+' - المدة: '+esc(exam.duration)+' دقيقة</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><form class="card" onsubmit="submitTraineeExam(event,\''+unitId+'\',\''+esc(exam.id)+'\')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>'+ranks.map(function(r){return '<option>'+r+'</option>'}).join('')+'</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="'+esc(unitName(unitId))+'"></div></div><div class="examTimer" id="examTimer">الوقت المحدد: '+esc(exam.duration)+' دقيقة</div>'+exam.questions.map(function(q,i){return '<div class="savedQuestion"><b>'+(i+1)+'. '+esc(q.text)+'</b>'+q.options.map(function(op){return '<label class="examAnswer"><input type="radio" name="q_'+esc(q.id)+'" value="'+esc(op)+'" required> '+esc(op)+'</label>'}).join('')+'</div>'}).join('')+'<button class="btn primary" style="width:100%;margin-top:15px">تسليم الاختبار</button></form></div>';
+  }
+  window.openTraineeExam=function(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var modal=document.getElementById('addModal'); if(modal){modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML='<div class="examEditorPanel"><div class="card" style="text-align:center"><h2 style="color:var(--gold2)">جاري تحميل الاختبار...</h2><p style="color:var(--muted)">يتم جلب الاختبار من Google Sheets</p></div></div>';}
+    fetchExam(unitId,examId).then(function(exam){
+      if(exam){renderExam(unitId,exam);return;}
+      try{if(typeof getExam==='function'){var local=getExam(unitId,examId);if(local){renderExam(unitId,local);return;}}}catch(e){}
+      if(modal){modal.style.display='none';modal.innerHTML='';} alert('لم يتم العثور على الاختبار في Google Sheets. احفظ الاختبار ثم أرسله للوحدة مرة أخرى.');
+    });
+  };
+  window.submitTraineeExam=function(ev,unitId,examId){
+    ev.preventDefault(); unitId=normalizeUnit(unitId);
+    var e=null; try{if(typeof getExam==='function')e=getExam(unitId,examId);}catch(err){}
+    if(!e){alert('لم يتم العثور على الاختبار. أعد فتح الرابط.');return;}
+    e=normalizeExam(e,unitId,examId);
+    var fd=new FormData(ev.target), num=(fd.get('num')||'').trim();
+    var total=e.questions.length, correct=0; e.questions.forEach(function(q){if(String(fd.get('q_'+q.id))===String(q.answer))correct++;});
+    var percent=total?Math.round((correct/total)*100):0, passed=percent>=Number(e.passScore||60);
+    var payload={type:'exam_result',name:fd.get('name')||'',rank:fd.get('rank')||'',militaryId:num,unit:fd.get('unit')||unitName(unitId),examTitle:e.title,score:correct+' / '+total,percent:percent,status:passed?'ناجح':'راسب'};
+    try{fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});}catch(_e){}
+    var modal=document.getElementById('addModal'); if(modal)modal.innerHTML='<div class="examEditorPanel"><div class="card certificate"><h2>نتيجة الاختبار</h2><h3>'+esc(payload.name)+'</h3><p>الدرجة: '+correct+' من '+total+' - النسبة '+percent+'%</p><p class="'+(passed?'certPass':'certFail')+'">'+(passed?'ناجح':'راسب')+'</p><div class="actionRow"><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div></div></div>';
   };
 })();
 </script>
@@ -2136,46 +2461,111 @@ renderAll();
 @keyframes examToastIn{from{transform:translate(-50%,-18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 </style>
 
-<!-- PATCH V35: إصلاح نهائي لقراءة وقت الاختبار القادم من Google Sheets على الجوال -->
-<script id="v35-mobile-sheet-time-normalizer">
+
+<!-- PATCH V33: فتح اختبار الجوال من Google Sheets بصيغ تاريخ ووقت نظيفة -->
+<script id="v33-mobile-exam-open-clean-time-final">
 (function(){
-  function toLatin(v){return String(v||'').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)}).replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)});}
-  function nDate(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(20\d{2}|19\d{2})[-\/]\s*(\d{1,2})[-\/]\s*(\d{1,2})/);
-    if(m)return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
-    m=s.match(/(\d{1,2})[-\/]\s*(\d{1,2})[-\/]\s*((?:20|19)\d{2})/);
-    if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
-    var d=new Date(s); if(!isNaN(d.getTime()))return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var APPS_URL=(window.GOOGLE_SCRIPT_URL&&String(window.GOOGLE_SCRIPT_URL).indexOf('/exec')>-1)?window.GOOGLE_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzVQvtAYupkAYBN4ZdtgAcfk2Gyc66os2rRIx1TxDMxYjvAStpXZLzMTN6E6Ku7UFNBFA/exec';
+  window.GOOGLE_SCRIPT_URL=APPS_URL;
+
+  function pad2(n){n=Number(n)||0;return (n<10?'0':'')+n;}
+  function esc(s){try{if(typeof escapeHtml==='function')return escapeHtml(s||'');}catch(e){}return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function unitName(unitId){try{if(typeof unitNameById==='function')return unitNameById(unitId);}catch(e){}var m={maintenance:'الصيانة',supply:'الإمداد',transport:'النقل',signal:'الإشارة'};return m[unitId]||unitId;}
+  function normalizeUnit(unitId){
+    var s=String(unitId||'').trim();
+    var map={'الصيانة':'maintenance','MAINTENANCE':'maintenance','maintenance':'maintenance','الإمداد':'supply','الامداد':'supply','SUPPLY':'supply','supply':'supply','النقل':'transport','TRANSPORT':'transport','transport':'transport','الإشارة':'signal','الاشارة':'signal','SIGNAL':'signal','signal':'signal'};
+    try{if(typeof normalizeUnitSafe==='function')return normalizeUnitSafe(s);}catch(e){}
+    return map[s]||s||'maintenance';
+  }
+  function ymdFromDate(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+  function hmFromDate(d){return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+  function cleanDate(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return ymdFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    // ISO أولاً حتى لا نأخذ تاريخ UTC ناقص يوم
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime())&&d.getFullYear()>2000)return ymdFromDate(d);}
+    var m=s.match(/(20\d{2})[\/\-](\d{1,2})[\/\-](\d{1,2})/); if(m)return m[1]+'-'+pad2(m[2])+'-'+pad2(m[3]);
+    m=s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](20\d{2})/); if(m)return m[3]+'-'+pad2(m[2])+'-'+pad2(m[1]);
+    var d2=new Date(s); if(!isNaN(d2.getTime())&&d2.getFullYear()>2000)return ymdFromDate(d2);
     return s;
   }
-  function nTime(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(?:T|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(!m)m=s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(m)return String(m[1]).padStart(2,'0')+':'+m[2];
-    var d=new Date(s); if(!isNaN(d.getTime()))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  function cleanTime(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return hmFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime()))return hmFromDate(d);}
+    if(/^\d+(\.\d+)?$/.test(s)){var num=Number(s);if(num>0&&num<1){var mins=Math.round(num*24*60);return pad2(Math.floor(mins/60))+':'+pad2(mins%60);}}
+    var pm=/م|مساء|PM/i.test(s), am=/ص|صباح|AM/i.test(s);
+    var m=s.match(/(\d{1,2}):(\d{2})/); if(m){var h=Number(m[1]), mm=Number(m[2]);if(pm&&h<12)h+=12;if(am&&h===12)h=0;return pad2(h)+':'+pad2(mm);}
+    m=s.match(/(\d{1,2})[^\d]+(\d{2})/); if(m){var hh=Number(m[1]), mn=Number(m[2]);if(pm&&hh<12)hh+=12;if(am&&hh===12)hh=0;return pad2(hh)+':'+pad2(mn);}
     return s;
   }
-  window.normalizeExamDateForMobile=nDate;
-  window.normalizeExamTimeForMobile=nTime;
-  window.examStartMsSafe=function(exam){
-    var d=nDate(exam&&exam.startDate),t=nTime(exam&&exam.startTime);
-    if(!d||!t)return NaN;
-    if(t.length===5)t+=':00';
-    var ms=new Date(d+'T'+t).getTime();
-    return isNaN(ms)?NaN:ms;
-  };
-  window.examStatus=function(exam){
-    if(!exam||!exam.startDate||!exam.startTime)return exam&&exam.sent?'جاهز':'قيد الإعداد';
-    var st=window.examStartMsSafe(exam);
-    if(isNaN(st))return exam.sent?'جاهز':'قيد الإعداد';
-    var en=st+(Number(exam.duration)||30)*60000,now=Date.now();
-    if(now<st)return 'قادم';
-    if(now>=st&&now<en)return 'مفتوح الآن';
+  function normalizeQuestion(q,i){
+    q=q||{}; var id=String(q.id||q.qid||('Q_'+i));
+    var text=String(q.text||q.q||q.question||'سؤال');
+    var opts=Array.isArray(q.options)?q.options:(Array.isArray(q.opts)?q.opts:['صح','خطأ']);
+    var answer=(q.answer!==undefined?q.answer:(q.correct!==undefined?q.correct:''));
+    return {id:id,type:q.type||'mcq',text:text,options:opts,answer:String(answer)};
+  }
+  function normalizeExam(data,unitId,examId){
+    data=data||{}; unitId=normalizeUnit(data.unit||unitId);
+    var qs=data.questions||[]; if(typeof qs==='string'){try{qs=JSON.parse(qs||'[]')}catch(e){qs=[];}}
+    if(!Array.isArray(qs))qs=[]; qs=qs.map(normalizeQuestion);
+    return {id:String(data.examId||data.id||examId||''),unitId:unitId,unit:unitId,title:String(data.examTitle||data.title||'اختبار'),examTitle:String(data.examTitle||data.title||'اختبار'),sent:true,status:'جاهز',startDate:cleanDate(data.startDate),startTime:cleanTime(data.startTime),duration:Number(data.duration||30),passScore:Number(data.passScore||60),questions:qs,results:[]};
+  }
+  function getStatus(exam){
+    var sd=cleanDate(exam.startDate), st=cleanTime(exam.startTime);
+    exam.startDate=sd; exam.startTime=st;
+    if(!sd||!st)return 'جاهز';
+    var start=new Date(sd+'T'+st+':00');
+    if(isNaN(start.getTime()))return 'جاهز';
+    var end=new Date(start.getTime()+(Number(exam.duration)||30)*60000);
+    var now=new Date();
+    if(now<start)return 'قادم';
+    if(now>=start&&now<=end)return 'مفتوح الآن';
     return 'منتهي';
+  }
+  window.examStatus=function(exam){return getStatus(exam||{});};
+  function saveLocal(unitId,exam){
+    try{unitId=normalizeUnit(unitId); if(!window.unitTestsStore)window.unitTestsStore={}; if(!unitTestsStore[unitId])unitTestsStore[unitId]=[]; var idx=unitTestsStore[unitId].findIndex(function(x){return String(x.id)===String(exam.id)}); if(idx>=0)unitTestsStore[unitId][idx]=Object.assign({},unitTestsStore[unitId][idx],exam); else unitTestsStore[unitId].push(exam); if(typeof saveExamStore==='function')saveExamStore();}catch(e){}
+  }
+  function fetchExam(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var url=APPS_URL+'?type=exam&unit='+encodeURIComponent(unitId)+'&examId='+encodeURIComponent(examId)+'&t='+Date.now();
+    return fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)return null;var ex=normalizeExam(d,unitId,examId);saveLocal(unitId,ex);return ex;}).catch(function(e){console.warn('V33 fetch failed',e);return null;});
+  }
+  function renderExam(unitId,exam){
+    unitId=normalizeUnit(unitId); exam=normalizeExam(exam,unitId,exam&&exam.id);
+    var status=getStatus(exam), allow=status==='مفتوح الآن'||(!exam.startDate&&!exam.startTime);
+    var modal=document.getElementById('addModal'); if(!modal)return;
+    modal.className='modalOverlay active examFullScreen'; modal.style.display='block';
+    var closedMsg=status==='قادم'?'الاختبار لم يبدأ بعد':'انتهى وقت الاختبار';
+    var when=(exam.startDate||'لم يحدد')+' '+(exam.startTime||'لم يحدد');
+    if(!allow){modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><div class="card" style="text-align:center"><h3 style="color:var(--gold2);font-size:26px">'+closedMsg+'</h3><p style="font-size:18px;color:var(--paper)">موعد الاختبار: '+esc(when)+'</p></div></div>'; return;}
+    var ranks=['لواء','عميد','عقيد','مقدم','رائد','نقيب','ملازم أول','ملازم','رئيس رقباء','رقيب أول','رقيب','وكيل رقيب','عريف','جندي أول','جندي'];
+    modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p><p style="color:var(--muted)">موعد الاختبار: '+esc(when)+' - المدة: '+esc(exam.duration)+' دقيقة</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><form class="card" onsubmit="submitTraineeExam(event,\''+unitId+'\',\''+esc(exam.id)+'\')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>'+ranks.map(function(r){return '<option>'+r+'</option>'}).join('')+'</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="'+esc(unitName(unitId))+'"></div></div><div class="examTimer" id="examTimer">الوقت المحدد: '+esc(exam.duration)+' دقيقة</div>'+exam.questions.map(function(q,i){return '<div class="savedQuestion"><b>'+(i+1)+'. '+esc(q.text)+'</b>'+q.options.map(function(op){return '<label class="examAnswer"><input type="radio" name="q_'+esc(q.id)+'" value="'+esc(op)+'" required> '+esc(op)+'</label>'}).join('')+'</div>'}).join('')+'<button class="btn primary" style="width:100%;margin-top:15px">تسليم الاختبار</button></form></div>';
+  }
+  window.openTraineeExam=function(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var modal=document.getElementById('addModal'); if(modal){modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML='<div class="examEditorPanel"><div class="card" style="text-align:center"><h2 style="color:var(--gold2)">جاري تحميل الاختبار...</h2><p style="color:var(--muted)">يتم جلب الاختبار من Google Sheets</p></div></div>';}
+    fetchExam(unitId,examId).then(function(exam){
+      if(exam){renderExam(unitId,exam);return;}
+      try{if(typeof getExam==='function'){var local=getExam(unitId,examId);if(local){renderExam(unitId,local);return;}}}catch(e){}
+      if(modal){modal.style.display='none';modal.innerHTML='';} alert('لم يتم العثور على الاختبار في Google Sheets. احفظ الاختبار ثم أرسله للوحدة مرة أخرى.');
+    });
+  };
+  window.submitTraineeExam=function(ev,unitId,examId){
+    ev.preventDefault(); unitId=normalizeUnit(unitId);
+    var e=null; try{if(typeof getExam==='function')e=getExam(unitId,examId);}catch(err){}
+    if(!e){alert('لم يتم العثور على الاختبار. أعد فتح الرابط.');return;}
+    e=normalizeExam(e,unitId,examId);
+    var fd=new FormData(ev.target), num=(fd.get('num')||'').trim();
+    var total=e.questions.length, correct=0; e.questions.forEach(function(q){if(String(fd.get('q_'+q.id))===String(q.answer))correct++;});
+    var percent=total?Math.round((correct/total)*100):0, passed=percent>=Number(e.passScore||60);
+    var payload={type:'exam_result',name:fd.get('name')||'',rank:fd.get('rank')||'',militaryId:num,unit:fd.get('unit')||unitName(unitId),examTitle:e.title,score:correct+' / '+total,percent:percent,status:passed?'ناجح':'راسب'};
+    try{fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});}catch(_e){}
+    var modal=document.getElementById('addModal'); if(modal)modal.innerHTML='<div class="examEditorPanel"><div class="card certificate"><h2>نتيجة الاختبار</h2><h3>'+esc(payload.name)+'</h3><p>الدرجة: '+correct+' من '+total+' - النسبة '+percent+'%</p><p class="'+(passed?'certPass':'certFail')+'">'+(passed?'ناجح':'راسب')+'</p><div class="actionRow"><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div></div></div>';
   };
 })();
 </script>
@@ -2199,46 +2589,111 @@ renderAll();
 @keyframes examToastIn{from{transform:translate(-50%,-18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 </style>
 
-<!-- PATCH V35: إصلاح نهائي لقراءة وقت الاختبار القادم من Google Sheets على الجوال -->
-<script id="v35-mobile-sheet-time-normalizer">
+
+<!-- PATCH V33: فتح اختبار الجوال من Google Sheets بصيغ تاريخ ووقت نظيفة -->
+<script id="v33-mobile-exam-open-clean-time-final">
 (function(){
-  function toLatin(v){return String(v||'').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)}).replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)});}
-  function nDate(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(20\d{2}|19\d{2})[-\/]\s*(\d{1,2})[-\/]\s*(\d{1,2})/);
-    if(m)return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
-    m=s.match(/(\d{1,2})[-\/]\s*(\d{1,2})[-\/]\s*((?:20|19)\d{2})/);
-    if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
-    var d=new Date(s); if(!isNaN(d.getTime()))return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var APPS_URL=(window.GOOGLE_SCRIPT_URL&&String(window.GOOGLE_SCRIPT_URL).indexOf('/exec')>-1)?window.GOOGLE_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzVQvtAYupkAYBN4ZdtgAcfk2Gyc66os2rRIx1TxDMxYjvAStpXZLzMTN6E6Ku7UFNBFA/exec';
+  window.GOOGLE_SCRIPT_URL=APPS_URL;
+
+  function pad2(n){n=Number(n)||0;return (n<10?'0':'')+n;}
+  function esc(s){try{if(typeof escapeHtml==='function')return escapeHtml(s||'');}catch(e){}return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function unitName(unitId){try{if(typeof unitNameById==='function')return unitNameById(unitId);}catch(e){}var m={maintenance:'الصيانة',supply:'الإمداد',transport:'النقل',signal:'الإشارة'};return m[unitId]||unitId;}
+  function normalizeUnit(unitId){
+    var s=String(unitId||'').trim();
+    var map={'الصيانة':'maintenance','MAINTENANCE':'maintenance','maintenance':'maintenance','الإمداد':'supply','الامداد':'supply','SUPPLY':'supply','supply':'supply','النقل':'transport','TRANSPORT':'transport','transport':'transport','الإشارة':'signal','الاشارة':'signal','SIGNAL':'signal','signal':'signal'};
+    try{if(typeof normalizeUnitSafe==='function')return normalizeUnitSafe(s);}catch(e){}
+    return map[s]||s||'maintenance';
+  }
+  function ymdFromDate(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+  function hmFromDate(d){return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+  function cleanDate(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return ymdFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    // ISO أولاً حتى لا نأخذ تاريخ UTC ناقص يوم
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime())&&d.getFullYear()>2000)return ymdFromDate(d);}
+    var m=s.match(/(20\d{2})[\/\-](\d{1,2})[\/\-](\d{1,2})/); if(m)return m[1]+'-'+pad2(m[2])+'-'+pad2(m[3]);
+    m=s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](20\d{2})/); if(m)return m[3]+'-'+pad2(m[2])+'-'+pad2(m[1]);
+    var d2=new Date(s); if(!isNaN(d2.getTime())&&d2.getFullYear()>2000)return ymdFromDate(d2);
     return s;
   }
-  function nTime(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(?:T|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(!m)m=s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(m)return String(m[1]).padStart(2,'0')+':'+m[2];
-    var d=new Date(s); if(!isNaN(d.getTime()))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  function cleanTime(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return hmFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime()))return hmFromDate(d);}
+    if(/^\d+(\.\d+)?$/.test(s)){var num=Number(s);if(num>0&&num<1){var mins=Math.round(num*24*60);return pad2(Math.floor(mins/60))+':'+pad2(mins%60);}}
+    var pm=/م|مساء|PM/i.test(s), am=/ص|صباح|AM/i.test(s);
+    var m=s.match(/(\d{1,2}):(\d{2})/); if(m){var h=Number(m[1]), mm=Number(m[2]);if(pm&&h<12)h+=12;if(am&&h===12)h=0;return pad2(h)+':'+pad2(mm);}
+    m=s.match(/(\d{1,2})[^\d]+(\d{2})/); if(m){var hh=Number(m[1]), mn=Number(m[2]);if(pm&&hh<12)hh+=12;if(am&&hh===12)hh=0;return pad2(hh)+':'+pad2(mn);}
     return s;
   }
-  window.normalizeExamDateForMobile=nDate;
-  window.normalizeExamTimeForMobile=nTime;
-  window.examStartMsSafe=function(exam){
-    var d=nDate(exam&&exam.startDate),t=nTime(exam&&exam.startTime);
-    if(!d||!t)return NaN;
-    if(t.length===5)t+=':00';
-    var ms=new Date(d+'T'+t).getTime();
-    return isNaN(ms)?NaN:ms;
-  };
-  window.examStatus=function(exam){
-    if(!exam||!exam.startDate||!exam.startTime)return exam&&exam.sent?'جاهز':'قيد الإعداد';
-    var st=window.examStartMsSafe(exam);
-    if(isNaN(st))return exam.sent?'جاهز':'قيد الإعداد';
-    var en=st+(Number(exam.duration)||30)*60000,now=Date.now();
-    if(now<st)return 'قادم';
-    if(now>=st&&now<en)return 'مفتوح الآن';
+  function normalizeQuestion(q,i){
+    q=q||{}; var id=String(q.id||q.qid||('Q_'+i));
+    var text=String(q.text||q.q||q.question||'سؤال');
+    var opts=Array.isArray(q.options)?q.options:(Array.isArray(q.opts)?q.opts:['صح','خطأ']);
+    var answer=(q.answer!==undefined?q.answer:(q.correct!==undefined?q.correct:''));
+    return {id:id,type:q.type||'mcq',text:text,options:opts,answer:String(answer)};
+  }
+  function normalizeExam(data,unitId,examId){
+    data=data||{}; unitId=normalizeUnit(data.unit||unitId);
+    var qs=data.questions||[]; if(typeof qs==='string'){try{qs=JSON.parse(qs||'[]')}catch(e){qs=[];}}
+    if(!Array.isArray(qs))qs=[]; qs=qs.map(normalizeQuestion);
+    return {id:String(data.examId||data.id||examId||''),unitId:unitId,unit:unitId,title:String(data.examTitle||data.title||'اختبار'),examTitle:String(data.examTitle||data.title||'اختبار'),sent:true,status:'جاهز',startDate:cleanDate(data.startDate),startTime:cleanTime(data.startTime),duration:Number(data.duration||30),passScore:Number(data.passScore||60),questions:qs,results:[]};
+  }
+  function getStatus(exam){
+    var sd=cleanDate(exam.startDate), st=cleanTime(exam.startTime);
+    exam.startDate=sd; exam.startTime=st;
+    if(!sd||!st)return 'جاهز';
+    var start=new Date(sd+'T'+st+':00');
+    if(isNaN(start.getTime()))return 'جاهز';
+    var end=new Date(start.getTime()+(Number(exam.duration)||30)*60000);
+    var now=new Date();
+    if(now<start)return 'قادم';
+    if(now>=start&&now<=end)return 'مفتوح الآن';
     return 'منتهي';
+  }
+  window.examStatus=function(exam){return getStatus(exam||{});};
+  function saveLocal(unitId,exam){
+    try{unitId=normalizeUnit(unitId); if(!window.unitTestsStore)window.unitTestsStore={}; if(!unitTestsStore[unitId])unitTestsStore[unitId]=[]; var idx=unitTestsStore[unitId].findIndex(function(x){return String(x.id)===String(exam.id)}); if(idx>=0)unitTestsStore[unitId][idx]=Object.assign({},unitTestsStore[unitId][idx],exam); else unitTestsStore[unitId].push(exam); if(typeof saveExamStore==='function')saveExamStore();}catch(e){}
+  }
+  function fetchExam(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var url=APPS_URL+'?type=exam&unit='+encodeURIComponent(unitId)+'&examId='+encodeURIComponent(examId)+'&t='+Date.now();
+    return fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)return null;var ex=normalizeExam(d,unitId,examId);saveLocal(unitId,ex);return ex;}).catch(function(e){console.warn('V33 fetch failed',e);return null;});
+  }
+  function renderExam(unitId,exam){
+    unitId=normalizeUnit(unitId); exam=normalizeExam(exam,unitId,exam&&exam.id);
+    var status=getStatus(exam), allow=status==='مفتوح الآن'||(!exam.startDate&&!exam.startTime);
+    var modal=document.getElementById('addModal'); if(!modal)return;
+    modal.className='modalOverlay active examFullScreen'; modal.style.display='block';
+    var closedMsg=status==='قادم'?'الاختبار لم يبدأ بعد':'انتهى وقت الاختبار';
+    var when=(exam.startDate||'لم يحدد')+' '+(exam.startTime||'لم يحدد');
+    if(!allow){modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><div class="card" style="text-align:center"><h3 style="color:var(--gold2);font-size:26px">'+closedMsg+'</h3><p style="font-size:18px;color:var(--paper)">موعد الاختبار: '+esc(when)+'</p></div></div>'; return;}
+    var ranks=['لواء','عميد','عقيد','مقدم','رائد','نقيب','ملازم أول','ملازم','رئيس رقباء','رقيب أول','رقيب','وكيل رقيب','عريف','جندي أول','جندي'];
+    modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p><p style="color:var(--muted)">موعد الاختبار: '+esc(when)+' - المدة: '+esc(exam.duration)+' دقيقة</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><form class="card" onsubmit="submitTraineeExam(event,\''+unitId+'\',\''+esc(exam.id)+'\')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>'+ranks.map(function(r){return '<option>'+r+'</option>'}).join('')+'</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="'+esc(unitName(unitId))+'"></div></div><div class="examTimer" id="examTimer">الوقت المحدد: '+esc(exam.duration)+' دقيقة</div>'+exam.questions.map(function(q,i){return '<div class="savedQuestion"><b>'+(i+1)+'. '+esc(q.text)+'</b>'+q.options.map(function(op){return '<label class="examAnswer"><input type="radio" name="q_'+esc(q.id)+'" value="'+esc(op)+'" required> '+esc(op)+'</label>'}).join('')+'</div>'}).join('')+'<button class="btn primary" style="width:100%;margin-top:15px">تسليم الاختبار</button></form></div>';
+  }
+  window.openTraineeExam=function(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var modal=document.getElementById('addModal'); if(modal){modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML='<div class="examEditorPanel"><div class="card" style="text-align:center"><h2 style="color:var(--gold2)">جاري تحميل الاختبار...</h2><p style="color:var(--muted)">يتم جلب الاختبار من Google Sheets</p></div></div>';}
+    fetchExam(unitId,examId).then(function(exam){
+      if(exam){renderExam(unitId,exam);return;}
+      try{if(typeof getExam==='function'){var local=getExam(unitId,examId);if(local){renderExam(unitId,local);return;}}}catch(e){}
+      if(modal){modal.style.display='none';modal.innerHTML='';} alert('لم يتم العثور على الاختبار في Google Sheets. احفظ الاختبار ثم أرسله للوحدة مرة أخرى.');
+    });
+  };
+  window.submitTraineeExam=function(ev,unitId,examId){
+    ev.preventDefault(); unitId=normalizeUnit(unitId);
+    var e=null; try{if(typeof getExam==='function')e=getExam(unitId,examId);}catch(err){}
+    if(!e){alert('لم يتم العثور على الاختبار. أعد فتح الرابط.');return;}
+    e=normalizeExam(e,unitId,examId);
+    var fd=new FormData(ev.target), num=(fd.get('num')||'').trim();
+    var total=e.questions.length, correct=0; e.questions.forEach(function(q){if(String(fd.get('q_'+q.id))===String(q.answer))correct++;});
+    var percent=total?Math.round((correct/total)*100):0, passed=percent>=Number(e.passScore||60);
+    var payload={type:'exam_result',name:fd.get('name')||'',rank:fd.get('rank')||'',militaryId:num,unit:fd.get('unit')||unitName(unitId),examTitle:e.title,score:correct+' / '+total,percent:percent,status:passed?'ناجح':'راسب'};
+    try{fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});}catch(_e){}
+    var modal=document.getElementById('addModal'); if(modal)modal.innerHTML='<div class="examEditorPanel"><div class="card certificate"><h2>نتيجة الاختبار</h2><h3>'+esc(payload.name)+'</h3><p>الدرجة: '+correct+' من '+total+' - النسبة '+percent+'%</p><p class="'+(passed?'certPass':'certFail')+'">'+(passed?'ناجح':'راسب')+'</p><div class="actionRow"><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div></div></div>';
   };
 })();
 </script>
@@ -2522,169 +2977,110 @@ renderAll();
 </script>
 
 
-<!-- PATCH V34: وضوح أسئلة المتدرب + عد تنازلي + حماية الخروج أثناء الاختبار -->
-<style id="v34-trainee-exam-security-style">
-.traineeExamSecure{position:relative!important;max-width:980px!important;margin:auto!important}
-.traineeExamSecure .secureTop{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-bottom:14px;border:1px solid rgba(240,206,122,.35);background:rgba(7,12,7,.84);border-radius:18px;padding:14px}
-.traineeExamSecure .secureTop h2{margin:0;color:var(--gold2)!important;font-size:28px!important}
-.traineeExamSecure .secureTop p{margin:5px 0 0;color:var(--muted)!important;line-height:1.7}
-.traineeExamSecure .countdownBox{min-width:170px;text-align:center;border:1px solid rgba(240,206,122,.45);border-radius:16px;background:rgba(200,164,93,.14);padding:10px 14px;color:var(--paper)}
-.traineeExamSecure .countdownBox small{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
-.traineeExamSecure .countdownBox b{display:block;color:var(--gold2);font-size:26px;letter-spacing:1px}
-.traineeExamSecure .antiCheatNotice{border:1px dashed rgba(240,206,122,.45);border-radius:14px;background:rgba(216,93,80,.10);color:#ffe7c4;padding:10px 12px;margin:12px 0;line-height:1.8;font-weight:700;text-align:center}
-.traineeExamSecure .card{background:rgba(10,16,10,.88)!important;border:1px solid rgba(240,206,122,.30)!important}
-.traineeExamSecure .savedQuestion{background:rgba(255,255,255,.075)!important;border:1px solid rgba(240,206,122,.32)!important;border-radius:18px!important;padding:16px!important;margin:14px 0!important}
-.traineeExamSecure .savedQuestion b{color:#fff8e9!important;font-size:18px!important;line-height:1.9!important;text-shadow:0 1px 4px rgba(0,0,0,.9)!important}
-.traineeExamSecure .examAnswer{display:block!important;margin:10px 0!important;padding:12px 14px!important;border:1px solid rgba(240,206,122,.28)!important;border-radius:14px!important;background:rgba(0,0,0,.25)!important;color:#fff8e9!important;font-size:16px!important;font-weight:700!important;line-height:1.8!important}
-.traineeExamSecure .examAnswer input{width:auto!important;margin-left:8px!important;transform:scale(1.15)}
-.traineeExamSecure input,.traineeExamSecure select{color:#fff8e9!important;background:rgba(0,0,0,.35)!important;border-color:rgba(240,206,122,.32)!important}
-.traineeExamSecure label{color:#f0ce7a!important;font-weight:800!important}
-.traineeExamSecure .submitExamLocked{width:100%;margin-top:15px;height:50px!important;font-size:18px!important;font-weight:900!important}
-body.examActiveLock{overscroll-behavior:contain!important}
-@media(max-width:700px){.traineeExamSecure .secureTop{grid-template-columns:1fr}.traineeExamSecure .countdownBox{min-width:0}.traineeExamSecure .secureTop h2{font-size:24px!important}.traineeExamSecure .savedQuestion b{font-size:17px!important}.traineeExamSecure .examAnswer{font-size:15px!important}}
-</style>
-<script id="v34-trainee-exam-security-patch">
+<!-- PATCH V33: فتح اختبار الجوال من Google Sheets بصيغ تاريخ ووقت نظيفة -->
+<script id="v33-mobile-exam-open-clean-time-final">
 (function(){
-  var activeExamLock=false;
-  var countdownTimer=null;
-  var oldRender=window.renderTraineeExamForm;
-  var oldSubmit=window.submitTraineeExam;
-  function esc(v){try{return typeof escapeHtml==='function'?escapeHtml(String(v||'')):String(v||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}catch(e){return String(v||'')}}
-  function unitTitle(unitId){try{return typeof unitNameById==='function'?unitNameById(unitId):unitId}catch(e){return unitId}}
-  function toLatinDigitsSafe(v){
-    return String(v||'').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)})
-                         .replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)});
-  }
-  function normalizeDatePart(v){
-    var s=toLatinDigitsSafe(v).trim();
-    if(!s)return '';
-    var m=s.match(/(20\d{2}|19\d{2})[-\/]\s*(\d{1,2})[-\/]\s*(\d{1,2})/);
-    if(m)return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
-    m=s.match(/(\d{1,2})[-\/]\s*(\d{1,2})[-\/]\s*((?:20|19)\d{2})/);
-    if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
-    var d=new Date(s);
-    if(!isNaN(d.getTime())){
-      return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    }
-    return s;
-  }
-  function normalizeTimePart(v){
-    var s=toLatinDigitsSafe(v).trim();
-    if(!s)return '';
-    var m=s.match(/(?:T|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(!m)m=s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(m)return String(m[1]).padStart(2,'0')+':'+m[2];
-    var d=new Date(s);
-    if(!isNaN(d.getTime())){
-      return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-    }
-    return s;
-  }
-  function examDateMs(e){
-    var d=normalizeDatePart(e&&e.startDate);
-    var t=normalizeTimePart(e&&e.startTime);
-    if(!d||!t)return NaN;
-    if(t.length===5)t=t+':00';
-    var ms=new Date(d+'T'+t).getTime();
-    return isNaN(ms)?NaN:ms;
-  }
-  function examEndMs(e){var st=examDateMs(e);return isNaN(st)?NaN:st+(Number(e&&e.duration)||30)*60000;}
-  function formatRemain(ms){
-    ms=Math.max(0,ms||0);var s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
-    return (h?String(h).padStart(2,'0')+':':'')+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
-  }
-  function lockExamPage(){
-    activeExamLock=true;document.body.classList.add('examActiveLock');
-    try{history.pushState({examLock:true},'',location.href)}catch(e){}
-  }
-  function unlockExamPage(){activeExamLock=false;document.body.classList.remove('examActiveLock');if(countdownTimer){clearInterval(countdownTimer);countdownTimer=null}}
-  window.unlockExamPage=unlockExamPage;
-  window.addEventListener('beforeunload',function(ev){if(activeExamLock){ev.preventDefault();ev.returnValue='الخروج من صفحة الاختبار قد يؤدي إلى إلغاء المحاولة.';return ev.returnValue;}});
-  window.addEventListener('popstate',function(){if(activeExamLock){try{history.pushState({examLock:true},'',location.href)}catch(e){} alert('لا يمكن الرجوع أثناء الاختبار. أكمل الاختبار ثم اضغط تسليم.');}});
-  document.addEventListener('visibilitychange',function(){if(activeExamLock && document.hidden){try{sessionStorage.setItem('examLeaveWarning',String((Number(sessionStorage.getItem('examLeaveWarning')||0)+1)))}catch(e){}}});
-  function startCountdown(e){
-    if(countdownTimer)clearInterval(countdownTimer);
-    var el=document.getElementById('traineeExamCountdown');
-    var label=document.getElementById('traineeExamCountdownLabel');
-    var end=examEndMs(e),start=examDateMs(e);
-    function tick(){
-      if(!el)return;
-      var now=Date.now();
-      if(!isNaN(start) && now<start){if(label)label.textContent='يبدأ بعد';el.textContent=formatRemain(start-now);return;}
-      if(label)label.textContent='الوقت المتبقي';
-      var rem=end-now;el.textContent=formatRemain(rem);
-      if(rem<=0){clearInterval(countdownTimer);countdownTimer=null;unlockExamPage();alert('انتهى وقت الاختبار.');try{closeExamEditor()}catch(x){}}
-    }
-    tick();countdownTimer=setInterval(tick,1000);
-  }
-  window.renderTraineeExamForm=function(unitId,e){
-    var st=examDateMs(e),en=examEndMs(e),now=Date.now();
-    var status=(typeof examStatus==='function')?examStatus(e):'مفتوح الآن';
-    if(!isNaN(st)&&!isNaN(en)){
-      if(now<st)status='قادم';
-      else if(now>=st&&now<en)status='مفتوح الآن';
-      else status='منتهي';
-    }
-    var allow=status==='مفتوح الآن'||(!e.startDate&&!e.startTime);
-    if(!isNaN(st)&&now<st)allow=false;
-    if(!isNaN(en)&&now>=en)allow=false;
-    if(!allow){
-      unlockExamPage();
-      var title=(now<st)?'الاختبار لم يبدأ بعد':'انتهى وقت الاختبار';
-      var small=(now<st)?'يبدأ بعد':'الموعد';
-      setTimeout(function(){startCountdown(e)},50);
-      return '<div class="examEditorPanel traineeExamSecure"><div class="secureTop"><div><h2>'+esc(e.title||'اختبار')+'</h2><p>وحدة '+esc(unitTitle(unitId))+' - الحالة: '+esc(status)+'</p></div><div class="countdownBox"><small id="traineeExamCountdownLabel">'+small+'</small><b id="traineeExamCountdown">--:--</b></div></div><div class="card" style="text-align:center"><h3 style="color:var(--gold2)">'+title+'</h3><p style="color:var(--muted);line-height:1.9">موعد الاختبار: '+esc(normalizeDatePart(e.startDate)||'غير محدد')+' '+esc(normalizeTimePart(e.startTime)||'')+'</p><button class="btn" onclick="closeExamEditor()">إغلاق</button></div></div>';
-    }
-    lockExamPage();
-    setTimeout(function(){startCountdown(e)},50);
-    var qs=(e.questions||[]).map(function(q,i){return '<div class="savedQuestion"><b>'+(i+1)+'. '+esc(q.text)+'</b>'+((q.options||[]).map(function(op){return '<label class="examAnswer"><input type="radio" name="q_'+esc(q.id)+'" value="'+esc(op)+'" required> '+esc(op)+'</label>'}).join(''))+'</div>'}).join('');
-    var ranks=['لواء','عميد','عقيد','مقدم','رائد','نقيب','ملازم أول','ملازم','رئيس رقباء','رقيب أول','رقيب','وكيل رقيب','عريف','جندي أول','جندي'];
-    return '<div class="examEditorPanel traineeExamSecure"><div class="secureTop"><div><h2>'+esc(e.title||'اختبار')+'</h2><p>وحدة '+esc(unitTitle(unitId))+' - لا تغادر الصفحة حتى تسليم الاختبار.</p></div><div class="countdownBox"><small id="traineeExamCountdownLabel">الوقت المتبقي</small><b id="traineeExamCountdown">--:--</b></div></div><div class="antiCheatNotice">تنبيه: الخروج أو الرجوع أثناء الاختبار قد يسجل محاولة مغادرة. أكمل الإجابة ثم اضغط تسليم الاختبار.</div><form class="card" onsubmit="submitTraineeExam(event,\''+esc(unitId)+'\',\''+esc(e.id)+'\')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>'+ranks.map(function(r){return '<option>'+esc(r)+'</option>'}).join('')+'</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="'+esc(unitTitle(unitId))+'"></div></div><div class="examTimer" id="examTimer">مدة الاختبار: '+esc(e.duration||30)+' دقيقة</div>'+qs+'<button class="btn primary submitExamLocked">تسليم الاختبار</button></form></div>';
-  };
-  window.submitTraineeExam=function(ev,unitId,examId){unlockExamPage();if(typeof oldSubmit==='function')return oldSubmit.apply(this,arguments)};
-})();
-</script>
+  var APPS_URL=(window.GOOGLE_SCRIPT_URL&&String(window.GOOGLE_SCRIPT_URL).indexOf('/exec')>-1)?window.GOOGLE_SCRIPT_URL:'https://script.google.com/macros/s/AKfycbzVQvtAYupkAYBN4ZdtgAcfk2Gyc66os2rRIx1TxDMxYjvAStpXZLzMTN6E6Ku7UFNBFA/exec';
+  window.GOOGLE_SCRIPT_URL=APPS_URL;
 
-<!-- PATCH V35: إصلاح نهائي لقراءة وقت الاختبار القادم من Google Sheets على الجوال -->
-<script id="v35-mobile-sheet-time-normalizer">
-(function(){
-  function toLatin(v){return String(v||'').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)}).replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)});}
-  function nDate(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(20\d{2}|19\d{2})[-\/]\s*(\d{1,2})[-\/]\s*(\d{1,2})/);
-    if(m)return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
-    m=s.match(/(\d{1,2})[-\/]\s*(\d{1,2})[-\/]\s*((?:20|19)\d{2})/);
-    if(m)return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
-    var d=new Date(s); if(!isNaN(d.getTime()))return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  function pad2(n){n=Number(n)||0;return (n<10?'0':'')+n;}
+  function esc(s){try{if(typeof escapeHtml==='function')return escapeHtml(s||'');}catch(e){}return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function unitName(unitId){try{if(typeof unitNameById==='function')return unitNameById(unitId);}catch(e){}var m={maintenance:'الصيانة',supply:'الإمداد',transport:'النقل',signal:'الإشارة'};return m[unitId]||unitId;}
+  function normalizeUnit(unitId){
+    var s=String(unitId||'').trim();
+    var map={'الصيانة':'maintenance','MAINTENANCE':'maintenance','maintenance':'maintenance','الإمداد':'supply','الامداد':'supply','SUPPLY':'supply','supply':'supply','النقل':'transport','TRANSPORT':'transport','transport':'transport','الإشارة':'signal','الاشارة':'signal','SIGNAL':'signal','signal':'signal'};
+    try{if(typeof normalizeUnitSafe==='function')return normalizeUnitSafe(s);}catch(e){}
+    return map[s]||s||'maintenance';
+  }
+  function ymdFromDate(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+  function hmFromDate(d){return pad2(d.getHours())+':'+pad2(d.getMinutes());}
+  function cleanDate(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return ymdFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    // ISO أولاً حتى لا نأخذ تاريخ UTC ناقص يوم
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime())&&d.getFullYear()>2000)return ymdFromDate(d);}
+    var m=s.match(/(20\d{2})[\/\-](\d{1,2})[\/\-](\d{1,2})/); if(m)return m[1]+'-'+pad2(m[2])+'-'+pad2(m[3]);
+    m=s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](20\d{2})/); if(m)return m[3]+'-'+pad2(m[2])+'-'+pad2(m[1]);
+    var d2=new Date(s); if(!isNaN(d2.getTime())&&d2.getFullYear()>2000)return ymdFromDate(d2);
     return s;
   }
-  function nTime(v){
-    var s=toLatin(v).trim(),m;
-    if(!s)return '';
-    m=s.match(/(?:T|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(!m)m=s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
-    if(m)return String(m[1]).padStart(2,'0')+':'+m[2];
-    var d=new Date(s); if(!isNaN(d.getTime()))return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  function cleanTime(v){
+    if(v===null||v===undefined)return '';
+    if(v instanceof Date&&!isNaN(v.getTime()))return hmFromDate(v);
+    var s=String(v).trim(); if(!s)return '';
+    if(s.indexOf('T')>-1){var d=new Date(s);if(!isNaN(d.getTime()))return hmFromDate(d);}
+    if(/^\d+(\.\d+)?$/.test(s)){var num=Number(s);if(num>0&&num<1){var mins=Math.round(num*24*60);return pad2(Math.floor(mins/60))+':'+pad2(mins%60);}}
+    var pm=/م|مساء|PM/i.test(s), am=/ص|صباح|AM/i.test(s);
+    var m=s.match(/(\d{1,2}):(\d{2})/); if(m){var h=Number(m[1]), mm=Number(m[2]);if(pm&&h<12)h+=12;if(am&&h===12)h=0;return pad2(h)+':'+pad2(mm);}
+    m=s.match(/(\d{1,2})[^\d]+(\d{2})/); if(m){var hh=Number(m[1]), mn=Number(m[2]);if(pm&&hh<12)hh+=12;if(am&&hh===12)hh=0;return pad2(hh)+':'+pad2(mn);}
     return s;
   }
-  window.normalizeExamDateForMobile=nDate;
-  window.normalizeExamTimeForMobile=nTime;
-  window.examStartMsSafe=function(exam){
-    var d=nDate(exam&&exam.startDate),t=nTime(exam&&exam.startTime);
-    if(!d||!t)return NaN;
-    if(t.length===5)t+=':00';
-    var ms=new Date(d+'T'+t).getTime();
-    return isNaN(ms)?NaN:ms;
-  };
-  window.examStatus=function(exam){
-    if(!exam||!exam.startDate||!exam.startTime)return exam&&exam.sent?'جاهز':'قيد الإعداد';
-    var st=window.examStartMsSafe(exam);
-    if(isNaN(st))return exam.sent?'جاهز':'قيد الإعداد';
-    var en=st+(Number(exam.duration)||30)*60000,now=Date.now();
-    if(now<st)return 'قادم';
-    if(now>=st&&now<en)return 'مفتوح الآن';
+  function normalizeQuestion(q,i){
+    q=q||{}; var id=String(q.id||q.qid||('Q_'+i));
+    var text=String(q.text||q.q||q.question||'سؤال');
+    var opts=Array.isArray(q.options)?q.options:(Array.isArray(q.opts)?q.opts:['صح','خطأ']);
+    var answer=(q.answer!==undefined?q.answer:(q.correct!==undefined?q.correct:''));
+    return {id:id,type:q.type||'mcq',text:text,options:opts,answer:String(answer)};
+  }
+  function normalizeExam(data,unitId,examId){
+    data=data||{}; unitId=normalizeUnit(data.unit||unitId);
+    var qs=data.questions||[]; if(typeof qs==='string'){try{qs=JSON.parse(qs||'[]')}catch(e){qs=[];}}
+    if(!Array.isArray(qs))qs=[]; qs=qs.map(normalizeQuestion);
+    return {id:String(data.examId||data.id||examId||''),unitId:unitId,unit:unitId,title:String(data.examTitle||data.title||'اختبار'),examTitle:String(data.examTitle||data.title||'اختبار'),sent:true,status:'جاهز',startDate:cleanDate(data.startDate),startTime:cleanTime(data.startTime),duration:Number(data.duration||30),passScore:Number(data.passScore||60),questions:qs,results:[]};
+  }
+  function getStatus(exam){
+    var sd=cleanDate(exam.startDate), st=cleanTime(exam.startTime);
+    exam.startDate=sd; exam.startTime=st;
+    if(!sd||!st)return 'جاهز';
+    var start=new Date(sd+'T'+st+':00');
+    if(isNaN(start.getTime()))return 'جاهز';
+    var end=new Date(start.getTime()+(Number(exam.duration)||30)*60000);
+    var now=new Date();
+    if(now<start)return 'قادم';
+    if(now>=start&&now<=end)return 'مفتوح الآن';
     return 'منتهي';
+  }
+  window.examStatus=function(exam){return getStatus(exam||{});};
+  function saveLocal(unitId,exam){
+    try{unitId=normalizeUnit(unitId); if(!window.unitTestsStore)window.unitTestsStore={}; if(!unitTestsStore[unitId])unitTestsStore[unitId]=[]; var idx=unitTestsStore[unitId].findIndex(function(x){return String(x.id)===String(exam.id)}); if(idx>=0)unitTestsStore[unitId][idx]=Object.assign({},unitTestsStore[unitId][idx],exam); else unitTestsStore[unitId].push(exam); if(typeof saveExamStore==='function')saveExamStore();}catch(e){}
+  }
+  function fetchExam(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var url=APPS_URL+'?type=exam&unit='+encodeURIComponent(unitId)+'&examId='+encodeURIComponent(examId)+'&t='+Date.now();
+    return fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(!d||!d.ok)return null;var ex=normalizeExam(d,unitId,examId);saveLocal(unitId,ex);return ex;}).catch(function(e){console.warn('V33 fetch failed',e);return null;});
+  }
+  function renderExam(unitId,exam){
+    unitId=normalizeUnit(unitId); exam=normalizeExam(exam,unitId,exam&&exam.id);
+    var status=getStatus(exam), allow=status==='مفتوح الآن'||(!exam.startDate&&!exam.startTime);
+    var modal=document.getElementById('addModal'); if(!modal)return;
+    modal.className='modalOverlay active examFullScreen'; modal.style.display='block';
+    var closedMsg=status==='قادم'?'الاختبار لم يبدأ بعد':'انتهى وقت الاختبار';
+    var when=(exam.startDate||'لم يحدد')+' '+(exam.startTime||'لم يحدد');
+    if(!allow){modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><div class="card" style="text-align:center"><h3 style="color:var(--gold2);font-size:26px">'+closedMsg+'</h3><p style="font-size:18px;color:var(--paper)">موعد الاختبار: '+esc(when)+'</p></div></div>'; return;}
+    var ranks=['لواء','عميد','عقيد','مقدم','رائد','نقيب','ملازم أول','ملازم','رئيس رقباء','رقيب أول','رقيب','وكيل رقيب','عريف','جندي أول','جندي'];
+    modal.innerHTML='<div class="examEditorPanel"><div class="head"><div><h2>'+esc(exam.title)+'</h2><p>وحدة '+esc(unitName(unitId))+' - الحالة: '+esc(status)+'</p><p style="color:var(--muted)">موعد الاختبار: '+esc(when)+' - المدة: '+esc(exam.duration)+' دقيقة</p></div><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div><form class="card" onsubmit="submitTraineeExam(event,\''+unitId+'\',\''+esc(exam.id)+'\')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>'+ranks.map(function(r){return '<option>'+r+'</option>'}).join('')+'</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="'+esc(unitName(unitId))+'"></div></div><div class="examTimer" id="examTimer">الوقت المحدد: '+esc(exam.duration)+' دقيقة</div>'+exam.questions.map(function(q,i){return '<div class="savedQuestion"><b>'+(i+1)+'. '+esc(q.text)+'</b>'+q.options.map(function(op){return '<label class="examAnswer"><input type="radio" name="q_'+esc(q.id)+'" value="'+esc(op)+'" required> '+esc(op)+'</label>'}).join('')+'</div>'}).join('')+'<button class="btn primary" style="width:100%;margin-top:15px">تسليم الاختبار</button></form></div>';
+  }
+  window.openTraineeExam=function(unitId,examId){
+    unitId=normalizeUnit(unitId); examId=String(examId||'');
+    var modal=document.getElementById('addModal'); if(modal){modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML='<div class="examEditorPanel"><div class="card" style="text-align:center"><h2 style="color:var(--gold2)">جاري تحميل الاختبار...</h2><p style="color:var(--muted)">يتم جلب الاختبار من Google Sheets</p></div></div>';}
+    fetchExam(unitId,examId).then(function(exam){
+      if(exam){renderExam(unitId,exam);return;}
+      try{if(typeof getExam==='function'){var local=getExam(unitId,examId);if(local){renderExam(unitId,local);return;}}}catch(e){}
+      if(modal){modal.style.display='none';modal.innerHTML='';} alert('لم يتم العثور على الاختبار في Google Sheets. احفظ الاختبار ثم أرسله للوحدة مرة أخرى.');
+    });
+  };
+  window.submitTraineeExam=function(ev,unitId,examId){
+    ev.preventDefault(); unitId=normalizeUnit(unitId);
+    var e=null; try{if(typeof getExam==='function')e=getExam(unitId,examId);}catch(err){}
+    if(!e){alert('لم يتم العثور على الاختبار. أعد فتح الرابط.');return;}
+    e=normalizeExam(e,unitId,examId);
+    var fd=new FormData(ev.target), num=(fd.get('num')||'').trim();
+    var total=e.questions.length, correct=0; e.questions.forEach(function(q){if(String(fd.get('q_'+q.id))===String(q.answer))correct++;});
+    var percent=total?Math.round((correct/total)*100):0, passed=percent>=Number(e.passScore||60);
+    var payload={type:'exam_result',name:fd.get('name')||'',rank:fd.get('rank')||'',militaryId:num,unit:fd.get('unit')||unitName(unitId),examTitle:e.title,score:correct+' / '+total,percent:percent,status:passed?'ناجح':'راسب'};
+    try{fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});}catch(_e){}
+    var modal=document.getElementById('addModal'); if(modal)modal.innerHTML='<div class="examEditorPanel"><div class="card certificate"><h2>نتيجة الاختبار</h2><h3>'+esc(payload.name)+'</h3><p>الدرجة: '+correct+' من '+total+' - النسبة '+percent+'%</p><p class="'+(passed?'certPass':'certFail')+'">'+(passed?'ناجح':'راسب')+'</p><div class="actionRow"><button class="btn" onclick="closeExamEditor&&closeExamEditor()">إغلاق</button></div></div></div>';
   };
 })();
 </script>
