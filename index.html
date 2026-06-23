@@ -1879,7 +1879,12 @@ renderAll();
   '</div>';}
   function resultsTable(unitId){var rows=allUnitResults(unitId);if(!rows.length)return '<div class="noteBox">لا توجد نتائج مسجلة حتى الآن.</div>';return '<div class="table-wrap"><table><thead><tr><th>م</th><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>الاختبار</th><th>الدرجة</th><th>النسبة</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>'+rows.map(function(x,i){var r=x.result,e=x.exam;return '<tr><td>'+(i+1)+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.rank)+'</td><td>'+esc(r.num)+'</td><td>'+esc(e.title)+'</td><td>'+esc(r.score)+'/'+esc(r.total)+'</td><td>'+esc(r.percent)+'%</td><td>'+(r.passed?'<span class="pass">ناجح</span>':'<span class="fail">راسب</span>')+'</td><td>'+esc(r.date)+'</td></tr>'}).join('')+'</tbody></table></div>';}
   window.exportUnitResultsExcel=function(unitId){unitId=normalizeUnit(unitId);var rows=allUnitResults(unitId);var csv='الاسم,الرتبة,الرقم العسكري,الوحدة,الاختبار,الدرجة,الإجمالي,النسبة,الحالة,التاريخ\n';rows.forEach(function(x){var r=x.result,e=x.exam;csv+=[r.name,r.rank,r.num,unitTitle(unitId),e.title,r.score,r.total,r.percent,(r.passed?'ناجح':'راسب'),r.date].map(function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'}).join(',')+'\n'});var blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='نتائج-'+unitTitle(unitId)+'.csv';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},1000)};
-  window.exportUnitResultsPDF=function(unitId){unitId=normalizeUnit(unitId);var w=window.open('','_blank');var html='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>نتائج '+esc(unitTitle(unitId))+'</title><style>@page{size:A4 landscape;margin:8mm}body{font-family:Tahoma;color:#111}h1{text-align:center}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #333;padding:6px;text-align:center}th{background:#eee}</style></head><body><h1>نتائج اختبارات وحدة '+esc(unitTitle(unitId))+'</h1>'+resultsTable(unitId).replace(/class="[^"]*"/g,'')+'</body></html>';w.document.write(html);w.document.close();setTimeout(function(){w.print()},300)};
+  window.exportUnitResultsPDF=function(unitId){unitId=normalizeUnit(unitId);var w=window.open('','_blank');var html='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>نتائج '+esc(unitTitle(unitId))+'</title><style>@page{size:A4 landscape;margin:8mm}body{font-family:Tahoma;color:#111}h1{text-align:center}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #333;padding:6px;text-align:center}th{background:#eee}</style></head><body><h1>نتائج اختبارات وحدة '+esc(unitTitle(unitId))+'</h1>'+resultsTable(unitId).replace(/class="[^"]*"/g,'')+'
+<style id="exam-toast-top-center-final-fix">
+.examToast{position:fixed!important;z-index:100000!important;left:50%!important;right:auto!important;top:22px!important;bottom:auto!important;transform:translateX(-50%)!important;border-radius:16px!important;padding:14px 22px!important;text-align:center!important;min-width:260px!important;max-width:min(92vw,560px)!important}
+@keyframes examToastIn{from{transform:translate(-50%,-18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+</style>
+</body></html>';w.document.write(html);w.document.close();setTimeout(function(){w.print()},300)};
   function examCards(unitId){var exams=getExams(unitId).filter(function(e){return e && (e.sent || (e.questions||[]).length>0 || e.status==='جاهز')});if(!exams.length)return '<div class="card"><h3 style="color:var(--gold2)">لا توجد اختبارات جاهزة</h3><p style="color:var(--muted)">بعد حفظ الأسئلة أو إرسال الاختبار للوحدة سيظهر هنا تلقائياً.</p></div>';return exams.map(function(e){var direct=window.buildExamLink(unitId,e.id);var res=e.results||[];var pass=res.filter(function(r){return r.passed}).length;return '<div class="card unitTraineeExamCard"><h3>'+esc(e.title||'اختبار بدون عنوان')+'</h3><span class="unitTraineeStatus">'+esc(stText(e))+'</span><div class="meta">عدد الأسئلة: '+((e.questions||[]).length)+'<br>الموعد: '+esc(e.startDate||'-')+' '+esc(e.startTime||'')+'<br>المدة: '+esc(e.duration||30)+' دقيقة<br>النتائج: '+res.length+' مختبر / '+pass+' ناجح</div><div class="unitTraineeLinkBox">'+esc(direct)+'</div><div class="actionRow" style="margin-top:12px"><button class="btn primary" onclick="openTraineeExam(\''+unitId+'\',\''+e.id+'\')">دخول الاختبار</button><button class="btn" onclick="copyExamLink(\''+unitId+'\',\''+e.id+'\')">نسخ رابط الاختبار</button></div></div>'}).join('')}
   window.openUnitTraineeExamPage=function(unitId){unitId=normalizeUnit(unitId);var u=unitObj(unitId);var page=ensurePage();page.innerHTML='<div class="unitTraineeHero"><div class="head" style="margin-bottom:0"><div><h2>'+(u.icon||'📝')+' صفحة مختبرين وحدة '+esc(u.name)+'</h2><p>الاختبارات المخصصة لهذه الوحدة تظهر هنا تلقائياً بعد حفظ الأسئلة أو الإرسال.</p></div><div class="actionRow no-print"><button class="btn" onclick="showPage(\'testsHub\')">رجوع للاختبارات</button><button class="btn primary" onclick="copyUnitTraineePageLink(\''+unitId+'\')">نسخ رابط صفحة الوحدة</button></div></div><div class="unitTraineeLinkBox">'+esc(window.buildUnitTraineePageLink(unitId))+'</div></div>'+dash(unitId)+'<div class="unitTraineeExamGrid">'+examCards(unitId)+'</div><h3 class="sectionTitle">لوحة نتائج الوحدة</h3><div class="actionRow no-print"><button class="btn" onclick="exportUnitResultsPDF(\''+unitId+'\')">تصدير PDF</button><button class="btn" onclick="exportUnitResultsExcel(\''+unitId+'\')">تصدير Excel</button></div>'+resultsTable(unitId);if(typeof showPage==='function')showPage('unitTraineeExamPage')};
   var oldRenderUnitTests=window.renderUnitTests;
@@ -1892,7 +1897,12 @@ renderAll();
   window.addQuestionToExam=function(){if(typeof oldAddQ==='function')oldAddQ.apply(this,arguments);try{var e=examById(examEditor.unitId,examEditor.examId);if(e){e.status=e.sent?'جاهز':'قيد الإعداد';if(typeof saveExamStore==='function')saveExamStore()}}catch(err){}};
   var oldSubmit=window.submitTraineeExam;
   window.submitTraineeExam=function(ev,unitId,examId){try{var e=examById(unitId,examId);if(e){var fd=new FormData(ev.target);var num=String(fd.get('num')||'').trim();if((e.results||[]).some(function(r){return String(r.num)===num})){var code=prompt('هذا الرقم العسكري سبق أن اختبر. أدخل رمز القائد للسماح بالإعادة:');if(code!==RETAKE_CODE){ev.preventDefault();toast('تم منع إعادة الاختبار بدون إذن القائد',false);return} e.results=e.results.filter(function(r){return String(r.num)!==num}); if(typeof saveExamStore==='function')saveExamStore();}}}catch(err){} if(typeof oldSubmit==='function')return oldSubmit.apply(this,arguments)};
-  window.printUnitTable=function(unitName){var st=unitStats(unitName);var rows=st.list.map(function(t){return '<tr><td>'+esc(t.name)+'</td><td>'+esc(t.rank)+'</td><td>'+esc(t.num)+'</td><td>'+esc(t.phone||'—')+'</td><td>'+esc(t.unit)+'</td>'+skills.map(function(s,i){return '<td>'+(t.s[i]?'✅ اجتاز':'❌ لم يجتاز')+'</td>'}).join('')+'<td>'+esc(bmi(t))+'</td><td>'+(ready(t)?'جاهز':'غير جاهز')+'</td></tr>'}).join('');var html='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>طباعة جدول '+esc(unitName)+'</title><style>@page{size:A4 landscape;margin:7mm}body{font-family:Tahoma,Arial,sans-serif;color:#000;margin:0}h1{text-align:center;margin:0 0 4px;font-size:18px}.sub{text-align:center;margin-bottom:10px;font-size:12px}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border:1px solid #333;padding:4px;text-align:center;white-space:nowrap}th{background:#e6e6e6;font-weight:bold}</style></head><body><h1>جدول متدربي وحدة '+esc(unitName)+'</h1><div class="sub">نظام إدارة المقاتل الشجاع - صيانة قوة طريف</div><table><thead><tr><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>رقم الجوال</th><th>الوحدة</th>'+skills.map(function(s){return '<th>'+esc(s)+'</th>'}).join('')+'<th>حالة الوزن</th><th>الجاهزية</th></tr></thead><tbody>'+rows+'</tbody></table></body></html>';var w=window.open('','_blank');w.document.write(html);w.document.close();setTimeout(function(){w.print()},300)};
+  window.printUnitTable=function(unitName){var st=unitStats(unitName);var rows=st.list.map(function(t){return '<tr><td>'+esc(t.name)+'</td><td>'+esc(t.rank)+'</td><td>'+esc(t.num)+'</td><td>'+esc(t.phone||'—')+'</td><td>'+esc(t.unit)+'</td>'+skills.map(function(s,i){return '<td>'+(t.s[i]?'✅ اجتاز':'❌ لم يجتاز')+'</td>'}).join('')+'<td>'+esc(bmi(t))+'</td><td>'+(ready(t)?'جاهز':'غير جاهز')+'</td></tr>'}).join('');var html='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>طباعة جدول '+esc(unitName)+'</title><style>@page{size:A4 landscape;margin:7mm}body{font-family:Tahoma,Arial,sans-serif;color:#000;margin:0}h1{text-align:center;margin:0 0 4px;font-size:18px}.sub{text-align:center;margin-bottom:10px;font-size:12px}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border:1px solid #333;padding:4px;text-align:center;white-space:nowrap}th{background:#e6e6e6;font-weight:bold}</style></head><body><h1>جدول متدربي وحدة '+esc(unitName)+'</h1><div class="sub">نظام إدارة المقاتل الشجاع - صيانة قوة طريف</div><table><thead><tr><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>رقم الجوال</th><th>الوحدة</th>'+skills.map(function(s){return '<th>'+esc(s)+'</th>'}).join('')+'<th>حالة الوزن</th><th>الجاهزية</th></tr></thead><tbody>'+rows+'</tbody></table>
+<style id="exam-toast-top-center-final-fix">
+.examToast{position:fixed!important;z-index:100000!important;left:50%!important;right:auto!important;top:22px!important;bottom:auto!important;transform:translateX(-50%)!important;border-radius:16px!important;padding:14px 22px!important;text-align:center!important;min-width:260px!important;max-width:min(92vw,560px)!important}
+@keyframes examToastIn{from{transform:translate(-50%,-18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+</style>
+</body></html>';var w=window.open('','_blank');w.document.write(html);w.document.close();setTimeout(function(){w.print()},300)};
   window.renderLeader=function(){try{var f=forceStats();var totalSkillChecks=trainees.length*skills.length;var totalPassedSkills=trainees.reduce(function(sum,t){return sum+t.s.filter(Boolean).length},0);var op=totalSkillChecks?Math.round(totalPassedSkills/totalSkillChecks*100):0;var urows=getUnitList().map(function(u){return {unit:u,st:unitStats(u.name)}}).sort(function(a,b){return b.st.pct-a.st.pct});var over=trainees.filter(function(t){return bmi(t)==='وزن زائد'}).length;var obese=trainees.filter(function(t){return bmi(t)==='سمنة'}).length;var urgent=[];skills.forEach(function(s,i){trainees.filter(function(t){return !t.s[i]}).slice(0,4).forEach(function(t){urgent.push({name:t.name,unit:t.unit,rank:t.rank,reason:s,type:'تدريب'})})});trainees.filter(function(t){return bmi(t)==='سمنة'}).forEach(function(t){urgent.push({name:t.name,unit:t.unit,rank:t.rank,reason:'سمنة',type:'صحي'})});urgent=urgent.slice(0,12);var html='<div class="head"><div><h2>لوحة القائد الاستراتيجية</h2><p>جاهزية القوة، ترتيب الوحدات، والمؤشرات التشغيلية</p></div><button class="btn no-print" onclick="showPage(\'home\')">رجوع</button></div>'+'<div class="kpis"><div class="kpi"><b>'+f.total+'</b><span>إجمالي القوة</span></div><div class="kpi ok"><b>'+f.passed+'</b><span>جاهزون بالكامل</span></div><div class="kpi bad"><b>'+f.fail+'</b><span>يحتاجون متابعة</span></div><div class="kpi ok"><b>'+f.pct+'%</b><span>جاهزية القوة</span></div><div class="kpi"><b>'+op+'%</b><span>القوة التشغيلية</span></div><div class="kpi"><b>'+f.status+'</b><span>حالة القوة</span></div><div class="kpi warn"><b>'+over+'</b><span>وزن زائد</span></div><div class="kpi bad"><b>'+obese+'</b><span>سمنة</span></div></div>'+'<h3 class="sectionTitle">جاهزية الوحدات وترتيبها</h3><div class="grid">'+urows.map(function(r,i){return '<div class="card"><h3 style="color:var(--gold2)">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':'▫️')+' '+(r.unit.icon||'')+' '+esc(r.unit.name)+'</h3><div class="kpis"><div class="kpi"><b>'+r.st.total+'</b><span>الأفراد</span></div><div class="kpi"><b>'+r.st.pct+'%</b><span>جاهزية الوحدة</span></div><div class="kpi bad"><b>'+r.st.fail+'</b><span>غير جاهزين</span></div></div><p style="color:var(--muted);font-size:12px;margin-top:10px">الحالة: '+esc(r.st.status)+'</p></div>'}).join('')+'</div>';var el=$id('leader');if(el)el.innerHTML=html}catch(err){console.error(err)}};
   function route(){var h=decodeURIComponent(location.hash||'');var m;if(!h)return;m=h.match(/^#exams-([^?]+)/);if(m){setTimeout(function(){openUnitTraineeExamPage(normalizeUnit(m[1]))},100);return}m=h.match(/^#exam-([^?]+)\?id=([^&]+)/);if(m){setTimeout(function(){openTraineeExam(normalizeUnit(m[1]),m[2])},100);return}m=h.match(/^#exam\?unit=([^&]+)&id=([^&]+)/);if(m){setTimeout(function(){openTraineeExam(normalizeUnit(m[1]),m[2])},100)}}
   window.addEventListener('hashchange',route);
@@ -2047,8 +2057,22 @@ renderAll();
       sent:!!exam.sent
     };
     try{
-      fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}).catch(function(){});
-    }catch(e){console.warn('exam_save post failed',e)}
+      console.log('SENDING EXAM TO SHEETS:', payload);
+      if(!payload.examId){ alert('لم يتم إرسال الاختبار: معرف الاختبار فارغ'); return; }
+      if(!payload.questions || !payload.questions.length){ console.warn('EXAM HAS NO QUESTIONS:', payload); }
+      fetch(APPS_URL,{
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify(payload)
+      }).then(function(){
+        console.log('EXAM POST SENT TO APPS SCRIPT');
+        try{ alert('تم إرسال الاختبار إلى Google Sheets، افتح ورقة الاختبارات واضغط تحديث.'); }catch(_e){}
+      }).catch(function(err){
+        console.error('EXAM POST ERROR:',err);
+        try{ alert('فشل إرسال الاختبار إلى Google Sheets'); }catch(_e){}
+      });
+    }catch(e){console.warn('exam_save post failed',e); try{alert('تعذر تنفيذ إرسال الاختبار: '+e.message)}catch(_e){}}
   }
 
   // استبدال الإرسال القديم exam_record بإرسال كامل exam_save متوافق مع Apps Script الحالي
@@ -2081,6 +2105,34 @@ renderAll();
     }catch(e){console.warn(e)}
     return r;
   };
+
+
+
+  // V29: زر يدوي وملتقط نقرات لضمان إرسال الاختبار حتى لو لم يستدع الزر القديم الدالة
+  window.forceSendCurrentExamToSheets=function(){
+    try{
+      var unitId=(window.examEditor&&examEditor.unitId)||window.currentTestUnit||window.currentUnit||'maintenance';
+      var examId=(window.examEditor&&examEditor.examId)||'';
+      var exam=localFind(unitId,examId);
+      if(!exam && window.unitTestsStore && unitTestsStore[normalizeUnitSafe(unitId)] && unitTestsStore[normalizeUnitSafe(unitId)].length){
+        var arr=unitTestsStore[normalizeUnitSafe(unitId)];
+        exam=arr[arr.length-1];
+      }
+      if(!exam){ alert('لم أجد الاختبار الحالي داخل الصفحة. افتح محرر الاختبار ثم اضغط إرسال للوحدة مرة أخرى.'); return false; }
+      postExamToSheets(unitId,exam);
+      return true;
+    }catch(e){ console.error('forceSendCurrentExamToSheets failed',e); alert('فشل تحديد الاختبار الحالي'); return false; }
+  };
+  document.addEventListener('click',function(ev){
+    try{
+      var t=ev.target;
+      if(!t) return;
+      var txt=(t.innerText||t.textContent||'').trim();
+      if(txt.indexOf('إرسال للوحدة')>-1 || txt.indexOf('إرسال الاختبار')>-1){
+        setTimeout(function(){ window.forceSendCurrentExamToSheets && window.forceSendCurrentExamToSheets(); },700);
+      }
+    }catch(e){}
+  },true);
 
   function fetchExamFromSheets(unitId, examId){
     unitId=normalizeUnitSafe(unitId);
