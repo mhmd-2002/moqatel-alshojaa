@@ -2205,4 +2205,301 @@ renderAll();
   };
 })();
 </script>
+
+<!-- PATCH V32: إصلاح قراءة وقت الاختبار من Google Sheets للجوال + حفظ النتائج -->
+<script id="v32-mobile-exam-time-result-fix">
+(function(){
+  var APPS_URL = (window.GOOGLE_SCRIPT_URL && String(window.GOOGLE_SCRIPT_URL).indexOf('/exec')>-1)
+    ? window.GOOGLE_SCRIPT_URL
+    : 'https://script.google.com/macros/s/AKfycbzVQvtAYupkAYBN4ZdtgAcfk2Gyc66os2rRIx1TxDMxYjvAStpXZLzMTN6E6Ku7UFNBFA/exec';
+  window.GOOGLE_SCRIPT_URL = APPS_URL;
+
+  function normalizeUnitV32(unitId){
+    try{ if(typeof normalizeUnit==='function') return normalizeUnit(unitId); }catch(e){}
+    var s=String(unitId||'').trim();
+    var map={
+      'الصيانة':'maintenance','maintenance':'maintenance','MAINTENANCE':'maintenance',
+      'الإمداد':'supply','الامداد':'supply','supply':'supply','SUPPLY':'supply',
+      'النقل':'transport','transport':'transport','TRANSPORT':'transport',
+      'الإشارة':'signal','الاشارة':'signal','signal':'signal','SIGNAL':'signal'
+    };
+    return map[s] || s || 'maintenance';
+  }
+
+  function pad2(n){ n=Number(n)||0; return (n<10?'0':'')+n; }
+
+  function dateToYMD(d){
+    if(!(d instanceof Date) || isNaN(d.getTime())) return '';
+    return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
+  }
+
+  function timeToHM(d){
+    if(!(d instanceof Date) || isNaN(d.getTime())) return '';
+    return pad2(d.getHours())+':'+pad2(d.getMinutes());
+  }
+
+  function normalizeSheetDate(v){
+    if(v === null || v === undefined) return '';
+    if(v instanceof Date) return dateToYMD(v);
+    var s=String(v).trim();
+    if(!s) return '';
+
+    // yyyy-mm-dd أو yyyy/mm/dd
+    var m=s.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+    if(m) return m[1]+'-'+pad2(m[2])+'-'+pad2(m[3]);
+
+    // dd/mm/yyyy أو dd-mm-yyyy
+    m=s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+    if(m) return m[3]+'-'+pad2(m[2])+'-'+pad2(m[1]);
+
+    // ISO date
+    var d=new Date(s);
+    if(!isNaN(d.getTime()) && d.getFullYear()>2000) return dateToYMD(d);
+
+    return s;
+  }
+
+  function normalizeSheetTime(v){
+    if(v === null || v === undefined) return '';
+    if(v instanceof Date) return timeToHM(v);
+    var s=String(v).trim();
+    if(!s) return '';
+
+    // Excel/Sheets time as fraction of day
+    if(/^\d+(\.\d+)?$/.test(s)){
+      var num=Number(s);
+      if(num>0 && num<1){
+        var mins=Math.round(num*24*60);
+        return pad2(Math.floor(mins/60))+':'+pad2(mins%60);
+      }
+    }
+
+    // ISO time. Convert to local time if it is a Date object string.
+    if(s.indexOf('T')>-1){
+      var d=new Date(s);
+      if(!isNaN(d.getTime())) return timeToHM(d);
+    }
+
+    // HH:mm أو HH:mm:ss
+    var m=s.match(/(\d{1,2}):(\d{2})/);
+    if(m) return pad2(m[1])+':'+pad2(m[2]);
+
+    // Arabic AM/PM text safety
+    var isPM=/م|مساء|PM/i.test(s), isAM=/ص|صباح|AM/i.test(s);
+    m=s.match(/(\d{1,2})[^\d]+(\d{2})/);
+    if(m){
+      var hh=Number(m[1]), mm=Number(m[2]);
+      if(isPM && hh<12) hh+=12;
+      if(isAM && hh===12) hh=0;
+      return pad2(hh)+':'+pad2(mm);
+    }
+
+    return s;
+  }
+
+  function normalizeExamV32(data, unitId, examId){
+    data=data||{};
+    unitId=normalizeUnitV32(data.unit || unitId);
+    var questions=[];
+    if(Array.isArray(data.questions)) questions=data.questions;
+    else if(typeof data.questions==='string'){
+      try{ questions=JSON.parse(data.questions||'[]'); }catch(e){ questions=[]; }
+    }
+
+    return {
+      id:String(data.examId || examId || ''),
+      examId:String(data.examId || examId || ''),
+      unitId:unitId,
+      unit:unitId,
+      title:String(data.examTitle || data.title || 'اختبار'),
+      examTitle:String(data.examTitle || data.title || 'اختبار'),
+      status:'جاهز',
+      sent:true,
+      startDate:normalizeSheetDate(data.startDate),
+      startTime:normalizeSheetTime(data.startTime),
+      duration:Number(data.duration || 30),
+      passScore:Number(data.passScore || 60),
+      questions:questions,
+      results:[]
+    };
+  }
+
+  function examStartEndV32(exam){
+    var sd=normalizeSheetDate(exam && exam.startDate);
+    var st=normalizeSheetTime(exam && exam.startTime);
+    if(!sd || !st) return null;
+    var start=new Date(sd+'T'+st+':00');
+    if(isNaN(start.getTime())) return null;
+    var end=new Date(start.getTime()+(Number(exam.duration)||30)*60000);
+    return {start:start,end:end,startDate:sd,startTime:st};
+  }
+
+  // إعادة تعريف حالة الاختبار بشكل آمن بعد إصلاح الصيغ القادمة من Google Sheets
+  window.examStatus=function(exam){
+    var se=examStartEndV32(exam);
+    if(!se) return exam && exam.sent ? 'جاهز' : 'قيد الإعداد';
+    // حفظ الصيغ النظيفة داخل الكائن حتى لا تظهر ISO مكسورة في الواجهة
+    exam.startDate=se.startDate;
+    exam.startTime=se.startTime;
+    var n=new Date();
+    if(n<se.start) return 'قادم';
+    if(n>=se.start && n<=se.end) return 'مفتوح الآن';
+    return 'منتهي';
+  };
+
+  function saveExamLocalV32(unitId, exam){
+    unitId=normalizeUnitV32(unitId);
+    if(!exam || !exam.id) return;
+    try{
+      if(!window.unitTestsStore) window.unitTestsStore={};
+      if(!unitTestsStore[unitId]) unitTestsStore[unitId]=[];
+      var i=unitTestsStore[unitId].findIndex(function(x){return String(x.id)===String(exam.id);});
+      if(i>=0) unitTestsStore[unitId][i]=Object.assign({}, unitTestsStore[unitId][i], exam);
+      else unitTestsStore[unitId].push(exam);
+      if(typeof saveExamStore==='function') saveExamStore();
+    }catch(e){ console.warn('V32 save local failed',e); }
+  }
+
+  function fetchExamFromSheetsV32(unitId, examId){
+    unitId=normalizeUnitV32(unitId);
+    var url=APPS_URL+'?type=exam&unit='+encodeURIComponent(unitId)+'&examId='+encodeURIComponent(examId)+'&t='+Date.now();
+    return fetch(url,{method:'GET',cache:'no-store'})
+      .then(function(res){ return res.json(); })
+      .then(function(data){
+        if(!data || !data.ok) return null;
+        var exam=normalizeExamV32(data, unitId, examId);
+        saveExamLocalV32(unitId, exam);
+        return exam;
+      })
+      .catch(function(err){ console.warn('V32 fetch exam failed',err); return null; });
+  }
+
+  function renderExamFromObjectV32(unitId, exam){
+    var modal=document.getElementById('addModal');
+    if(!modal) return;
+    unitId=normalizeUnitV32(unitId);
+    exam=normalizeExamV32(exam, unitId, exam && exam.id);
+
+    modal.className='modalOverlay active examFullScreen';
+    modal.style.display='block';
+
+    if(typeof window.renderTraineeExamForm==='function'){
+      modal.innerHTML=window.renderTraineeExamForm(unitId, exam);
+    }else{
+      modal.innerHTML='<div class="examEditorPanel"><div class="card"><h2 style="color:var(--gold2)">'+(exam.title||'اختبار')+'</h2><p>تعذر عرض نموذج الاختبار.</p></div></div>';
+    }
+  }
+
+  // فتح رابط المتدرب: جلب إجباري من Google Sheets ثم عرض بصيغ وقت نظيفة
+  window.openTraineeExam=function(unitId, examId){
+    unitId=normalizeUnitV32(unitId);
+    examId=String(examId||'');
+    var modal=document.getElementById('addModal');
+    if(modal){
+      modal.className='modalOverlay active examFullScreen';
+      modal.style.display='block';
+      modal.innerHTML='<div class="examEditorPanel"><div class="card" style="text-align:center"><h2 style="color:var(--gold2)">جاري تحميل الاختبار...</h2><p style="color:var(--muted)">يتم جلب الاختبار من Google Sheets</p></div></div>';
+    }
+
+    fetchExamFromSheetsV32(unitId,examId).then(function(exam){
+      if(exam) {
+        renderExamFromObjectV32(unitId, exam);
+      } else {
+        // fallback محلي إذا لم يتوفر اتصال
+        try{
+          var local=null;
+          if(typeof getExam==='function') local=getExam(unitId,examId);
+          if(local){ renderExamFromObjectV32(unitId, local); return; }
+        }catch(e){}
+        if(modal){ modal.style.display='none'; modal.innerHTML=''; }
+        alert('لم يتم العثور على الاختبار في Google Sheets. احفظ الاختبار ثم أرسله للوحدة مرة أخرى.');
+      }
+    });
+  };
+
+  // حفظ نتائج المتدرب في Google Sheets مع الحفاظ على عرض النتيجة الحالي
+  window.submitTraineeExam=function(ev,unitId,examId){
+    ev.preventDefault();
+    unitId=normalizeUnitV32(unitId);
+    var e=null;
+    try{ if(typeof getExam==='function') e=getExam(unitId,examId); }catch(err){}
+    if(!e){
+      alert('لم يتم العثور على الاختبار. أعد فتح الرابط.');
+      return;
+    }
+
+    e=normalizeExamV32(e,unitId,examId);
+    var fd=new FormData(ev.target);
+    var num=(fd.get('num')||'').trim();
+
+    e.results=e.results||[];
+    if(e.results.some(function(r){return String(r.num)===num;})){
+      if(typeof notifyExam==='function') notifyExam('تم منع التكرار: هذا الرقم العسكري سبق أن اختبر',false);
+      else alert('تم منع التكرار: هذا الرقم العسكري سبق أن اختبر');
+      return;
+    }
+
+    var total=(e.questions||[]).length, correct=0;
+    (e.questions||[]).forEach(function(q){
+      if(fd.get('q_'+q.id)===q.answer) correct++;
+    });
+    var percent=total?Math.round((correct/total)*100):0;
+    var passed=percent>=Number(e.passScore||60);
+
+    var result={
+      id:(typeof makeId==='function'?makeId('RES'):'RES-'+Date.now()),
+      name:fd.get('name')||'',
+      rank:fd.get('rank')||'',
+      num:num,
+      unit:fd.get('unit')||unitId,
+      score:correct,
+      total:total,
+      percent:percent,
+      passed:passed,
+      date:new Date().toLocaleString('ar-SA')
+    };
+
+    e.results.push(result);
+    saveExamLocalV32(unitId,e);
+
+    try{
+      fetch(APPS_URL,{
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({
+          type:'exam_result',
+          name:result.name,
+          rank:result.rank,
+          militaryId:result.num,
+          unit:result.unit,
+          examTitle:e.title || e.examTitle || 'اختبار',
+          score:correct+' / '+total,
+          percent:percent,
+          status:passed?'ناجح':'راسب'
+        })
+      });
+    }catch(err){ console.warn('V32 result post failed',err); }
+
+    try{ if(typeof playExamSound==='function') playExamSound(); }catch(err){}
+
+    var modal=document.getElementById('addModal');
+    if(modal){
+      modal.innerHTML='<div class="examEditorPanel"><div class="card certificate"><h2>نتيجة الاختبار</h2><h3>'+String(result.name).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];})+'</h3><p>الدرجة: '+correct+' من '+total+' - النسبة '+percent+'%</p><p class="'+(passed?'certPass':'certFail')+'">'+(passed?'ناجح':'راسب')+'</p><div class="actionRow"><button class="btn" onclick="closeExamEditor()">إغلاق</button></div></div></div>';
+    }
+  };
+
+  // إعادة تشغيل مسار الرابط بعد تحميل التصحيح
+  setTimeout(function(){
+    try{
+      var h=decodeURIComponent(location.hash||''), m;
+      m=h.match(/^#exam-([^?]+)\?id=([^&]+)/);
+      if(m){ window.openTraineeExam(m[1],m[2]); return; }
+      m=h.match(/^#exam\?unit=([^&]+)&id=([^&]+)/);
+      if(m){ window.openTraineeExam(m[1],m[2]); return; }
+    }catch(e){}
+  },500);
+})();
+</script>
+
 </body></html>
