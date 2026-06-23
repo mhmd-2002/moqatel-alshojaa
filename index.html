@@ -1578,7 +1578,33 @@ function addQuestionToExam(){let e=getExam(examEditor.unitId,examEditor.examId);
 e.questions=e.questions||[];e.questions.push(q);e.status='قيد الإعداد';e.updatedAt=nowIso();saveExamStore();clearQuestionForm();let list=document.getElementById('savedQuestionsList');if(list)list.innerHTML=renderSavedQuestions(e);updateQuestionCounters(e);notifyExam('تم حفظ السؤال، يمكنك الآن إضافة السؤال التالي',true);}
 function renderSavedQuestions(exam){let qs=exam.questions||[];if(!qs.length)return '<p style="color:var(--muted);text-align:center;padding:20px">لم تتم إضافة أسئلة بعد. أضف السؤال الأول وسيظهر هنا مباشرة.</p>';return qs.map((q,i)=>`<div class="savedQuestion"><b><span class="qIndex">${i+1}</span>${escapeHtml(q.text)}</b><small>${q.type==='tf'?'صح أو خطأ':'اختيار من متعدد'} - الإجابة الصحيحة: ${escapeHtml(q.answer)}</small>${q.options&&q.options.length?`<div class="qOpts">${q.options.map(op=>`<span>${escapeHtml(op)}</span>`).join('')}</div>`:''}<div class="qBtns"><button class="btn danger" onclick="removeQuestion('${q.id}')">حذف السؤال</button></div></div>`).join('')}
 function removeQuestion(qid){let e=getExam(examEditor.unitId,examEditor.examId);if(!e)return;if(!confirm('تأكيد حذف السؤال؟'))return;e.questions=(e.questions||[]).filter(q=>q.id!==qid);e.updatedAt=nowIso();saveExamStore();let list=document.getElementById('savedQuestionsList');if(list)list.innerHTML=renderSavedQuestions(e);updateQuestionCounters(e);notifyExam('تم حذف السؤال',true);}
-function sendExamToUnit(){let e=getExam(examEditor.unitId,examEditor.examId);if(!e)return;saveExamMeta(false);if(!e.title||!e.startDate||!e.startTime||!e.duration||(e.questions||[]).length===0){notifyExam('أكمل عنوان الاختبار والتاريخ والوقت والمدة وأضف سؤالاً واحداً على الأقل',false);return}e.sent=true;e.status='جاهز';e.sentAt=nowIso();saveExamStore();notifyExam('تم إرسال الاختبار إلى وحدة '+unitNameById(examEditor.unitId)+' بنجاح',true);playExamSound();}
+function sendExamToUnit(){
+  let e=getExam(examEditor.unitId,examEditor.examId);
+  if(!e)return;
+
+  saveExamMeta(false);
+
+  if(!e.title||!e.startDate||!e.startTime||!e.duration||(e.questions||[]).length===0){
+    notifyExam('أكمل عنوان الاختبار والتاريخ والوقت والمدة وأضف سؤالاً واحداً على الأقل',false);
+    return;
+  }
+
+  e.sent=true;
+  e.status='جاهز';
+  e.sentAt=nowIso();
+  saveExamStore();
+
+  if(typeof syncExamRecordToSheets === 'function'){
+    syncExamRecordToSheets(examEditor.unitId, e);
+    console.log('SENDING EXAM TO SHEETS:', e);
+  }else{
+    console.error('syncExamRecordToSheets غير موجودة');
+    alert('تعذر العثور على دالة إرسال الاختبار إلى Google Sheets');
+  }
+
+  notifyExam('تم إرسال الاختبار إلى وحدة '+unitNameById(examEditor.unitId)+' بنجاح',true);
+  playExamSound();
+}
 function notifyExam(msg,ok){let n=document.createElement('div');n.className='examToast '+(ok?'ok':'bad');n.textContent=msg;document.body.appendChild(n);setTimeout(()=>n.remove(),3200)}
 function playExamSound(){try{let a=new Audio('https://actions.google.com/sounds/v1/notifications/bell.ogg');a.volume=.35;a.play().catch(()=>{})}catch(e){}}
 const EXAM_PUBLIC_BASE_KEY='moqatel_v3_exam_public_base_url';
