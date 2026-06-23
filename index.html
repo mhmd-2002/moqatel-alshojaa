@@ -2006,4 +2006,132 @@ renderAll();
 .examToast{position:fixed!important;z-index:100000!important;left:50%!important;right:auto!important;top:22px!important;bottom:auto!important;transform:translateX(-50%)!important;border-radius:16px!important;padding:14px 22px!important;text-align:center!important;min-width:260px!important;max-width:min(92vw,560px)!important}
 @keyframes examToastIn{from{transform:translate(-50%,-18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 </style>
+
+
+<!-- PATCH V28: حفظ الاختبارات في Google Sheets وفتحها من الجوال -->
+<script id="v28-exam-google-sheets-mobile-fix">
+(function(){
+  var APPS_URL = (window.GOOGLE_SCRIPT_URL && String(window.GOOGLE_SCRIPT_URL).indexOf('/exec')>-1)
+    ? window.GOOGLE_SCRIPT_URL
+    : 'https://script.google.com/macros/s/AKfycbzVQvtAYupkAYBN4ZdtgAcfk2Gyc66os2rRIx1TxDMxYjvAStpXZLzMTN6E6Ku7UFNBFA/exec';
+  window.GOOGLE_SCRIPT_URL = APPS_URL;
+
+  function normalizeUnitSafe(unitId){
+    try{ if(typeof normalizeUnit==='function') return normalizeUnit(unitId); }catch(e){}
+    var s=String(unitId||'').trim();
+    var map={'الصيانة':'maintenance','الامداد':'supply','الإمداد':'supply','النقل':'transport','الاشارة':'signal','الإشارة':'signal','maintenance':'maintenance','supply':'supply','transport':'transport','signal':'signal'};
+    return map[s] || s || 'maintenance';
+  }
+  function titleOfExam(exam){return (exam && (exam.title || exam.examTitle)) || 'اختبار';}
+  function localFind(unitId, examId){
+    unitId=normalizeUnitSafe(unitId);
+    try{ if(typeof getExam==='function'){var e=getExam(unitId,examId); if(e)return e;} }catch(e){}
+    try{ if(window.unitTestsStore && unitTestsStore[unitId]) return unitTestsStore[unitId].find(function(x){return String(x.id)===String(examId);}); }catch(e){}
+    return null;
+  }
+  function saveLocal(unitId, exam){
+    unitId=normalizeUnitSafe(unitId);
+    if(!exam || !exam.id) return;
+    try{
+      if(!window.unitTestsStore) window.unitTestsStore={};
+      if(!unitTestsStore[unitId]) unitTestsStore[unitId]=[];
+      var i=unitTestsStore[unitId].findIndex(function(x){return String(x.id)===String(exam.id);});
+      if(i>=0) unitTestsStore[unitId][i]=Object.assign({},unitTestsStore[unitId][i],exam);
+      else unitTestsStore[unitId].push(exam);
+      if(typeof saveExamStore==='function') saveExamStore();
+    }catch(e){console.warn('saveLocal exam failed',e)}
+  }
+  function postExamToSheets(unitId, exam){
+    unitId=normalizeUnitSafe(unitId);
+    if(!exam) return;
+    var payload={
+      type:'exam_save',
+      examId:exam.id || '',
+      unit:unitId,
+      examTitle:titleOfExam(exam),
+      questions:exam.questions || [],
+      startDate:exam.startDate || '',
+      startTime:exam.startTime || '',
+      duration:exam.duration || 30,
+      passScore:exam.passScore || 60,
+      sent:!!exam.sent
+    };
+    try{
+      fetch(APPS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}).catch(function(){});
+    }catch(e){console.warn('exam_save post failed',e)}
+  }
+
+  // استبدال الإرسال القديم exam_record بإرسال كامل exam_save متوافق مع Apps Script الحالي
+  window.syncExamRecordToSheets=function(unitId, exam){ postExamToSheets(unitId, exam); };
+
+  // حفظ الاختبار في Google Sheets عند الإرسال للوحدة
+  var oldSendExamToUnit=window.sendExamToUnit;
+  window.sendExamToUnit=function(){
+    var r;
+    if(typeof oldSendExamToUnit==='function') r=oldSendExamToUnit.apply(this,arguments);
+    try{
+      var unitId=window.examEditor && examEditor.unitId;
+      var examId=window.examEditor && examEditor.examId;
+      var exam=localFind(unitId,examId);
+      if(exam) postExamToSheets(unitId,exam);
+    }catch(e){console.warn(e)}
+    return r;
+  };
+
+  // حفظ نسخة في Google Sheets عند حفظ بيانات الاختبار أو الأسئلة
+  var oldSaveExamMeta=window.saveExamMeta;
+  window.saveExamMeta=function(showMsg){
+    var r;
+    if(typeof oldSaveExamMeta==='function') r=oldSaveExamMeta.apply(this,arguments);
+    try{
+      var unitId=window.examEditor && examEditor.unitId;
+      var examId=window.examEditor && examEditor.examId;
+      var exam=localFind(unitId,examId);
+      if(exam && ((exam.questions||[]).length || exam.sent)) postExamToSheets(unitId,exam);
+    }catch(e){console.warn(e)}
+    return r;
+  };
+
+  function fetchExamFromSheets(unitId, examId){
+    unitId=normalizeUnitSafe(unitId);
+    var url=APPS_URL+'?type=exam&unit='+encodeURIComponent(unitId)+'&examId='+encodeURIComponent(examId)+'&t='+Date.now();
+    return fetch(url,{method:'GET',cache:'no-store'}).then(function(res){return res.json();}).then(function(data){
+      if(!data || !data.ok) return null;
+      var exam={
+        id:data.examId || examId,
+        unitId:unitId,
+        title:data.examTitle || 'اختبار',
+        status:'جاهز',
+        sent:true,
+        startDate:data.startDate || '',
+        startTime:data.startTime || '',
+        duration:data.duration || 30,
+        passScore:data.passScore || 60,
+        questions:Array.isArray(data.questions)?data.questions:[],
+        results:[]
+      };
+      saveLocal(unitId,exam);
+      return exam;
+    }).catch(function(err){console.warn('fetch exam failed',err);return null;});
+  }
+
+  // فتح الاختبار من الجوال: إذا لم يوجد محلياً يتم جلبه من Google Sheets
+  var oldOpenTraineeExam=window.openTraineeExam;
+  window.openTraineeExam=function(unitId,examId){
+    unitId=normalizeUnitSafe(unitId);
+    var local=localFind(unitId,examId);
+    if(local && typeof oldOpenTraineeExam==='function') return oldOpenTraineeExam(unitId,examId);
+    var modal=document.getElementById('addModal');
+    if(modal){
+      modal.className='modalOverlay active examFullScreen';
+      modal.style.display='block';
+      modal.innerHTML='<div class="examEditorPanel"><div class="card" style="text-align:center"><h2 style="color:var(--gold2)">جاري تحميل الاختبار...</h2><p style="color:var(--muted)">يتم جلب الاختبار من Google Sheets</p></div></div>';
+    }
+    fetchExamFromSheets(unitId,examId).then(function(exam){
+      if(exam && typeof oldOpenTraineeExam==='function') oldOpenTraineeExam(unitId,examId);
+      else { if(modal){modal.style.display='none';modal.innerHTML='';} alert('لم يتم العثور على الاختبار في Google Sheets. احفظ الاختبار ثم أرسله للوحدة مرة أخرى.'); }
+    });
+  };
+})();
+</script>
 </body></html>
