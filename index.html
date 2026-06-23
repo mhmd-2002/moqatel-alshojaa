@@ -1963,7 +1963,7 @@ renderAll();
     if(!ENABLE_EXAM_RECORD_SYNC || !exam) return;
     postToSheets({
       type:'exam_record',
-      examId:exam.id||'',
+      examId:exam.id || exam.examId || (window.examEditor && examEditor.examId) || '',
       examTitle:exam.title||'',
       unit:unitName(unitId),
       startDate:exam.startDate||'',
@@ -2072,7 +2072,7 @@ renderAll();
     if(!exam) return;
     var payload={
       type:'exam_save',
-      examId:exam.id || '',
+      examId:exam.id || exam.examId || (window.examEditor && examEditor.examId) || '',
       unit:unitId,
       examTitle:titleOfExam(exam),
       questions:exam.questions || [],
@@ -2082,6 +2082,9 @@ renderAll();
       passScore:exam.passScore || 60,
       sent:!!exam.sent
     };
+    if((!payload.examId || payload.examId===unitId.toUpperCase()) && window.examEditor && examEditor.examId){
+      payload.examId = examEditor.examId;
+    }
     try{
       console.log('SENDING EXAM TO SHEETS:', payload);
       if(!payload.examId){ alert('لم يتم إرسال الاختبار: معرف الاختبار فارغ'); return; }
