@@ -2278,7 +2278,11 @@ renderAll();
   window.examScrollQuestionsV7=qScroll;
   function removeBar(){var b=document.querySelector('.examFloatingBarV7'); if(b) b.remove(); document.body.classList.remove('exam-editor-open-v7');}
   function addBar(){
-    var m=modal(); if(!isOpen()) {removeBar(); return;}
+    var m=modal();
+    /* تظهر الأزرار العائمة فقط داخل محرر إعداد الاختبار للقائد، وليس داخل صفحة المختبر */
+    var isTraineeExam = !!(m && m.querySelector('.traineeExamSecure'));
+    var isEditorPanel = !!(m && m.querySelector('.examQuestionCard') && m.querySelector('#examTitle'));
+    if(!isOpen() || isTraineeExam || !isEditorPanel) {removeBar(); return;}
     document.body.classList.add('exam-editor-open-v7');
     if(!document.querySelector('.examFloatingBarV7')){
       var bar=document.createElement('div');
@@ -2897,4 +2901,37 @@ body.examActiveLock{overscroll-behavior:contain!important}
   window.addEventListener('hashchange',route);setTimeout(route,450);
 })();
 </script>
+
+<!-- FIX V37: منع ظهور أزرار حفظ/إرسال الاختبار في صفحة المختبر -->
+<style id="fix-hide-editor-buttons-from-trainee-v37">
+body:not(.exam-editor-open-v7) .examFloatingBarV7{display:none!important;pointer-events:none!important;}
+#addModal .traineeExamSecure .examFloatingBarV7{display:none!important;pointer-events:none!important;}
+</style>
+<script id="fix-hide-editor-buttons-from-trainee-v37-js">
+(function(){
+  function removeEditorBar(){
+    try{
+      var bars=document.querySelectorAll('.examFloatingBarV7');
+      bars.forEach(function(b){b.remove();});
+      document.body.classList.remove('exam-editor-open-v7');
+    }catch(e){}
+  }
+  var oldOpen=window.openTraineeExam;
+  if(typeof oldOpen==='function' && !oldOpen.__noEditorBarV37){
+    window.openTraineeExam=function(){
+      removeEditorBar();
+      var r=oldOpen.apply(this,arguments);
+      setTimeout(removeEditorBar,80);
+      setTimeout(removeEditorBar,500);
+      return r;
+    };
+    window.openTraineeExam.__noEditorBarV37=true;
+  }
+  document.addEventListener('click',function(){
+    var m=document.getElementById('addModal');
+    if(m && m.querySelector('.traineeExamSecure')) setTimeout(removeEditorBar,10);
+  },true);
+})();
+</script>
+
 </body></html>
