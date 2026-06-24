@@ -741,80 +741,6 @@ th{background:#e8e8e8}
 <thead><tr><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>رقم الجوال</th><th>الوحدة</th>${skills.map(s=>`<th>${s}</th>`).join('')}<th>حالة الوزن</th><th>الجاهزية</th></tr></thead>
 <tbody>${rows}</tbody>
 </table>
-<!-- SAFE PERMISSIONS CARD/PAGE PATCH - لا يغير أكواد التشغيل الأساسية -->
-<style id="permissions-safe-card-page-v2">
-.permissionsSafeBadge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--gold2);background:rgba(200,164,93,.10);font-size:12px}
-.permissionsSafeLayout{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:16px;align-items:start}.permissionsSafeTable table{min-width:820px}.permissionsSafeLog{max-height:260px;overflow:auto;display:grid;gap:8px}.permissionsSafeLogItem{border:1px solid var(--line);border-radius:14px;padding:9px;background:rgba(0,0,0,.14);color:var(--muted);font-size:12px;line-height:1.7}.permissionsSafeLogItem b{color:var(--gold2)}
-.permissionsSafeMiniGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}.permissionsSafeMini{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(255,255,255,.04);color:var(--muted);font-size:13px;line-height:1.7}.permissionsSafeMini b{display:block;color:var(--gold2);margin-bottom:5px}
-@media(max-width:900px){.permissionsSafeLayout{grid-template-columns:1fr}.permissionsSafeTable table{min-width:760px}}
-</style>
-<script id="permissions-safe-card-page-v2">
-(function(){
-  'use strict';
-  var ROLES={
-    commander:'قائد القوة - جميع الأقسام',
-    training_manager:'مدير التدريب - الاختبارات والخطط والتقارير',
-    unit_leader:'قائد وحدة - بيانات الوحدة فقط',
-    medic:'المسعف - الصحية والإسعاف',
-    comm:'الاتصالات - مركز الاتصالات',
-    trainer:'المدرب - بنك المعلومات وخطة التدريب',
-    trainee:'المتدرب - الاختبارات والنتائج'
-  };
-  var DEFAULT_USERS=[
-    {name:'قائد القوة',username:'admin',password:'Tarif@2026',role:'commander',unit:'جميع الوحدات',active:true},
-    {name:'مدير التدريب',username:'training',password:'1234',role:'training_manager',unit:'جميع الوحدات',active:true},
-    {name:'مسعف القوة',username:'medic',password:'5555',role:'medic',unit:'جميع الوحدات',active:true},
-    {name:'مركز الاتصالات',username:'comm',password:'1234',role:'comm',unit:'جميع الوحدات',active:true}
-  ];
-  function esc(v){return String(v==null?'':v).replace(/[&<>'"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]})}
-  function $id(id){return document.getElementById(id)}
-  function getUsers(){
-    try{var x=JSON.parse(localStorage.getItem('bf_system_users')||'null');if(Array.isArray(x)&&x.length)return x}catch(e){}
-    localStorage.setItem('bf_system_users',JSON.stringify(DEFAULT_USERS));return DEFAULT_USERS.slice();
-  }
-  function saveUsers(users){localStorage.setItem('bf_system_users',JSON.stringify(users||[]))}
-  function getLogs(){try{return JSON.parse(localStorage.getItem('bf_permission_logs')||'[]')||[]}catch(e){return []}}
-  function addLog(action){var logs=getLogs();logs.unshift({time:new Date().toLocaleString('ar-SA'),action:action});localStorage.setItem('bf_permission_logs',JSON.stringify(logs.slice(0,80)))}
-  function unitOptions(selected){
-    var list=['جميع الوحدات'];
-    try{if(Array.isArray(window.units)) window.units.forEach(function(u){if(u&&u.name)list.push(u.name)})}catch(e){}
-    return list.map(function(x){return '<option '+(x===selected?'selected':'')+'>'+esc(x)+'</option>'}).join('')
-  }
-  function roleOptions(selected){return Object.keys(ROLES).map(function(k){return '<option value="'+k+'" '+(k===selected?'selected':'')+'>'+esc(ROLES[k])+'</option>'}).join('')}
-  window.renderUserAdmin=function(){
-    var el=$id('userAdmin'); if(!el) return;
-    var users=getUsers(); var logs=getLogs();
-    el.innerHTML='<div class="head"><div><h2>🔐 إدارة الصلاحيات</h2><p>إدارة المستخدمين والصلاحيات دون تغيير نظام الدخول الحالي أو حذف أي خصائص.</p></div><button class="btn" onclick="showPage(\'home\')">رجوع</button></div>'+
-    '<div class="permissionsSafeMiniGrid"><div class="permissionsSafeMini"><b>الحساب الافتراضي</b>admin / Tarif@2026</div><div class="permissionsSafeMini"><b>الحفظ</b>يتم حفظ المستخدمين محلياً داخل المتصفح LocalStorage.</div><div class="permissionsSafeMini"><b>ملاحظة تشغيلية</b>هذه الصفحة لا تعطل كلمات المرور القديمة للأقسام حتى لا تتعطل النسخة.</div></div>'+
-    '<div class="permissionsSafeLayout"><div class="card"><h3 style="color:var(--gold2);margin-top:0">إضافة / تعديل مستخدم</h3><div class="formgrid"><div><label>الاسم</label><input id="permName" placeholder="مثال: قائد الصيانة"></div><div><label>اسم المستخدم</label><input id="permUsername" placeholder="username"></div><div><label>كلمة المرور</label><input id="permPassword" placeholder="password"></div><div><label>الصلاحية</label><select id="permRole">'+roleOptions('unit_leader')+'</select></div><div><label>الوحدة</label><select id="permUnit">'+unitOptions('جميع الوحدات')+'</select></div><div><label>حالة الحساب</label><select id="permActive"><option value="true">مفعل</option><option value="false">معطل</option></select></div></div><div class="actionRow" style="margin-top:12px"><button class="btn primary" onclick="savePermissionUser()">حفظ المستخدم</button><button class="btn" onclick="clearPermissionForm()">تفريغ</button></div></div>'+
-    '<div><div class="card permissionsSafeTable"><h3 style="color:var(--gold2);margin-top:0">المستخدمون</h3><div class="table-wrap"><table><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الصلاحية</th><th>الوحدة</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>'+users.map(function(u,i){return '<tr><td>'+esc(u.name)+'</td><td>'+esc(u.username)+'</td><td><span class="permissionsSafeBadge">'+esc(ROLES[u.role]||u.role)+'</span></td><td>'+esc(u.unit||'جميع الوحدات')+'</td><td>'+(u.active?'<span class="pass">مفعل</span>':'<span class="fail">معطل</span>')+'</td><td><button class="btn" onclick="editPermissionUser('+i+')">تعديل</button> <button class="btn" onclick="togglePermissionUser('+i+')">'+(u.active?'تعطيل':'تفعيل')+'</button> <button class="btn danger" onclick="deletePermissionUser('+i+')">حذف</button></td></tr>'}).join('')+'</tbody></table></div></div><div class="card" style="margin-top:16px"><h3 style="color:var(--gold2);margin-top:0">سجل النشاط</h3><div class="permissionsSafeLog">'+(logs.length?logs.map(function(l){return '<div class="permissionsSafeLogItem"><b>'+esc(l.time)+'</b><br>'+esc(l.action)+'</div>'}).join(''):'<div class="hint">لا يوجد نشاط حتى الآن.</div>')+'</div></div></div></div>';
-  };
-  window.clearPermissionForm=function(){['permName','permUsername','permPassword'].forEach(function(id){var x=$id(id);if(x)x.value=''});var r=$id('permRole');if(r)r.value='unit_leader';var a=$id('permActive');if(a)a.value='true';var u=$id('permUnit');if(u)u.value='جميع الوحدات';delete window.__permEditIndex};
-  window.savePermissionUser=function(){
-    var name=($id('permName')||{}).value||'', username=($id('permUsername')||{}).value||'', password=($id('permPassword')||{}).value||'';
-    if(!name.trim()||!username.trim()||!password.trim()){alert('أكمل الاسم واسم المستخدم وكلمة المرور');return}
-    var users=getUsers(); var obj={name:name.trim(),username:username.trim(),password:password.trim(),role:($id('permRole')||{}).value||'unit_leader',unit:($id('permUnit')||{}).value||'جميع الوحدات',active:(($id('permActive')||{}).value!=='false')};
-    if(typeof window.__permEditIndex==='number'){users[window.__permEditIndex]=obj;addLog('تعديل المستخدم: '+obj.username)}else{if(users.some(function(u){return u.username===obj.username})){alert('اسم المستخدم موجود مسبقاً');return}users.push(obj);addLog('إضافة مستخدم جديد: '+obj.username)}
-    saveUsers(users); clearPermissionForm(); renderUserAdmin();
-  };
-  window.editPermissionUser=function(i){var u=getUsers()[i];if(!u)return;window.__permEditIndex=i;renderUserAdmin();setTimeout(function(){if($id('permName'))$id('permName').value=u.name||'';if($id('permUsername'))$id('permUsername').value=u.username||'';if($id('permPassword'))$id('permPassword').value=u.password||'';if($id('permRole'))$id('permRole').value=u.role||'unit_leader';if($id('permUnit'))$id('permUnit').value=u.unit||'جميع الوحدات';if($id('permActive'))$id('permActive').value=u.active?'true':'false'},0)};
-  window.togglePermissionUser=function(i){var users=getUsers();if(!users[i])return;users[i].active=!users[i].active;saveUsers(users);addLog((users[i].active?'تفعيل':'تعطيل')+' المستخدم: '+users[i].username);renderUserAdmin()};
-  window.deletePermissionUser=function(i){var users=getUsers();if(!users[i])return;if(users[i].username==='admin'){alert('لا يمكن حذف حساب المدير الافتراضي');return}if(confirm('حذف المستخدم؟')){var name=users[i].username;users.splice(i,1);saveUsers(users);addLog('حذف المستخدم: '+name);renderUserAdmin()}};
-  function addPermissionsEntrances(){
-    try{
-      var nav=document.querySelector('.nav');
-      if(nav && !document.querySelector('[data-perm-nav="1"]')){var b=document.createElement('button');b.setAttribute('data-perm-nav','1');b.textContent='🔐 إدارة الصلاحيات';b.onclick=function(){renderUserAdmin();showPage('userAdmin')};nav.appendChild(b)}
-      var grid=document.querySelector('#home .heroBox .grid');
-      if(grid && !document.querySelector('[data-perm-card="1"]')){var d=document.createElement('div');d.className='card module';d.setAttribute('data-perm-card','1');d.onclick=function(){renderUserAdmin();showPage('userAdmin')};d.innerHTML='<div class="icon">🔐</div><h3>إدارة الصلاحيات</h3><p>إضافة المستخدمين، تحديد الصلاحيات، تفعيل أو تعطيل الحسابات، وسجل النشاط.</p>';grid.appendChild(d)}
-    }catch(e){console.error(e)}
-  }
-  var oldRenderAll=window.renderAll;
-  window.renderAll=function(){if(typeof oldRenderAll==='function')oldRenderAll.apply(this,arguments);addPermissionsEntrances();if($id('userAdmin')&&$id('userAdmin').classList.contains('active'))renderUserAdmin()};
-  document.addEventListener('DOMContentLoaded',function(){addPermissionsEntrances();if(!$id('userAdmin')){var m=document.querySelector('main');if(m){var s=document.createElement('section');s.className='page';s.id='userAdmin';m.appendChild(s)}}});
-  setTimeout(addPermissionsEntrances,300);
-})();
-</script>
-
 </body>
 </html>`;
   let w=window.open('','_blank');
@@ -2850,4 +2776,57 @@ body.examActiveLock{overscroll-behavior:contain!important}
   window.addEventListener('hashchange',route);setTimeout(route,450);
 })();
 </script>
+
+<!-- SAFE PERMISSIONS CARD/PAGE - JS ONLY, prevents code from appearing on page -->
+<script id="permissions-card-safe-no-code">
+(function(){
+  'use strict';
+  var ROLES={commander:'قائد القوة - جميع الأقسام',training_manager:'مدير التدريب - الاختبارات والخطط والتقارير',unit_leader:'قائد وحدة - بيانات الوحدة فقط',medic:'المسعف - الصحية والإسعاف',comm:'الاتصالات - مركز الاتصالات',trainer:'المدرب - بنك المعلومات وخطة التدريب',trainee:'المتدرب - الاختبارات والنتائج'};
+  var DEFAULT_USERS=[
+    {name:'قائد القوة',username:'admin',password:'Tarif@2026',role:'commander',unit:'جميع الوحدات',active:true},
+    {name:'مدير التدريب',username:'training',password:'1234',role:'training_manager',unit:'جميع الوحدات',active:true},
+    {name:'مسعف القوة',username:'medic',password:'5555',role:'medic',unit:'جميع الوحدات',active:true},
+    {name:'مركز الاتصالات',username:'comm',password:'1234',role:'comm',unit:'جميع الوحدات',active:true}
+  ];
+  function css(){
+    if(document.getElementById('permissions-safe-css-no-code')) return;
+    var s=document.createElement('style');
+    s.id='permissions-safe-css-no-code';
+    s.textContent='.permissionsSafeBadge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--gold2);background:rgba(200,164,93,.10);font-size:12px}.permissionsSafeLayout{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:16px;align-items:start}.permissionsSafeTable table{min-width:820px}.permissionsSafeLog{max-height:260px;overflow:auto;display:grid;gap:8px}.permissionsSafeLogItem{border:1px solid var(--line);border-radius:14px;padding:9px;background:rgba(0,0,0,.14);color:var(--muted);font-size:12px;line-height:1.7}.permissionsSafeLogItem b{color:var(--gold2)}.permissionsSafeMiniGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}.permissionsSafeMini{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(255,255,255,.04);color:var(--muted);font-size:13px;line-height:1.7}.permissionsSafeMini b{display:block;color:var(--gold2);margin-bottom:5px}@media(max-width:900px){.permissionsSafeLayout{grid-template-columns:1fr}.permissionsSafeTable table{min-width:760px}}';
+    document.head.appendChild(s);
+  }
+  function esc(v){return String(v==null?'':v).replace(/[&<>\'\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]||c})}
+  function loadUsers(){try{var v=JSON.parse(localStorage.getItem('bf_permission_users_v1')||'null');return Array.isArray(v)&&v.length?v:DEFAULT_USERS.slice()}catch(e){return DEFAULT_USERS.slice()}}
+  function saveUsers(a){localStorage.setItem('bf_permission_users_v1',JSON.stringify(a))}
+  function loadLogs(){try{return JSON.parse(localStorage.getItem('bf_permission_logs_v1')||'[]')}catch(e){return []}}
+  function addLog(action){var logs=loadLogs();logs.unshift({time:new Date().toLocaleString('ar-SA'),action:action});localStorage.setItem('bf_permission_logs_v1',JSON.stringify(logs.slice(0,80)))}
+  function unitsList(){return (window.units||[]).map(function(u){return u.name})}
+  function roleOptions(sel){return Object.keys(ROLES).map(function(k){return '<option value="'+k+'" '+(k===sel?'selected':'')+'>'+ROLES[k]+'</option>'}).join('')}
+  function unitOptions(sel){var arr=['جميع الوحدات'].concat(unitsList());return arr.map(function(u){return '<option value="'+esc(u)+'" '+(u===sel?'selected':'')+'>'+esc(u)+'</option>'}).join('')}
+  window.renderUserAdmin=function(){
+    css();
+    var el=document.getElementById('userAdmin');
+    if(!el){el=document.createElement('section');el.className='page';el.id='userAdmin';document.querySelector('main').appendChild(el)}
+    var users=loadUsers(),logs=loadLogs();
+    el.innerHTML='<div class="head"><div><h2>🔐 إدارة الصلاحيات</h2><p>إدارة المستخدمين والصلاحيات دون تغيير نظام الدخول الحالي أو حذف أي خصائص.</p></div><button class="btn" onclick="showPage(\'home\')">رجوع</button></div>'+
+    '<div class="permissionsSafeMiniGrid"><div class="permissionsSafeMini"><b>الحساب الافتراضي</b>admin / Tarif@2026</div><div class="permissionsSafeMini"><b>الحفظ</b>يتم حفظ المستخدمين داخل المتصفح LocalStorage.</div><div class="permissionsSafeMini"><b>ملاحظة مهمة</b>لم يتم تعطيل كلمات المرور القديمة حتى لا تتعطل البطاقات الحالية.</div></div>'+
+    '<div class="permissionsSafeLayout"><div class="card"><h3 style="color:var(--gold2);margin-top:0">إضافة / تعديل مستخدم</h3><div class="formgrid"><div><label>الاسم</label><input id="permName" placeholder="مثال: قائد الصيانة"></div><div><label>اسم المستخدم</label><input id="permUsername" placeholder="username"></div><div><label>كلمة المرور</label><input id="permPassword" placeholder="password"></div><div><label>الصلاحية</label><select id="permRole">'+roleOptions('unit_leader')+'</select></div><div><label>الوحدة</label><select id="permUnit">'+unitOptions('جميع الوحدات')+'</select></div><div><label>حالة الحساب</label><select id="permActive"><option value="true">مفعل</option><option value="false">معطل</option></select></div></div><div class="actionRow" style="margin-top:12px"><button class="btn primary" onclick="savePermissionUser()">حفظ المستخدم</button><button class="btn" onclick="clearPermissionForm()">تفريغ</button></div></div>'+
+    '<div><div class="card permissionsSafeTable"><h3 style="color:var(--gold2);margin-top:0">المستخدمون</h3><div class="table-wrap"><table><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الصلاحية</th><th>الوحدة</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>'+users.map(function(u,i){return '<tr><td>'+esc(u.name)+'</td><td>'+esc(u.username)+'</td><td><span class="permissionsSafeBadge">'+esc(ROLES[u.role]||u.role)+'</span></td><td>'+esc(u.unit||'جميع الوحدات')+'</td><td>'+(u.active?'<span class="pass">مفعل</span>':'<span class="fail">معطل</span>')+'</td><td><button class="btn" onclick="editPermissionUser('+i+')">تعديل</button> <button class="btn" onclick="togglePermissionUser('+i+')">'+(u.active?'تعطيل':'تفعيل')+'</button> <button class="btn danger" onclick="deletePermissionUser('+i+')">حذف</button></td></tr>'}).join('')+'</tbody></table></div></div><div class="card" style="margin-top:16px"><h3 style="color:var(--gold2);margin-top:0">سجل النشاط</h3><div class="permissionsSafeLog">'+(logs.length?logs.map(function(l){return '<div class="permissionsSafeLogItem"><b>'+esc(l.time)+'</b><br>'+esc(l.action)+'</div>'}).join(''):'<div class="hint">لا يوجد نشاط حتى الآن.</div>')+'</div></div></div></div>';
+  };
+  window.clearPermissionForm=function(){['permName','permUsername','permPassword'].forEach(function(id){var x=document.getElementById(id);if(x)x.value=''});var r=document.getElementById('permRole'),u=document.getElementById('permUnit'),a=document.getElementById('permActive');if(r)r.value='unit_leader';if(u)u.value='جميع الوحدات';if(a)a.value='true'};
+  window.savePermissionUser=function(){var name=document.getElementById('permName').value.trim(),username=document.getElementById('permUsername').value.trim(),password=document.getElementById('permPassword').value.trim(),role=document.getElementById('permRole').value,unit=document.getElementById('permUnit').value,active=document.getElementById('permActive').value==='true';if(!name||!username||!password){alert('أكمل الاسم واسم المستخدم وكلمة المرور');return}var users=loadUsers();var idx=users.findIndex(function(x){return x.username===username});var item={name:name,username:username,password:password,role:role,unit:unit,active:active};if(idx>=0){users[idx]=item;addLog('تعديل المستخدم: '+name)}else{users.push(item);addLog('إضافة المستخدم: '+name)}saveUsers(users);renderUserAdmin();if(typeof showToast==='function')showToast('تم حفظ المستخدم')};
+  window.editPermissionUser=function(i){var u=loadUsers()[i];if(!u)return;document.getElementById('permName').value=u.name||'';document.getElementById('permUsername').value=u.username||'';document.getElementById('permPassword').value=u.password||'';document.getElementById('permRole').value=u.role||'unit_leader';document.getElementById('permUnit').value=u.unit||'جميع الوحدات';document.getElementById('permActive').value=String(u.active!==false);window.scrollTo({top:0,behavior:'smooth'})};
+  window.togglePermissionUser=function(i){var users=loadUsers();if(!users[i])return;users[i].active=!users[i].active;addLog((users[i].active?'تفعيل':'تعطيل')+' المستخدم: '+users[i].name);saveUsers(users);renderUserAdmin()};
+  window.deletePermissionUser=function(i){var users=loadUsers();if(!users[i])return;if(!confirm('حذف المستخدم؟'))return;addLog('حذف المستخدم: '+users[i].name);users.splice(i,1);saveUsers(users);renderUserAdmin()};
+  function install(){
+    css();
+    if(!document.getElementById('userAdmin')){var sec=document.createElement('section');sec.className='page';sec.id='userAdmin';document.querySelector('main').appendChild(sec)}
+    var nav=document.querySelector('.nav');if(nav&&!document.querySelector('[data-perm-nav="1"]')){var b=document.createElement('button');b.setAttribute('data-perm-nav','1');b.textContent='🔐 إدارة الصلاحيات';b.onclick=function(){renderUserAdmin();showPage('userAdmin')};nav.appendChild(b)}
+    var grid=document.querySelector('#home .grid');if(grid&&!document.querySelector('[data-perm-card="1"]')){var d=document.createElement('div');d.className='card module';d.setAttribute('data-perm-card','1');d.onclick=function(){renderUserAdmin();showPage('userAdmin')};d.innerHTML='<div class="icon">🔐</div><h3>إدارة الصلاحيات</h3><p>إضافة المستخدمين، تحديد الصلاحيات، تفعيل أو تعطيل الحسابات، وسجل النشاط.</p>';grid.appendChild(d)}
+    renderUserAdmin();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+})();
+</script>
+
 </body></html>
