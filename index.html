@@ -802,164 +802,7 @@ function printUnitTable(unitName){let st=unitStats(unitName);let rows=st.list.ma
   }
 }
 </style>
-</head><body><h1>جدول متدربي وحدة ${unitName}</h1><div class="sub">نظام إدارة المقاتل الشجاع - صيانة قوة طريف</div><table><thead><tr><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>رقم الجوال</th><th>الوحدة</th>${skills.map(s=>`<th>${s}</th>`).join('')}<th>حالة الوزن</th><th>الجاهزية</th></tr></thead><tbody>${rows}</tbody></table>
-
-<!-- PATCH V35: تسجيل مغادرة صفحة الاختبار + تنبيه متدرج + إنهاء تلقائي عند المخالفة الثالثة -->
-<style id="v35-exam-leave-violations-style">
-.examViolationPanelV35{
-  display:grid!important;
-  grid-template-columns:1fr auto!important;
-  gap:12px!important;
-  align-items:center!important;
-  border:1px solid rgba(240,206,122,.42)!important;
-  border-radius:18px!important;
-  padding:13px 15px!important;
-  margin:12px 0!important;
-  background:rgba(200,164,93,.10)!important;
-  box-shadow:0 10px 25px rgba(0,0,0,.20)!important;
-}
-.examViolationPanelV35 .vTextV35 b{display:block!important;color:var(--gold2)!important;font-size:17px!important;margin-bottom:4px!important}
-.examViolationPanelV35 .vTextV35 span{display:block!important;color:var(--muted)!important;font-size:13px!important;line-height:1.7!important}
-.examViolationPanelV35 .vCountV35{
-  min-width:118px!important;text-align:center!important;border-radius:16px!important;padding:10px 12px!important;
-  border:1px solid rgba(240,206,122,.35)!important;background:rgba(0,0,0,.22)!important;
-}
-.examViolationPanelV35 .vCountV35 small{display:block!important;color:var(--muted)!important;font-size:11px!important;margin-bottom:3px!important}
-.examViolationPanelV35 .vCountV35 strong{display:block!important;font-size:32px!important;line-height:1!important;color:var(--ok)!important}
-.examViolationPanelV35.level1{border-color:rgba(217,150,56,.70)!important;background:rgba(217,150,56,.16)!important}
-.examViolationPanelV35.level1 .vCountV35 strong{color:var(--warn)!important}
-.examViolationPanelV35.level2{border-color:rgba(216,93,80,.75)!important;background:rgba(216,93,80,.17)!important}
-.examViolationPanelV35.level2 .vCountV35 strong{color:#ffb6ad!important}
-.examViolationPanelV35.level3{border-color:rgba(216,93,80,1)!important;background:rgba(216,93,80,.28)!important;animation:v35Pulse 1s infinite alternate!important}
-.examViolationPanelV35.level3 .vCountV35 strong{color:#fff!important}
-.examToastV35{
-  position:fixed!important;top:86px!important;left:50%!important;transform:translateX(-50%)!important;z-index:2147483200!important;
-  width:min(92vw,560px)!important;border-radius:18px!important;padding:14px 18px!important;text-align:center!important;
-  font-weight:900!important;line-height:1.8!important;color:#111!important;background:linear-gradient(135deg,#f0ce7a,#d99638)!important;
-  box-shadow:0 16px 40px rgba(0,0,0,.45)!important;border:1px solid rgba(255,255,255,.35)!important;
-}
-.examToastV35.danger{color:#fff!important;background:linear-gradient(135deg,#8b0000,#d85d50)!important}
-@keyframes v35Pulse{from{filter:brightness(1)}to{filter:brightness(1.25)}}
-@media(max-width:700px){.examViolationPanelV35{grid-template-columns:1fr!important;text-align:center!important}.examToastV35{top:72px!important}}
-</style>
-<script id="v35-exam-leave-violations-patch">
-(function(){
-  var MAX_VIOLATIONS=3;
-  var suppressNextHidden=false;
-  function isExamActive(){return document.body && document.body.classList && document.body.classList.contains('examActiveLock') && !!document.querySelector('.traineeExamSecure form');}
-  function currentKey(){
-    try{
-      var h=String(location.hash||'');
-      var m=h.match(/id=([^&]+)/);
-      return 'examViolationsV35_'+(m?m[1]:'current');
-    }catch(e){return 'examViolationsV35_current'}
-  }
-  function getCount(){try{return Number(sessionStorage.getItem(currentKey())||0)||0}catch(e){return 0}}
-  function setCount(n){try{sessionStorage.setItem(currentKey(),String(n||0))}catch(e){}}
-  function resetCount(){setCount(0); updatePanel(0);}
-  function toastV35(msg,level){
-    try{
-      var old=document.getElementById('examToastV35'); if(old)old.remove();
-      var d=document.createElement('div'); d.id='examToastV35'; d.className='examToastV35 '+(level>=2?'danger':''); d.textContent=msg;
-      document.body.appendChild(d); setTimeout(function(){try{d.remove()}catch(e){}},3600);
-    }catch(e){try{alert(msg)}catch(_e){}}
-  }
-  function panelHtml(n){
-    return '<div class="examViolationPanelV35 level'+Math.min(3,n)+'" id="examViolationPanelV35">'+
-      '<div class="vTextV35"><b>مراقبة مغادرة صفحة الاختبار</b><span>المخالفة الأولى تنبيه أصفر، الثانية تنبيه أحمر، والثالثة تنهي الاختبار تلقائياً.</span></div>'+
-      '<div class="vCountV35"><small>عدد المخالفات</small><strong id="examViolationCountV35">'+n+'</strong></div>'+ 
-    '</div>';
-  }
-  function injectPanel(){
-    try{
-      var secure=document.querySelector('.traineeExamSecure');
-      if(!secure || document.getElementById('examViolationPanelV35'))return;
-      var notice=secure.querySelector('.antiCheatNotice');
-      if(notice){notice.insertAdjacentHTML('afterend',panelHtml(getCount()));}
-      else{secure.insertAdjacentHTML('afterbegin',panelHtml(getCount()));}
-    }catch(e){}
-  }
-  function updatePanel(n){
-    injectPanel();
-    var p=document.getElementById('examViolationPanelV35'), c=document.getElementById('examViolationCountV35');
-    if(p){p.className='examViolationPanelV35 level'+Math.min(3,n)}
-    if(c)c.textContent=String(n||0);
-  }
-  function forceFinishExam(){
-    try{
-      var form=document.querySelector('.traineeExamSecure form');
-      if(!form)return;
-      form.querySelectorAll('[required]').forEach(function(el){el.removeAttribute('required')});
-      var btn=form.querySelector('button[type="submit"],button.submitExamLocked,.btn.primary');
-      if(btn)btn.disabled=true;
-      suppressNextHidden=true;
-      if(typeof form.requestSubmit==='function')form.requestSubmit();
-      else form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
-    }catch(e){console.warn('force finish failed',e)}
-  }
-  function recordLeave(){
-    if(!isExamActive())return;
-    if(suppressNextHidden){suppressNextHidden=false;return;}
-    var n=getCount()+1; setCount(n); updatePanel(n);
-    if(n===1){toastV35('تنبيه أول: تم رصد مغادرة صفحة الاختبار. عدد المخالفات: 1',1);}
-    else if(n===2){toastV35('تنبيه أحمر: تم رصد مغادرة صفحة الاختبار للمرة الثانية. المخالفة الثالثة تنهي الاختبار.',2);}
-    else if(n>=MAX_VIOLATIONS){toastV35('تم إنهاء الاختبار تلقائياً بسبب تكرار مغادرة الصفحة.',3); setTimeout(forceFinishExam,450);}
-  }
-  document.addEventListener('visibilitychange',function(){if(document.hidden)recordLeave();});
-  window.addEventListener('blur',function(){setTimeout(function(){ if(document.hidden) recordLeave(); },120);});
-  var oldOpen=window.openTraineeExam;
-  if(typeof oldOpen==='function'){
-    window.openTraineeExam=function(){resetCount(); var r=oldOpen.apply(this,arguments); setTimeout(injectPanel,700); return r;};
-  }
-  var oldRender=window.renderTraineeExamForm;
-  if(typeof oldRender==='function'){
-    window.renderTraineeExamForm=function(){var html=oldRender.apply(this,arguments); setTimeout(injectPanel,80); return html;};
-  }
-  var oldSubmit=window.submitTraineeExam;
-  if(typeof oldSubmit==='function'){
-    window.submitTraineeExam=function(ev,unitId,examId){
-      var violations=getCount();
-      var r=oldSubmit.apply(this,arguments);
-      setTimeout(function(){
-        try{
-          var exam=(typeof getExam==='function'?getExam(unitId,examId):null) || (window.unitTestsStore&&unitTestsStore[unitId]||[]).find(function(x){return String(x.id)===String(examId)});
-          if(exam && exam.results && exam.results.length){
-            var last=exam.results[exam.results.length-1];
-            if(last && last.violations==null){last.violations=violations; last.leaveViolations=violations; if(typeof saveExamStore==='function')saveExamStore();}
-          }
-          var cert=document.querySelector('.certificate');
-          if(cert && !document.getElementById('certViolationsV35')){
-            var color=violations>=3?'var(--bad)':violations>=2?'var(--warn)':'var(--ok)';
-            cert.insertAdjacentHTML('beforeend','<p id="certViolationsV35" style="color:'+color+';font-weight:900">عدد مخالفات مغادرة الصفحة: '+violations+'</p>');
-          }
-        }catch(e){console.warn(e)}
-      },120);
-      return r;
-    };
-  }
-  var oldSync=window.syncExamResultToSheets;
-  if(typeof oldSync==='function'){
-    window.syncExamResultToSheets=function(unitId,exam,result){
-      try{ if(result && result.violations==null) result.violations=getCount(); }catch(e){}
-      var r=oldSync.apply(this,arguments);
-      try{
-        if(typeof postToSheets==='function' && exam && result){
-          postToSheets({
-            type:'exam_result',
-            name:result.name||'',rank:result.rank||'',militaryId:result.num||result.militaryId||'',unit:result.unit||'',
-            examTitle:exam.title||'',score:String((result.score||0)+'/'+(result.total||0)),percent:result.percent||0,
-            status:result.passed?'ناجح':'راسب',violations:result.violations||0,leaveViolations:result.violations||0
-          });
-        }
-      }catch(e){}
-      return r;
-    };
-  }
-  setInterval(function(){if(isExamActive())injectPanel();},1000);
-})();
-</script>
-
-</body></html>`;let w=window.open('','_blank');w.document.write(html);w.document.close();w.focus();setTimeout(()=>w.print(),300)}
+</head><body><h1>جدول متدربي وحدة ${unitName}</h1><div class="sub">نظام إدارة المقاتل الشجاع - صيانة قوة طريف</div><table><thead><tr><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>رقم الجوال</th><th>الوحدة</th>${skills.map(s=>`<th>${s}</th>`).join('')}<th>حالة الوزن</th><th>الجاهزية</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;let w=window.open('','_blank');w.document.write(html);w.document.close();w.focus();setTimeout(()=>w.print(),300)}
 function renderLeader(){
   let f=forceStats();
   let totalSkillChecks=trainees.length*skills.length;
@@ -2047,7 +1890,7 @@ function updateQuestionCounters(e){let count=(e.questions||[]).length;let qc=doc
 function previewTraineeExam(unitId,examId){openTraineeExam(unitId,examId)}
 function openTraineeExam(unitId,examId){let e=getExam(unitId,examId);if(!e){alert('لم يتم العثور على الاختبار');return}let modal=document.getElementById('addModal');modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML=renderTraineeExamForm(unitId,e)}
 function renderTraineeExamForm(unitId,e){let status=examStatus(e);let allow=status==='مفتوح الآن'||!e.startDate||!e.startTime;return `<div class="examEditorPanel"><div class="head"><div><h2>${escapeHtml(e.title)}</h2><p>وحدة ${unitNameById(unitId)} - الحالة: ${status}</p></div><button class="btn" onclick="closeExamEditor()">إغلاق</button></div>${!allow?`<div class="card"><h3 style="color:var(--gold2)">${status==='قادم'?'الاختبار لم يبدأ بعد':'انتهى وقت الاختبار'}</h3><p>موعد الاختبار: ${e.startDate} ${e.startTime}</p></div>`:`<form class="card" onsubmit="submitTraineeExam(event,'${unitId}','${e.id}')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>${['لواء','عميد','عقيد','مقدم','رائد','نقيب','ملازم أول','ملازم','رئيس رقباء','رقيب أول','رقيب','وكيل رقيب','عريف','جندي أول','جندي'].map(r=>`<option>${r}</option>`).join('')}</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="${unitNameById(unitId)}"></div></div><div class="examTimer" id="examTimer">الوقت المحدد: ${e.duration||30} دقيقة</div>${(e.questions||[]).map((q,i)=>`<div class="savedQuestion"><b>${i+1}. ${escapeHtml(q.text)}</b>${q.options.map(op=>`<label class="examAnswer"><input type="radio" name="q_${q.id}" value="${escapeHtml(op)}" required> ${escapeHtml(op)}</label>`).join('')}</div>`).join('')}<button class="btn primary" style="width:100%;margin-top:15px">تسليم الاختبار</button></form>`}</div>`}
-function submitTraineeExam(ev,unitId,examId){ev.preventDefault();let e=getExam(unitId,examId);if(!e)return;let fd=new FormData(ev.target);let num=(fd.get('num')||'').trim();e.results=e.results||[];if(e.results.some(r=>String(r.num)===num)){notifyExam('تم منع التكرار: هذا الرقم العسكري سبق أن اختبر',false);return}let total=(e.questions||[]).length,correct=0;e.questions.forEach(q=>{if(fd.get('q_'+q.id)===q.answer)correct++});let percent=total?Math.round((correct/total)*100):0;let passed=percent>=Number(e.passScore||60);let result={id:makeId('RES'),name:fd.get('name'),rank:fd.get('rank'),num,unit:fd.get('unit'),score:correct,total,percent,passed,date:new Date().toLocaleString('ar-SA')};e.results.push(result);saveExamStore();playExamSound();document.getElementById('addModal').innerHTML=`<div class="examEditorPanel"><div class="card certificate"><h2>نتيجة الاختبار</h2><h3>${escapeHtml(result.name)}</h3><p>الدرجة: ${correct} من ${total} - النسبة ${percent}%</p><p class="${passed?'certPass':'certFail'}">${passed?'ناجح':'راسب'}</p><div class="actionRow"><button class="btn" onclick="closeExamEditor()">إغلاق</button>${passed?`<button class="btn primary" onclick="printCertificate('${unitId}','${examId}','${result.id}')">طباعة الشهادة</button>`:''}</div></div></div>`;}
+function submitTraineeExam(ev,unitId,examId){ev.preventDefault();let e=getExam(unitId,examId);if(!e)return;let fd=new FormData(ev.target);let num=(fd.get('num')||'').trim();e.results=e.results||[];if(e.results.some(r=>String(r.num)===num)){notifyExam('تم منع التكرار: هذا الرقم العسكري سبق أن اختبر',false);return}let total=(e.questions||[]).length,correct=0;e.questions.forEach(q=>{if(fd.get('q_'+q.id)===q.answer)correct++});let percent=total?Math.round((correct/total)*100):0;let passed=percent>=Number(e.passScore||60);let result={id:makeId('RES'),name:fd.get('name'),rank:fd.get('rank'),num,unit:fd.get('unit'),score:correct,total,percent,passed,date:new Date().toLocaleString('ar-SA'),violations:Number(sessionStorage.getItem('examLeaveViolations_'+unitId+'_'+examId)||0)};e.results.push(result);saveExamStore();playExamSound();document.getElementById('addModal').innerHTML=`<div class="examEditorPanel"><div class="card certificate"><h2>نتيجة الاختبار</h2><h3>${escapeHtml(result.name)}</h3><p>الدرجة: ${correct} من ${total} - النسبة ${percent}%</p><p class="${passed?'certPass':'certFail'}">${passed?'ناجح':'راسب'}</p><p>مخالفات مغادرة الصفحة: ${result.violations||0}</p><div class="actionRow"><button class="btn" onclick="closeExamEditor()">إغلاق</button>${passed?`<button class="btn primary" onclick="printCertificate('${unitId}','${examId}','${result.id}')">طباعة الشهادة</button>`:''}</div></div></div>`;}
 function printCertificate(unitId,examId,resultId){let e=getExam(unitId,examId);let r=(e.results||[]).find(x=>x.id===resultId);if(!r)return;let html=`<html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>شهادة ${r.name}</title><style>@page{size:A4 landscape;margin:10mm}body{font-family:Tahoma,Arial;background:#fff;color:#111}.cert{border:8px double #b38b32;padding:35px;text-align:center;height:185mm}h1{font-size:34px;margin:10px;color:#8a671f}h2{font-size:24px}.name{font-size:30px;font-weight:bold;margin:20px}.row{display:flex;justify-content:center;gap:35px;margin:18px}.box{border:1px solid #999;padding:12px 25px}.footer{margin-top:35px;display:flex;justify-content:space-between}
 /* تأكيد نهائي: لا تظهر بطاقات اسم المستخدم وكلمة المرور داخل صفحة اختبارات الوحدة */
 #unitTests .login,#unitTests .loginCard,#unitTests .unitCredentialHint,#unitTests .healthCredGrid{display:none!important}
@@ -2145,7 +1988,7 @@ function printCertificate(unitId,examId,resultId){let e=getExam(unitId,examId);l
 </style>
 </head><body><div class="cert"><h1>شهادة اجتياز</h1><h2>نظام إدارة المقاتل الشجاع</h2><p>تُمنح هذه الشهادة للمتدرب</p><div class="name">${escapeHtml(r.rank)} / ${escapeHtml(r.name)}</div><div class="row"><div class="box">الرقم العسكري: ${escapeHtml(r.num)}</div><div class="box">الوحدة: ${escapeHtml(r.unit)}</div></div><p>لاجتيازه اختبار: <b>${escapeHtml(e.title)}</b></p><p>الدرجة: ${r.score} من ${r.total} - النسبة: ${r.percent}%</p><div class="footer"><span>التاريخ: ${r.date}</span><span>مركز التدريب</span></div></div>
 </body></html>`;let w=window.open('','_blank');w.document.write(html);w.document.close();setTimeout(()=>w.print(),300)}
-function openExamResults(unitId,examId){let e=getExam(unitId,examId);if(!e)return;let rows=(e.results||[]).map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.rank)}</td><td>${escapeHtml(r.num)}</td><td>${r.score}/${r.total}</td><td>${r.percent}%</td><td>${r.passed?'ناجح':'راسب'}</td><td>${r.date}</td></tr>`).join('')||'<tr><td colspan="8">لا توجد نتائج حتى الآن</td></tr>';let modal=document.getElementById('addModal');modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML=`<div class="examEditorPanel"><div class="head"><div><h2>نتائج ${escapeHtml(e.title)}</h2><p>وحدة ${unitNameById(unitId)}</p></div><button class="btn" onclick="closeExamEditor()">إغلاق</button></div><div class="card"><table><thead><tr><th>م</th><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>الدرجة</th><th>النسبة</th><th>النتيجة</th><th>التاريخ</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;}
+function openExamResults(unitId,examId){let e=getExam(unitId,examId);if(!e)return;let rows=(e.results||[]).map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.rank)}</td><td>${escapeHtml(r.num)}</td><td>${r.score}/${r.total}</td><td>${r.percent}%</td><td>${r.passed?'ناجح':'راسب'}</td><td>${r.violations||0}</td><td>${r.date}</td></tr>`).join('')||'<tr><td colspan="9">لا توجد نتائج حتى الآن</td></tr>';let modal=document.getElementById('addModal');modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML=`<div class="examEditorPanel"><div class="head"><div><h2>نتائج ${escapeHtml(e.title)}</h2><p>وحدة ${unitNameById(unitId)}</p></div><button class="btn" onclick="closeExamEditor()">إغلاق</button></div><div class="card"><table><thead><tr><th>م</th><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>الدرجة</th><th>النسبة</th><th>النتيجة</th><th>التاريخ</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;}
 function deleteExam(unitId,examId){if(!confirm('هل تريد حذف الاختبار؟ سيتم حذف الأسئلة والنتائج الخاصة به.'))return;unitTestsStore[unitId]=(unitTestsStore[unitId]||[]).filter(e=>e.id!==examId);saveExamStore();renderUnitTests();notifyExam('تم حذف الاختبار',true)}
 function exportExamBackup(unitId){let data=JSON.stringify(unitTestsStore[unitId]||[],null,2);let blob=new Blob([data],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-exams-'+unitId+'.json';a.click();URL.revokeObjectURL(a.href)}
 function importExamBackup(unitId){let inp=document.createElement('input');inp.type='file';inp.accept='.json,application/json';inp.onchange=()=>{let f=inp.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let data=JSON.parse(r.result);if(!Array.isArray(data))throw Error('bad');unitTestsStore[unitId]=data;saveExamStore();renderUnitTests();notifyExam('تم استيراد نسخة الاختبارات بنجاح',true)}catch(e){notifyExam('ملف النسخة الاحتياطية غير صحيح',false)}};r.readAsText(f)};inp.click()}
@@ -2278,11 +2121,7 @@ renderAll();
   window.examScrollQuestionsV7=qScroll;
   function removeBar(){var b=document.querySelector('.examFloatingBarV7'); if(b) b.remove(); document.body.classList.remove('exam-editor-open-v7');}
   function addBar(){
-    var m=modal();
-    /* تظهر الأزرار العائمة فقط داخل محرر إعداد الاختبار للقائد، وليس داخل صفحة المختبر */
-    var isTraineeExam = !!(m && m.querySelector('.traineeExamSecure'));
-    var isEditorPanel = !!(m && m.querySelector('.examQuestionCard') && m.querySelector('#examTitle'));
-    if(!isOpen() || isTraineeExam || !isEditorPanel) {removeBar(); return;}
+    var m=modal(); if(!isOpen()) {removeBar(); return;}
     document.body.classList.add('exam-editor-open-v7');
     if(!document.querySelector('.examFloatingBarV7')){
       var bar=document.createElement('div');
@@ -2738,6 +2577,12 @@ renderAll();
 .traineeExamSecure input,.traineeExamSecure select{color:#fff8e9!important;background:rgba(0,0,0,.35)!important;border-color:rgba(240,206,122,.32)!important}
 .traineeExamSecure label{color:#f0ce7a!important;font-weight:800!important}
 .traineeExamSecure .submitExamLocked{width:100%;margin-top:15px;height:50px!important;font-size:18px!important;font-weight:900!important}
+
+.traineeExamSecure .violationBox{border:1px solid rgba(240,206,122,.38);border-radius:16px;background:rgba(217,150,56,.12);padding:12px;margin:12px 0;text-align:center;font-weight:900;line-height:1.8;color:#ffe7c4}
+.traineeExamSecure .violationBox b{display:inline-block;min-width:38px;color:var(--gold2);font-size:24px;vertical-align:middle}
+.traineeExamSecure .violationBox.warn1{background:rgba(217,150,56,.16);border-color:rgba(217,150,56,.55);color:#ffe7c4}
+.traineeExamSecure .violationBox.warn2{background:rgba(216,93,80,.18);border-color:rgba(216,93,80,.60);color:#ffd5d2}
+.traineeExamSecure .violationBox.danger3{background:rgba(216,93,80,.32);border-color:rgba(216,93,80,.80);color:#fff}
 body.examActiveLock{overscroll-behavior:contain!important}
 @media(max-width:700px){.traineeExamSecure .secureTop{grid-template-columns:1fr}.traineeExamSecure .countdownBox{min-width:0}.traineeExamSecure .secureTop h2{font-size:24px!important}.traineeExamSecure .savedQuestion b{font-size:17px!important}.traineeExamSecure .examAnswer{font-size:15px!important}}
 </style>
@@ -2745,10 +2590,39 @@ body.examActiveLock{overscroll-behavior:contain!important}
 (function(){
   var activeExamLock=false;
   var countdownTimer=null;
+  var currentExamUnit=null;
+  var currentExamId=null;
+  var currentViolationKey=null;
   var oldRender=window.renderTraineeExamForm;
   var oldSubmit=window.submitTraineeExam;
   function esc(v){try{return typeof escapeHtml==='function'?escapeHtml(String(v||'')):String(v||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}catch(e){return String(v||'')}}
   function unitTitle(unitId){try{return typeof unitNameById==='function'?unitNameById(unitId):unitId}catch(e){return unitId}}
+  function violationKey(unitId,examId){return 'examLeaveViolations_'+unitId+'_'+examId}
+  function getViolations(){try{return Number(sessionStorage.getItem(currentViolationKey)||0)||0}catch(e){return 0}}
+  function setViolations(n){
+    try{if(currentViolationKey)sessionStorage.setItem(currentViolationKey,String(n||0))}catch(e){}
+    var box=document.getElementById('examViolationBox'), num=document.getElementById('examViolationCount'), msg=document.getElementById('examViolationMsg');
+    if(num)num.textContent=String(n||0);
+    if(box){box.classList.remove('warn1','warn2','danger3'); if(n===1)box.classList.add('warn1'); else if(n===2)box.classList.add('warn2'); else if(n>=3)box.classList.add('danger3');}
+    if(msg){msg.textContent=n>=3?'تم إنهاء الاختبار بسبب تكرار مغادرة الصفحة.':(n===2?'تحذير نهائي: مغادرة أخرى تنهي الاختبار تلقائياً.':(n===1?'تم رصد مغادرة صفحة الاختبار.':'لم يتم رصد مغادرة للصفحة.'))}
+  }
+  function forceFinishByViolation(){
+    try{
+      var form=document.querySelector('.traineeExamSecure form');
+      if(form && currentExamUnit && currentExamId){
+        alert('تم إنهاء الاختبار بسبب تكرار مغادرة الصفحة 3 مرات.');
+        window.submitTraineeExam({preventDefault:function(){},target:form},currentExamUnit,currentExamId);
+      }
+    }catch(e){try{unlockExamPage();closeExamEditor()}catch(x){}}
+  }
+  function recordLeaveViolation(){
+    if(!activeExamLock||!currentViolationKey)return;
+    var n=getViolations()+1;
+    setViolations(n);
+    if(n===1)alert('تنبيه أول: تم رصد مغادرة صفحة الاختبار.');
+    else if(n===2)alert('تحذير نهائي: مغادرة أخرى ستنهي الاختبار تلقائياً.');
+    else if(n>=3)forceFinishByViolation();
+  }
   function toLatinDigitsSafe(v){
     return String(v||'').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d)})
                          .replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)});
@@ -2799,7 +2673,7 @@ body.examActiveLock{overscroll-behavior:contain!important}
   window.unlockExamPage=unlockExamPage;
   window.addEventListener('beforeunload',function(ev){if(activeExamLock){ev.preventDefault();ev.returnValue='الخروج من صفحة الاختبار قد يؤدي إلى إلغاء المحاولة.';return ev.returnValue;}});
   window.addEventListener('popstate',function(){if(activeExamLock){try{history.pushState({examLock:true},'',location.href)}catch(e){} alert('لا يمكن الرجوع أثناء الاختبار. أكمل الاختبار ثم اضغط تسليم.');}});
-  document.addEventListener('visibilitychange',function(){if(activeExamLock && document.hidden){try{sessionStorage.setItem('examLeaveWarning',String((Number(sessionStorage.getItem('examLeaveWarning')||0)+1)))}catch(e){}}});
+  document.addEventListener('visibilitychange',function(){if(activeExamLock && document.hidden){recordLeaveViolation();}});
   function startCountdown(e){
     if(countdownTimer)clearInterval(countdownTimer);
     var el=document.getElementById('traineeExamCountdown');
@@ -2827,19 +2701,20 @@ body.examActiveLock{overscroll-behavior:contain!important}
     if(!isNaN(st)&&now<st)allow=false;
     if(!isNaN(en)&&now>=en)allow=false;
     if(!allow){
-      unlockExamPage();
+      unlockExamPage();currentExamUnit=null;currentExamId=null;currentViolationKey=null;
       var title=(now<st)?'الاختبار لم يبدأ بعد':'انتهى وقت الاختبار';
       var small=(now<st)?'يبدأ بعد':'الموعد';
       setTimeout(function(){startCountdown(e)},50);
       return '<div class="examEditorPanel traineeExamSecure"><div class="secureTop"><div><h2>'+esc(e.title||'اختبار')+'</h2><p>وحدة '+esc(unitTitle(unitId))+' - الحالة: '+esc(status)+'</p></div><div class="countdownBox"><small id="traineeExamCountdownLabel">'+small+'</small><b id="traineeExamCountdown">--:--</b></div></div><div class="card" style="text-align:center"><h3 style="color:var(--gold2)">'+title+'</h3><p style="color:var(--muted);line-height:1.9">موعد الاختبار: '+esc(normalizeDatePart(e.startDate)||'غير محدد')+' '+esc(normalizeTimePart(e.startTime)||'')+'</p><button class="btn" onclick="closeExamEditor()">إغلاق</button></div></div>';
     }
+    currentExamUnit=unitId;currentExamId=e.id;currentViolationKey=violationKey(unitId,e.id);setViolations(0);
     lockExamPage();
-    setTimeout(function(){startCountdown(e)},50);
+    setTimeout(function(){startCountdown(e);setViolations(getViolations())},50);
     var qs=(e.questions||[]).map(function(q,i){return '<div class="savedQuestion"><b>'+(i+1)+'. '+esc(q.text)+'</b>'+((q.options||[]).map(function(op){return '<label class="examAnswer"><input type="radio" name="q_'+esc(q.id)+'" value="'+esc(op)+'" required> '+esc(op)+'</label>'}).join(''))+'</div>'}).join('');
     var ranks=['لواء','عميد','عقيد','مقدم','رائد','نقيب','ملازم أول','ملازم','رئيس رقباء','رقيب أول','رقيب','وكيل رقيب','عريف','جندي أول','جندي'];
-    return '<div class="examEditorPanel traineeExamSecure"><div class="secureTop"><div><h2>'+esc(e.title||'اختبار')+'</h2><p>وحدة '+esc(unitTitle(unitId))+' - لا تغادر الصفحة حتى تسليم الاختبار.</p></div><div class="countdownBox"><small id="traineeExamCountdownLabel">الوقت المتبقي</small><b id="traineeExamCountdown">--:--</b></div></div><div class="antiCheatNotice">تنبيه: الخروج أو الرجوع أثناء الاختبار قد يسجل محاولة مغادرة. أكمل الإجابة ثم اضغط تسليم الاختبار.</div><form class="card" onsubmit="submitTraineeExam(event,\''+esc(unitId)+'\',\''+esc(e.id)+'\')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>'+ranks.map(function(r){return '<option>'+esc(r)+'</option>'}).join('')+'</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="'+esc(unitTitle(unitId))+'"></div></div><div class="examTimer" id="examTimer">مدة الاختبار: '+esc(e.duration||30)+' دقيقة</div>'+qs+'<button class="btn primary submitExamLocked">تسليم الاختبار</button></form></div>';
+    return '<div class="examEditorPanel traineeExamSecure"><div class="secureTop"><div><h2>'+esc(e.title||'اختبار')+'</h2><p>وحدة '+esc(unitTitle(unitId))+' - لا تغادر الصفحة حتى تسليم الاختبار.</p></div><div class="countdownBox"><small id="traineeExamCountdownLabel">الوقت المتبقي</small><b id="traineeExamCountdown">--:--</b></div></div><div class="antiCheatNotice">تنبيه: الخروج أو الرجوع أثناء الاختبار قد يسجل محاولة مغادرة. أكمل الإجابة ثم اضغط تسليم الاختبار.</div><div id="examViolationBox" class="violationBox">عدد مخالفات مغادرة الصفحة: <b id="examViolationCount">0</b><div id="examViolationMsg">لم يتم رصد مغادرة للصفحة.</div></div><form class="card" onsubmit="submitTraineeExam(event,\''+esc(unitId)+'\',\''+esc(e.id)+'\')"><h3>بيانات المختبر - جميع الحقول إلزامية</h3><div class="examEditorGrid"><div><label>الاسم *</label><input name="name" required></div><div><label>الرتبة *</label><select name="rank" required>'+ranks.map(function(r){return '<option>'+esc(r)+'</option>'}).join('')+'</select></div><div><label>الرقم العسكري *</label><input name="num" required></div><div><label>الوحدة *</label><input name="unit" required value="'+esc(unitTitle(unitId))+'"></div></div><div class="examTimer" id="examTimer">مدة الاختبار: '+esc(e.duration||30)+' دقيقة</div>'+qs+'<button class="btn primary submitExamLocked">تسليم الاختبار</button></form></div>';
   };
-  window.submitTraineeExam=function(ev,unitId,examId){unlockExamPage();if(typeof oldSubmit==='function')return oldSubmit.apply(this,arguments)};
+  window.submitTraineeExam=function(ev,unitId,examId){if(!currentViolationKey)currentViolationKey=violationKey(unitId,examId);unlockExamPage();if(typeof oldSubmit==='function')return oldSubmit.apply(this,arguments)};
 })();
 </script>
 
@@ -2863,6 +2738,12 @@ body.examActiveLock{overscroll-behavior:contain!important}
 .traineeExamSecure input,.traineeExamSecure select{color:#fff8e9!important;background:rgba(0,0,0,.35)!important;border-color:rgba(240,206,122,.32)!important}
 .traineeExamSecure label{color:#f0ce7a!important;font-weight:800!important}
 .traineeExamSecure .submitExamLocked{width:100%;margin-top:15px;height:50px!important;font-size:18px!important;font-weight:900!important}
+
+.traineeExamSecure .violationBox{border:1px solid rgba(240,206,122,.38);border-radius:16px;background:rgba(217,150,56,.12);padding:12px;margin:12px 0;text-align:center;font-weight:900;line-height:1.8;color:#ffe7c4}
+.traineeExamSecure .violationBox b{display:inline-block;min-width:38px;color:var(--gold2);font-size:24px;vertical-align:middle}
+.traineeExamSecure .violationBox.warn1{background:rgba(217,150,56,.16);border-color:rgba(217,150,56,.55);color:#ffe7c4}
+.traineeExamSecure .violationBox.warn2{background:rgba(216,93,80,.18);border-color:rgba(216,93,80,.60);color:#ffd5d2}
+.traineeExamSecure .violationBox.danger3{background:rgba(216,93,80,.32);border-color:rgba(216,93,80,.80);color:#fff}
 body.examActiveLock{overscroll-behavior:contain!important}
 .examToast{position:fixed!important;z-index:100000!important;left:50%!important;right:auto!important;top:22px!important;bottom:auto!important;transform:translateX(-50%)!important;border-radius:16px!important;padding:14px 22px!important;text-align:center!important;min-width:260px!important;max-width:min(92vw,560px)!important;background:rgba(12,22,13,.96)!important;border:1px solid rgba(240,206,122,.45)!important;color:#fff8e9!important;box-shadow:0 10px 30px rgba(0,0,0,.4)!important}
 @media(max-width:700px){.traineeExamSecure .secureTop{grid-template-columns:1fr}.traineeExamSecure .countdownBox{min-width:0}.traineeExamSecure .secureTop h2{font-size:24px!important}.traineeExamSecure .savedQuestion b{font-size:17px!important}.traineeExamSecure .examAnswer{font-size:15px!important}}
@@ -2901,37 +2782,4 @@ body.examActiveLock{overscroll-behavior:contain!important}
   window.addEventListener('hashchange',route);setTimeout(route,450);
 })();
 </script>
-
-<!-- FIX V37: منع ظهور أزرار حفظ/إرسال الاختبار في صفحة المختبر -->
-<style id="fix-hide-editor-buttons-from-trainee-v37">
-body:not(.exam-editor-open-v7) .examFloatingBarV7{display:none!important;pointer-events:none!important;}
-#addModal .traineeExamSecure .examFloatingBarV7{display:none!important;pointer-events:none!important;}
-</style>
-<script id="fix-hide-editor-buttons-from-trainee-v37-js">
-(function(){
-  function removeEditorBar(){
-    try{
-      var bars=document.querySelectorAll('.examFloatingBarV7');
-      bars.forEach(function(b){b.remove();});
-      document.body.classList.remove('exam-editor-open-v7');
-    }catch(e){}
-  }
-  var oldOpen=window.openTraineeExam;
-  if(typeof oldOpen==='function' && !oldOpen.__noEditorBarV37){
-    window.openTraineeExam=function(){
-      removeEditorBar();
-      var r=oldOpen.apply(this,arguments);
-      setTimeout(removeEditorBar,80);
-      setTimeout(removeEditorBar,500);
-      return r;
-    };
-    window.openTraineeExam.__noEditorBarV37=true;
-  }
-  document.addEventListener('click',function(){
-    var m=document.getElementById('addModal');
-    if(m && m.querySelector('.traineeExamSecure')) setTimeout(removeEditorBar,10);
-  },true);
-})();
-</script>
-
 </body></html>
