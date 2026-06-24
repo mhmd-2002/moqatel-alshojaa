@@ -576,11 +576,28 @@ body.exam-editor-open-v7{
   }
 }
 </style>
+
+<style id="permissions-system-v1">
+/* ===== نظام الصلاحيات - إضافة آمنة ===== */
+.authStatusBar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;margin:12px auto 0;max-width:1400px;padding:0 22px;color:var(--muted);font-size:12px}
+.authStatusBar .authUserBadge{border:1px solid var(--line);border-radius:999px;padding:6px 11px;background:rgba(200,164,93,.10);color:var(--gold2)}
+.authStatusBar button{padding:6px 10px;border-radius:999px;font-size:12px}
+.authGuardNotice{max-width:620px;margin:45px auto;text-align:center;border:1px solid rgba(216,93,80,.45);background:rgba(216,93,80,.10);border-radius:22px;padding:26px;box-shadow:var(--shadow)}
+.authGuardNotice h2{color:var(--gold2);margin:0 0 10px}.authGuardNotice p{color:var(--muted);line-height:1.8}
+.authLoginHero{min-height:520px;display:grid;place-items:center}.authLoginCard{width:min(96vw,520px);background:linear-gradient(135deg,rgba(18,27,18,.92),rgba(28,42,28,.90));border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--shadow)}
+.authLoginCard h2{margin:0 0 8px;color:var(--gold2);text-align:center}.authLoginCard p{color:var(--muted);line-height:1.8;text-align:center;margin:0 0 18px}.authLoginCard .btn.primary{width:100%;height:46px;margin-top:6px}
+.authRoleGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:14px}.authRoleChip{border:1px solid var(--line);border-radius:16px;padding:10px;text-align:center;background:rgba(0,0,0,.15);color:var(--muted);font-size:12px}.authRoleChip b{display:block;color:var(--gold2);font-size:14px;margin-bottom:4px}
+.permissionGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.permissionCard{border:1px solid var(--line);background:rgba(255,255,255,.045);border-radius:18px;padding:16px}.permissionCard h4{margin:0 0 8px;color:var(--gold2)}.permissionCard p{margin:0;color:var(--muted);line-height:1.7;font-size:13px}
+.userAdminLayout{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:16px}.userAdminTable table{min-width:820px}.roleBadge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--gold2);background:rgba(200,164,93,.08);font-size:12px}.roleBadge.off{color:#ffd5d2;border-color:rgba(216,93,80,.45);background:rgba(216,93,80,.10)}
+.logBox{max-height:260px;overflow:auto;display:grid;gap:8px}.logItem{border:1px solid var(--line);border-radius:14px;padding:9px;background:rgba(0,0,0,.14);color:var(--muted);font-size:12px;line-height:1.7}.logItem b{color:var(--gold2)}
+[data-auth-hidden="1"]{display:none!important}
+@media(max-width:900px){.userAdminLayout{grid-template-columns:1fr}.authStatusBar{padding:0 10px}}
+</style>
 </head><body>
 <header class="top no-print"><div class="topin"><div class="brand"><div class="mark">⌖</div><div><h1>نظام إدارة المقاتل الشجاع</h1><p>صيانة قوة طريف</p></div></div><nav class="nav"><button onclick="showPage('home')">الرئيسية</button><button onclick="showPage('leader')">لوحة القائد</button><button onclick="showPage('unitsLogin')">قاعدة بيانات متدربي القوة</button><button onclick="showPage('testsHub')">الاختبارات</button><button onclick="showPage('trainingLogin')">خطة التدريب</button><button onclick="showPage('weatherLogin')">الطقس الميداني</button><button onclick="showPage('healthLogin')">الصحية</button><button onclick="showPage('medicLogin')">الإسعاف الميداني</button><button onclick="showPage('commLogin')">الاتصالات</button><button onclick="showPage('teacherLogin')">المعلم</button><button onclick="showPage('traineeLogin')">المتدربين</button><button onclick="showPage('reports')">التقارير</button></nav></div></header>
 <main>
 <section class="page active" id="home"><div class="hero"><div class="heroBox"><div class="eyebrow">BRAVE FIGHTER CONTROL SYSTEM V3</div><h2>نظام إدارة المقاتل الشجاع</h2><p>منظومة موحدة لإدارة متدربي القوة حسب الوحدات، متابعة الجاهزية، الاختبارات، الحالة الصحية، الاتصالات، بوابة المعلم، والتقارير.</p><div class="grid" style="margin-top:22px"><div class="card module" onclick="showPage('leader')"><div class="icon">⭐</div><h3>لوحة القائد</h3><p>جاهزية القوة والوحدات والتنبيهات والمتعثرين.</p></div><div class="card module" onclick="showPage('unitsLogin')"><div class="icon">🗂️</div><h3>قاعدة بيانات متدربي القوة</h3><p>الوحدات: الصيانة، الإمداد، النقل، الإشارة، كتيبة الدبابات، كتيبة المشاة، كتيبة المهندسين، الشرطة العسكرية، سرية القيادة، التشغيل والصيانة.</p></div><div class="card module" onclick="showPage('testsHub')"><div class="icon">📝</div><h3>الاختبارات</h3><p>اختبارات مستقلة لكل وحدة مع اسم مستخدم وكلمة مرور لكل بطاقة.</p></div><div class="card module" onclick="showPage('trainingLogin')"><div class="icon">📅</div><h3>خطة التدريب</h3><p>خطط يومية وأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.</p></div><div class="card module" onclick="showPage('weatherLogin')"><div class="icon">🌦️</div><h3>الطقس الميداني</h3><p>تقدير المخاطر الجوية للتدريب: حرارة، رياح، رؤية، غبار، وإجهاد حراري.</p></div><div class="card module" onclick="showPage('healthLogin')"><div class="icon">🩺</div><h3>اللوحة الصحية</h3><p>الخطوات، الوزن، النشاط، وطلبات المستوصف.</p></div><div class="card module" onclick="showPage('medicLogin')"><div class="icon">🚑</div><h3>الإسعاف الميداني</h3><p>مكتبة توعوية وصحية للمستندات والصور والفيديوهات والدروس.</p></div><div class="card module" onclick="showPage('commLogin')"><div class="icon">📡</div><h3>مركز الاتصالات</h3><p>رسائل واتساب ومراجع وملفات وصوتيات.</p></div><div class="card module" onclick="showPage('teacherLogin')"><div class="icon">🎓</div><h3>بوابة المعلم</h3><p>معايير التعليم، طرق التدريس، ومكتبة الملفات.</p></div><div class="card module" onclick="showPage('traineeLogin')"><div class="icon">🪖</div><h3>صفحة المتدربين</h3><p>بحث ذاتي آمن لعرض بيانات المتدرب واختباراته وطباعة تقريره بدون أسماء عامة.</p></div><div class="card module" onclick="showPage('reports')"><div class="icon">📊</div><h3>التقارير والإحصائيات</h3><p>تقارير A4 للقوة والوحدات والمعايير والوزن.</p></div></div></div></div></section>
-<section class="page" id="unitsLogin"></section><section class="page" id="unitsHub"></section><section class="page" id="testsHub"></section><section class="page" id="testUnitLogin"></section><section class="page" id="unitTests"></section><section class="page" id="unitLogin"></section><section class="page" id="unitDb"></section><section class="page" id="leader"></section><section class="page" id="teacherLogin"></section><section class="page" id="traineeLogin"></section><section class="page" id="healthLogin"></section><section class="page" id="trainingLogin"></section><section class="page" id="weatherLogin"></section><section class="page" id="medicLogin"></section><section class="page" id="commLogin"></section><section class="page" id="reports"></section>
+<section class="page" id="unitsLogin"></section><section class="page" id="unitsHub"></section><section class="page" id="testsHub"></section><section class="page" id="testUnitLogin"></section><section class="page" id="unitTests"></section><section class="page" id="unitLogin"></section><section class="page" id="unitDb"></section><section class="page" id="leader"></section><section class="page" id="teacherLogin"></section><section class="page" id="traineeLogin"></section><section class="page" id="healthLogin"></section><section class="page" id="trainingLogin"></section><section class="page" id="weatherLogin"></section><section class="page" id="medicLogin"></section><section class="page" id="commLogin"></section><section class="page" id="reports"></section><section class="page" id="loginPage"></section><section class="page" id="userAdmin"></section>
 </main><div class="modalOverlay no-print" id="addModal"></div>
 <script>
 const units=[{id:'maintenance',name:'الصيانة',user:'maint',pass:'1111',icon:'⚙️'},{id:'supply',name:'الإمداد',user:'supply',pass:'2222',icon:'📦'},{id:'transport',name:'النقل',user:'transport',pass:'3333',icon:'🚚'},{id:'signal',name:'الإشارة',user:'signal',pass:'4444',icon:'📡'},{id:'tank_battalion',name:'كتيبة الدبابات',user:'tank',pass:'5555',icon:'🛡️'},{id:'infantry_battalion',name:'كتيبة المشاة',user:'infantry',pass:'6666',icon:'🪖'},{id:'engineer_battalion',name:'كتيبة المهندسين',user:'engineer',pass:'7777',icon:'⚙️'},{id:'military_police',name:'الشرطة العسكرية',user:'mp',pass:'8888',icon:'🚔'},{id:'command_company',name:'سرية القيادة',user:'command',pass:'9999',icon:'🎖️'},{id:'operation_maintenance',name:'التشغيل والصيانة',user:'opsmaint',pass:'1010',icon:'🔧'}];
@@ -699,143 +716,39 @@ function closeAddModal(){document.getElementById('addModal').style.display='none
 function addTrainee(unit){trainees.push(readForm(unit));closeAddModal();renderUnitDb()}
 function saveEdit(num){let old=trainees.find(x=>x.num===num);let updated=readForm(old.unit);trainees=trainees.map(x=>x.num===num?updated:x);closeAddModal();renderUnitDb()}
 function delTrainee(num){if(confirm('هل تريد حذف المتدرب؟')){trainees=trainees.filter(t=>t.num!==num);renderUnitDb()}}
-function printUnitTable(unitName){let st=unitStats(unitName);let rows=st.list.map(t=>`<tr><td>${t.name}</td><td>${t.rank}</td><td>${t.num}</td><td>${t.phone||'—'}</td><td>${t.unit}</td>${t.s.map(x=>`<td>${x?'✅ اجتاز':'❌ لم يجتاز'}</td>`).join('')}<td>${bmi(t)}</td><td>${ready(t)?'جاهز':'غير جاهز'}</td></tr>`).join('');let html=`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>طباعة جدول ${unitName}</title><style>@page{size:A4 landscape;margin:7mm}body{font-family:Tahoma,Arial,sans-serif;color:#000;margin:0}h1{text-align:center;margin:0 0 4px;font-size:18px}.sub{text-align:center;margin-bottom:10px;font-size:12px}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border:1px solid #333;padding:4px;text-align:center;white-space:nowrap}th{background:#e6e6e6;font-weight:bold}
-/* إصلاح ظهور بيانات الدخول المقترحة داخل تسجيل دخول الوحدات الصحية */
-.unitCredentialHint{
-  margin-top:14px;
-  border:1px dashed rgba(240,206,122,.55);
-  background:rgba(201,164,93,.10);
-  color:var(--gold2);
-  border-radius:14px;
-  padding:12px 14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-  font-weight:700;
-  direction:rtl;
-}
-.unitCredentialHint span{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  background:rgba(8,13,8,.55);
-  border:1px solid rgba(240,206,122,.28);
-  border-radius:999px;
-  padding:7px 12px;
-  color:var(--paper);
-}
-.unitCredentialHint b{color:var(--gold2)}
-.loginField label{
-  display:block!important;
-  visibility:visible!important;
-  opacity:1!important;
-  color:var(--gold2)!important;
-  font-size:13px!important;
-  font-weight:700!important;
-  margin-bottom:7px!important;
-  text-align:right!important;
-}
-.loginField input{
-  color:var(--paper)!important;
-}
-@media(max-width:650px){
-  .unitCredentialHint{align-items:stretch;justify-content:stretch}
-  .unitCredentialHint span{width:100%;justify-content:space-between}
-}
-
-
-/* ===== V4 ترتيب صفحة إعداد الأسئلة وروابط الاختبار الصحيحة ===== */
-.examEditorPanel.examEditorPanelV4{max-width:1280px!important;padding:0!important;overflow:hidden!important}
-.examEditorTopBar{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 18px;background:linear-gradient(135deg,rgba(16,21,15,.98),rgba(28,42,28,.96));border-bottom:1px solid var(--line)}
-.examEditorTopBar h2{margin:0;color:var(--gold2);font-size:28px}.examEditorTopBar p{margin:6px 0 0;color:var(--muted)}
-.examEditorBody{padding:18px}.examEditorSummary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
-.examEditorSummary .miniDash{border:1px solid var(--line);background:rgba(255,255,255,.055);border-radius:18px;padding:14px;text-align:center}.miniDash b{display:block;font-size:24px;color:var(--gold2)}.miniDash span{color:var(--muted);font-size:13px}
-.examEditorMainGrid{display:grid!important;grid-template-columns:minmax(340px,420px) minmax(440px,1fr)!important;gap:16px!important;align-items:start!important}
-.examFormCard,.examQuestionCard,.examSavedCard{background:rgba(12,22,13,.78)!important;border:1px solid var(--line)!important;border-radius:22px!important;padding:16px!important;box-shadow:var(--shadow)!important}
-.examFormCard h3,.examQuestionCard h3,.examSavedCard h3{margin:0 0 12px!important;color:var(--gold2)!important}.examFormCard label,.examQuestionCard label{font-weight:bold!important}
-.examLinkTools{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin-top:10px}.examLinkTools input{direction:ltr;text-align:left}.examLinkWarning{color:#f0ce7a;background:rgba(217,150,56,.13);border:1px solid rgba(217,150,56,.35);padding:9px;border-radius:12px;margin-top:8px;font-size:13px}
-.examQuestionLayout{display:grid;grid-template-columns:1fr 1fr;gap:14px}.examQuestionLayout .full{grid-column:1/-1}.questionTypePills{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 4px}.questionTypePills span{border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-size:12px}
-.examQuestionActions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}.examQuestionActions .btn.primary{flex:1;min-width:220px}.examSavedCard{margin-top:16px!important;max-height:46vh;overflow:auto}.savedQuestion{position:relative}.savedQuestion b{display:block;padding-left:70px;line-height:1.7}.savedQuestion .qIndex{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:rgba(200,164,93,.18);border:1px solid var(--line);color:var(--gold2);margin-left:8px}.savedQuestion .qBtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.savedQuestion .qOpts{color:var(--muted);font-size:12px;margin-top:6px}.savedQuestion .qOpts span{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 8px;margin:3px}.examCountBadge{display:inline-block;border:1px solid var(--line);background:rgba(200,164,93,.12);color:var(--gold2);border-radius:999px;padding:5px 12px;margin-right:8px}
-@media(max-width:900px){.examEditorMainGrid{grid-template-columns:1fr!important}.examQuestionLayout{grid-template-columns:1fr}.examEditorTopBar{position:relative;flex-direction:column;align-items:stretch}.examSavedCard{max-height:none}}
-
+function printUnitTable(unitName){
+  let st=unitStats(unitName);
+  let rows=st.list.map(t=>`<tr><td>${t.name}</td><td>${t.rank}</td><td>${t.num}</td><td>${t.phone||'—'}</td><td>${t.unit}</td>${t.s.map(x=>`<td>${x?'✅ اجتاز':'❌ لم يجتاز'}</td>`).join('')}<td>${bmi(t)}</td><td>${ready(t)?'جاهز':'غير جاهز'}</td></tr>`).join('');
+  let html=`<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>طباعة جدول ${unitName}</title>
+<style>
+@page{size:A4 landscape;margin:7mm}
+body{font-family:Tahoma,Arial,sans-serif;color:#111;background:#fff}
+h1{text-align:center;margin:0 0 6px;font-size:22px}
+.sub{text-align:center;margin-bottom:12px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th,td{border:1px solid #777;padding:6px;text-align:center}
+th{background:#e8e8e8}
 </style>
-
-<!-- V8: ضبط الشريط والأزرار العائمة بدون تغطية محتوى الصفحة -->
-<style id="exam-floating-bar-adjust-v8">
-/* رفع المساحة السفلية قليلاً حتى لا يلامس الشريط آخر الحقول */
-#addModal.modalOverlay.active.examFullScreen{
-  padding-bottom:96px!important;
+</head>
+<body>
+<h1>جدول متدربي وحدة ${unitName}</h1>
+<div class="sub">نظام إدارة المقاتل الشجاع - صيانة قوة طريف</div>
+<table>
+<thead><tr><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>رقم الجوال</th><th>الوحدة</th>${skills.map(s=>`<th>${s}</th>`).join('')}<th>حالة الوزن</th><th>الجاهزية</th></tr></thead>
+<tbody>${rows}</tbody>
+</table>
+</body>
+</html>`;
+  let w=window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(),300);
 }
-#addModal.active.examFullScreen .examEditorPanel,
-#addModal.active.examFullScreen .examEditorPanelV4{
-  margin-bottom:78px!important;
-}
-#addModal.active.examFullScreen .examSavedCard{
-  margin-bottom:82px!important;
-}
-/* الشريط أصبح صغيراً في المنتصف بدلاً من ممتد على كامل العرض */
-.examFloatingBarV7{
-  left:50%!important;
-  right:auto!important;
-  bottom:12px!important;
-  transform:translateX(-50%)!important;
-  width:auto!important;
-  max-width:min(760px,calc(100vw - 34px))!important;
-  min-height:0!important;
-  padding:7px 9px!important;
-  gap:7px!important;
-  border-radius:999px!important;
-  background:rgba(12,22,13,.90)!important;
-  border:1px solid rgba(240,206,122,.32)!important;
-  box-shadow:0 10px 28px rgba(0,0,0,.34)!important;
-  backdrop-filter:blur(10px)!important;
-}
-.examFloatingBarV7 .btn{
-  min-width:0!important;
-  width:auto!important;
-  height:34px!important;
-  padding:7px 14px!important;
-  border-radius:999px!important;
-  font-size:13px!important;
-  line-height:1!important;
-  white-space:nowrap!important;
-  box-shadow:none!important;
-}
-.examFloatingBarV7 .primary{
-  padding-inline:18px!important;
-  font-weight:900!important;
-}
-/* زر الصعود أصغر لأنه إجراء مساعد */
-.examFloatingBarV7 .btn:last-child{
-  padding-inline:12px!important;
-  opacity:.92!important;
-}
-/* على الشاشات الصغيرة يصبح صفين خفيفين بدون حجب كبير */
-@media(max-width:700px){
-  #addModal.modalOverlay.active.examFullScreen{padding-bottom:132px!important;}
-  .examFloatingBarV7{
-    left:8px!important;
-    right:8px!important;
-    bottom:8px!important;
-    transform:none!important;
-    max-width:none!important;
-    width:auto!important;
-    border-radius:18px!important;
-    padding:8px!important;
-    gap:6px!important;
-  }
-  .examFloatingBarV7 .btn{
-    flex:1 1 calc(50% - 6px)!important;
-    min-width:calc(50% - 6px)!important;
-    height:36px!important;
-    padding:8px 6px!important;
-    font-size:12px!important;
-  }
-}
-</style>
-</head><body><h1>جدول متدربي وحدة ${unitName}</h1><div class="sub">نظام إدارة المقاتل الشجاع - صيانة قوة طريف</div><table><thead><tr><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>رقم الجوال</th><th>الوحدة</th>${skills.map(s=>`<th>${s}</th>`).join('')}<th>حالة الوزن</th><th>الجاهزية</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;let w=window.open('','_blank');w.document.write(html);w.document.close();w.focus();setTimeout(()=>w.print(),300)}
 function renderLeader(){
   let f=forceStats();
   let totalSkillChecks=trainees.length*skills.length;
@@ -2861,6 +2774,67 @@ body.examActiveLock{overscroll-behavior:contain!important}
   window.submitTraineeExam=function(ev,unitId,examId){unlockExamPage();if(typeof oldSubmit==='function')return oldSubmit.apply(this,arguments)};
   function route(){var h=decodeURIComponent(location.hash||''),m;if(!h)return;m=h.match(/^#exam-([^?]+)\?id=([^&]+)/);if(m){setTimeout(function(){window.openTraineeExam(normalizeUnitSafe(m[1]),m[2])},100);return}m=h.match(/^#exam\?unit=([^&]+)&id=([^&]+)/);if(m){setTimeout(function(){window.openTraineeExam(normalizeUnitSafe(m[1]),m[2])},100)}}
   window.addEventListener('hashchange',route);setTimeout(route,450);
+})();
+</script>
+<!-- ===== MEDIC FIX READY: معاينة وحفظ وإرسال مواد الإسعاف الميداني ===== -->
+<style id="medic-fixed-ready-v1">
+.medicFixedToolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.medicFixedStats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}.medicFixedStats .kpi{padding:12px}.medicIncomingBox{margin-top:18px}.medicIncomingGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.medicIncomingCard{border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.16);padding:14px;position:relative;overflow:hidden}.medicIncomingCard h4{margin:0 0 8px;color:var(--gold2)}.medicIncomingCard p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}.medicIncomingBadge{position:absolute;top:10px;left:10px;border:1px solid rgba(240,206,122,.35);border-radius:999px;padding:4px 8px;color:var(--gold2);font-size:11px;background:rgba(200,164,93,.10)}.medicFileMeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.medicFileMeta span{border:1px solid var(--line);border-radius:999px;padding:4px 8px;color:var(--gold2);font-size:11px;background:rgba(200,164,93,.07)}.medicPreviewFrame{width:100%;height:min(70vh,720px);border:1px solid var(--line);border-radius:16px;background:rgba(0,0,0,.22)}.medicPreviewImg{max-width:100%;max-height:70vh;display:block;margin:auto;border-radius:16px;border:1px solid var(--line)}.medicPreviewMedia{width:100%;max-height:70vh;border-radius:16px;border:1px solid var(--line);background:#000}.medicStorageNote{margin-top:10px;border:1px dashed rgba(240,206,122,.38);background:rgba(200,164,93,.08);border-radius:14px;padding:10px;color:var(--muted);font-size:12px;line-height:1.7}.medicUnitFilter{max-width:260px}.fileItem.medicNewItem{border-color:rgba(88,184,121,.45);background:rgba(88,184,121,.08)}
+@media(max-width:900px){.medicPreviewFrame{height:60vh}.medicFixedToolbar{display:grid}.medicUnitFilter{max-width:100%}}
+</style>
+<script id="medic-fixed-ready-v1">
+(function(){
+  var STORE_KEY='moqatel_medic_items_v1';
+  var NOTICE_KEY='moqatel_medic_notices_v1';
+  var VIEW_KEY='moqatel_medic_viewed_v1';
+  function esc(v){try{return typeof escapeHtml==='function'?escapeHtml(String(v==null?'':v)):String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}catch(e){return String(v==null?'':v)}}
+  function uid(){return 'MEDIC-'+Date.now()+'-'+Math.random().toString(36).slice(2,7).toUpperCase()}
+  function now(){return new Date().toLocaleString('ar-SA')}
+  function getUnits(){return Array.isArray(window.units)?window.units:[]}
+  function toast(msg,ok){try{if(typeof notifyExam==='function'){notifyExam(msg,ok!==false);return}}catch(e){} var n=document.createElement('div');n.className='examToast '+(ok===false?'bad':'ok');n.textContent=msg;document.body.appendChild(n);setTimeout(function(){n.remove()},3200)}
+  function playBell(){try{var ctx=new (window.AudioContext||window.webkitAudioContext)();var osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';osc.frequency.value=880;gain.gain.value=.07;osc.connect(gain);gain.connect(ctx.destination);osc.start();setTimeout(function(){osc.frequency.value=660},120);setTimeout(function(){osc.stop();ctx.close()},260)}catch(e){}}
+  function loadMedicStore(){try{var saved=JSON.parse(localStorage.getItem(STORE_KEY)||'[]');if(Array.isArray(saved)&&saved.length){window.medicItems=saved.concat((window.medicItems||[]).filter(function(x){return !x._sampleLocked && !saved.some(function(s){return s.name===x.name&&s.category===x.category})}))}}catch(e){} try{var notices=JSON.parse(localStorage.getItem(NOTICE_KEY)||'[]');if(Array.isArray(notices)&&notices.length)window.medicNotices=notices}catch(e){} if(Array.isArray(window.medicItems)){window.medicItems=window.medicItems.map(function(x){if(!x.id)x.id=uid(); if(!x.created)x.created=now(); return x})}}
+  function saveMedicStore(){try{localStorage.setItem(STORE_KEY,JSON.stringify(window.medicItems||[]));localStorage.setItem(NOTICE_KEY,JSON.stringify(window.medicNotices||[]))}catch(e){toast('تم الحفظ مؤقتاً، لكن حجم الملف كبير وقد لا يستمر بعد التحديث',false)}}
+  function viewedIds(){try{return JSON.parse(localStorage.getItem(VIEW_KEY)||'[]')}catch(e){return []}}
+  function markViewed(id){try{var a=viewedIds();if(a.indexOf(id)<0){a.push(id);localStorage.setItem(VIEW_KEY,JSON.stringify(a))}}catch(e){}}
+  function isNew(x){return viewedIds().indexOf(x.id)<0}
+  function targetMatchesUnit(x,u){return x&&u&&(x.target==='جميع المتدربين'||x.target===u.name||x.target===u.id)}
+  function typeByMime(file,selected){if(!file)return selected||'رابط';var m=file.type||'',n=(file.name||'').toLowerCase();if(m.indexOf('pdf')>-1||n.endsWith('.pdf'))return 'PDF';if(m.indexOf('image/')===0)return 'صورة';if(m.indexOf('video/')===0)return 'فيديو';if(m.indexOf('audio/')===0)return 'صوت';if(/\.docx?$/.test(n))return 'Word';if(/\.pptx?$/.test(n))return 'PowerPoint';return selected||'ملف'}
+  function fileToDataURL(file){return new Promise(function(resolve,reject){if(!file){resolve('');return} var max=18*1024*1024;if(file.size>max){reject(new Error('large'));return} var r=new FileReader();r.onload=function(){resolve(r.result||'')};r.onerror=function(){reject(r.error||new Error('read'))};r.readAsDataURL(file)})}
+  loadMedicStore();
+
+  window.openMedicCenter=function(){
+    var items=window.medicItems||[], notices=window.medicNotices||[], units=getUnits();
+    var newCount=items.filter(isNew).length;
+    document.getElementById('medicLogin').innerHTML='<div class="head"><div><h2>🚑 مركز التوعية والإسعاف الميداني</h2><p>مكتبة صحية ميدانية مع معاينة مباشرة وإرسال واضح للوحدات</p></div><button class="btn" onclick="showPage(\'home\')">رجوع</button></div>'+
+    '<div class="medicHero"><div class="medicAlert"><h3>🚨 الحالات الطارئة السريعة</h3><p style="color:var(--muted);line-height:1.8;margin:0">إرشادات توعوية أولية لا تغني عن المسعف أو الطبيب. في الحالات الخطرة يتم إيقاف التدريب وطلب المساعدة فوراً.</p><div class="emergencyGrid">'+(typeof medicEmergencyCards==='function'?medicEmergencyCards().map(function(x,i){return '<div class="emergencyCard" onclick="showMedicEmergency('+i+')"><b>'+esc(x.icon)+' '+esc(x.title)+'</b><small>'+esc(x.short)+'</small></div>'}).join(''):'')+'</div></div>'+
+    '<div class="medicPanel"><h3>ملخص المركز</h3><div class="medicFixedStats"><div class="kpi"><b>'+items.length+'</b><span>إجمالي المواد</span></div><div class="kpi ok"><b>'+newCount+'</b><span>مواد جديدة</span></div><div class="kpi warn"><b>'+items.filter(function(x){return x.type==='صورة'}).length+'</b><span>صور</span></div><div class="kpi"><b>'+items.filter(function(x){return x.type==='PDF'}).length+'</b><span>PDF</span></div></div><div class="medicNotice"><b style="color:var(--gold2)">آخر إشعار:</b><br>'+(notices[0]?esc(notices[0].title)+' - '+esc(notices[0].date):'لا توجد إشعارات')+'</div></div></div>'+
+    '<div class="split"><div class="card"><h3 style="color:var(--gold2)">إضافة مادة صحية للمتدربين</h3><div class="formgrid"><div><label>عنوان المادة</label><input id="medicName" placeholder="مثال: التعامل مع النزيف الحاد"></div><div><label>نوع المادة</label><select id="medicType"><option>PDF</option><option>صورة</option><option>فيديو</option><option>صوت</option><option>Word</option><option>PowerPoint</option><option>رابط</option></select></div><div><label>التصنيف</label><select id="medicCategory"><option>النزيف</option><option>الكسور</option><option>الحروق</option><option>الإجهاد الحراري</option><option>الجفاف</option><option>الإخلاء الطبي</option><option>الإنعاش القلبي الرئوي</option><option>حقيبة الإسعاف</option><option>مكتبة صحية عامة</option></select></div><div><label>المستهدف</label><select id="medicTarget"><option>جميع المتدربين</option>'+units.map(function(u){return '<option>'+esc(u.name)+'</option>'}).join('')+'</select></div><div><label>رفع ملف</label><input id="medicFile" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*,video/*,audio/*"></div><div><label>رابط اختياري</label><input id="medicLink" placeholder="https://..."></div><div style="grid-column:1/-1"><label>وصف مختصر</label><textarea id="medicNote" placeholder="اكتب الهدف من المادة أو التعليمات المختصرة"></textarea></div></div><div class="actionRow" style="margin-top:12px"><button class="btn primary" onclick="addMedicItem()">حفظ وإرسال للوحدة</button><button class="btn" onclick="sendMedicNotice()">إشعار المتدربين</button></div><div class="medicStorageNote">تم إصلاح المعاينة: PDF والصور والفيديو والصوت تُعرض مباشرة. الملفات الكبيرة جداً يفضل رفعها إلى GitHub أو Google Drive ووضع الرابط.</div></div>'+
+    '<div class="card"><div class="medicFixedToolbar"><select id="medicUnitFilter" class="medicUnitFilter" onchange="renderMedicList()"><option value="all">كل المواد</option><option value="new">المواد الجديدة فقط</option>'+units.map(function(u){return '<option value="'+esc(u.name)+'">'+esc(u.name)+'</option>'}).join('')+'</select><button class="btn" onclick="markAllMedicViewed()">تصفير عداد الجديد</button><button class="btn" onclick="exportMedicLibrary()">نسخ سجل المواد</button></div><h3 style="color:var(--gold2)">مكتبة الإسعاف الميداني</h3><div id="medicList" class="fileList"></div></div></div>'+
+    '<div class="medicIncomingBox card"><h3 style="color:var(--gold2)">📥 صندوق المواد الواردة للوحدات</h3><p style="color:var(--muted)">يوضح أين تظهر المواد بعد إرسالها للوحدة المستهدفة.</p><div id="medicIncomingUnits" class="medicIncomingGrid"></div></div>'+
+    '<h3 class="sectionTitle">الدروس التصنيفية الجاهزة</h3><div class="medicLessonGrid">'+['النزيف','الكسور','الحروق','الإجهاد الحراري','الجفاف','الإخلاء الطبي','الإنعاش القلبي الرئوي','حقيبة الإسعاف'].map(function(c){return '<div class="medicLesson"><h4>'+esc(c)+'</h4><p>'+(typeof medicCategoryText==='function'?esc(medicCategoryText(c)):'مادة توعوية صحية ميدانية.')+'</p></div>'}).join('')+'</div>';
+    window.renderMedicList(); window.renderMedicIncomingUnits();
+  };
+
+  window.addMedicItem=function(){
+    var file=document.getElementById('medicFile')&&document.getElementById('medicFile').files&&document.getElementById('medicFile').files[0];
+    var selectedType=(document.getElementById('medicType')||{}).value||'رابط';
+    var item={id:uid(),type:typeByMime(file,selectedType),name:(document.getElementById('medicName')||{}).value||(file&&file.name)||'مادة صحية جديدة',category:(document.getElementById('medicCategory')||{}).value||'مكتبة صحية عامة',target:(document.getElementById('medicTarget')||{}).value||'جميع المتدربين',link:(document.getElementById('medicLink')||{}).value||'',note:(document.getElementById('medicNote')||{}).value||'مادة توعوية صحية ميدانية.',created:now(),fileName:file?file.name:'',mime:file?file.type:'',size:file?file.size:0,dataUrl:''};
+    function finish(){window.medicItems=window.medicItems||[];window.medicNotices=window.medicNotices||[];window.medicItems.unshift(item);window.medicNotices.unshift({date:now(),title:'وصلت مادة إسعاف ميداني جديدة: '+item.name,body:'المستهدف: '+item.target+' - '+item.note});saveMedicStore();playBell();toast('تم حفظ المادة وإظهارها في صندوق '+item.target,true);window.openMedicCenter()}
+    if(file){fileToDataURL(file).then(function(data){item.dataUrl=data;finish()}).catch(function(){item.note+=' | تنبيه: الملف كبير، تم حفظ بياناته فقط. ضع رابطاً للمعاينة الدائمة.';finish()})}else{finish()}
+  };
+
+  window.renderMedicList=function(){var el=document.getElementById('medicList');if(!el)return;var filter=(document.getElementById('medicUnitFilter')||{}).value||'all';var list=(window.medicItems||[]).filter(function(x){if(filter==='new')return isNew(x);if(filter==='all')return true;return x.target==='جميع المتدربين'||x.target===filter});el.innerHTML=list.map(function(x){var i=(window.medicItems||[]).findIndex(function(it){return it.id===x.id});var fresh=isNew(x);return '<div class="fileItem '+(fresh?'medicNewItem':'')+'"><div><b>'+(fresh?'🟢 ':'')+esc(x.name)+'</b><br><small>'+esc(x.type)+' - '+esc(x.category)+' - '+esc(x.target)+'</small><br><small>'+esc(x.note||'')+'</small><div class="medicFileMeta"><span>'+esc(x.created||'غير محدد')+'</span>'+(x.fileName?'<span>'+esc(x.fileName)+'</span>':'')+(x.size?'<span>'+Math.round(x.size/1024)+' KB</span>':'')+'</div></div><div class="actionRow"><button class="btn primary" onclick="previewMedicItem('+i+')">معاينة</button><button class="btn" onclick="sendMedicItemWhatsApp('+i+')">واتساب</button><button class="btn danger" onclick="deleteMedicItem('+i+')">حذف</button></div></div>'}).join('')||'<div class="noteBox">لا توجد مواد صحية حسب التصفية الحالية.</div>'};
+
+  window.renderMedicIncomingUnits=function(){var el=document.getElementById('medicIncomingUnits');if(!el)return;var items=window.medicItems||[];el.innerHTML=getUnits().map(function(u){var list=items.filter(function(x){return targetMatchesUnit(x,u)});var latest=list[0];return '<div class="medicIncomingCard"><span class="medicIncomingBadge">'+list.length+'</span><h4>'+esc(u.icon||'📥')+' '+esc(u.name)+'</h4>'+(latest?'<p><b style="color:var(--gold2)">آخر مادة:</b><br>'+esc(latest.name)+'<br><small>'+esc(latest.category)+' - '+esc(latest.created||'')+'</small></p><div class="actionRow" style="margin-top:10px"><button class="btn" onclick="filterMedicUnit(\''+esc(u.name)+'\')">عرض مواد الوحدة</button><button class="btn primary" onclick="previewMedicItemById(\''+esc(latest.id)+'\')">معاينة الأخيرة</button></div>':'<p>لا توجد مواد واردة لهذه الوحدة حتى الآن.</p>')+'</div>'}).join('')};
+  window.filterMedicUnit=function(name){var s=document.getElementById('medicUnitFilter');if(s){s.value=name;window.renderMedicList();document.getElementById('medicList')&&document.getElementById('medicList').scrollIntoView({behavior:'smooth',block:'start'})}};
+  window.previewMedicItemById=function(id){var i=(window.medicItems||[]).findIndex(function(x){return x.id===id});if(i>=0)window.previewMedicItem(i)};
+
+  window.previewMedicItem=function(i){var x=(window.medicItems||[])[i];if(!x)return;markViewed(x.id);saveMedicStore();var src=x.dataUrl||x.link||'';var body='';var type=String(x.type||'').toLowerCase();var mime=String(x.mime||'').toLowerCase();if(src){if(type.indexOf('pdf')>-1||mime.indexOf('pdf')>-1){body='<iframe class="medicPreviewFrame" src="'+esc(src)+'"></iframe>'}else if(type.indexOf('صورة')>-1||mime.indexOf('image/')===0){body='<img class="medicPreviewImg" src="'+esc(src)+'" alt="معاينة">'}else if(type.indexOf('فيديو')>-1||mime.indexOf('video/')===0){body='<video class="medicPreviewMedia" src="'+esc(src)+'" controls></video>'}else if(type.indexOf('صوت')>-1||mime.indexOf('audio/')===0){body='<audio class="medicPreviewMedia" src="'+esc(src)+'" controls></audio>'}else if(/^https?:\/\//i.test(src)){body='<p><a href="'+esc(src)+'" target="_blank" style="color:var(--gold2)">فتح الرابط أو المستند في نافذة جديدة</a></p><iframe class="medicPreviewFrame" src="'+esc(src)+'"></iframe>'}else{body='<div class="noteBox">هذا النوع محفوظ في السجل. للمعاينة الكاملة ارفع الملف كرابط أو استخدم PDF/صورة/فيديو/صوت.</div>'}}else{body='<div class="noteBox">لا يوجد ملف أو رابط محفوظ لهذه المادة.</div>'}var m=document.getElementById('addModal');m.style.display='flex';m.className='modalOverlay active';m.innerHTML='<div class="modalBox"><div class="modalHead"><h3>معاينة مادة الإسعاف</h3><button class="modalClose" onclick="closeModal()">إغلاق</button></div><div class="card"><h3 style="color:var(--gold2)">'+esc(x.name)+'</h3><p style="color:var(--muted)">'+esc(x.type)+' - '+esc(x.category)+' - '+esc(x.target)+'</p><p style="color:var(--muted);line-height:1.8">'+esc(x.note||'')+'</p>'+body+'<div class="actionRow" style="margin-top:12px"><button class="btn" onclick="sendMedicItemWhatsApp('+i+')">إرسال واتساب</button>'+(src?'<a class="btn primary" href="'+esc(src)+'" target="_blank">فتح خارجي</a>':'')+'</div></div></div>';window.renderMedicList&&window.renderMedicList();window.renderMedicIncomingUnits&&window.renderMedicIncomingUnits()};
+  window.sendMedicItemWhatsApp=function(i){var x=(window.medicItems||[])[i];if(!x)return;var msg='🔔 مادة إسعاف ميداني جديدة\n\nالعنوان: '+x.name+'\nالتصنيف: '+x.category+'\nالنوع: '+x.type+'\nالمستهدف: '+x.target+'\nتاريخ الإضافة: '+(x.created||'')+'\n\n'+(x.note||'')+'\n'+(x.link||'يرجى الدخول للنظام للاطلاع على المادة.')+'\n\nالمسعف الصحي - مركز التدريب';toast('تم تجهيز رسالة الواتساب للمادة',true);window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank')};
+  window.sendMedicNotice=function(){var title=(document.getElementById('medicName')||{}).value||'تنبيه صحي جديد';var note=(document.getElementById('medicNote')||{}).value||'يرجى متابعة مركز التوعية والإسعاف الميداني داخل النظام.';window.medicNotices=window.medicNotices||[];window.medicNotices.unshift({date:now(),title:title,body:note});saveMedicStore();playBell();toast('تم إنشاء إشعار صحي جديد',true);window.open('https://wa.me/?text='+encodeURIComponent('🔔 إشعار صحي\n\n'+title+'\n'+note+'\n\nالمسعف الصحي - مركز التدريب'),'_blank')};
+  window.deleteMedicItem=function(i){if(!confirm('هل تريد حذف هذه المادة من مكتبة الإسعاف؟'))return;(window.medicItems||[]).splice(i,1);saveMedicStore();toast('تم حذف المادة',true);window.renderMedicList&&window.renderMedicList();window.renderMedicIncomingUnits&&window.renderMedicIncomingUnits()};
+  window.markAllMedicViewed=function(){try{localStorage.setItem(VIEW_KEY,JSON.stringify((window.medicItems||[]).map(function(x){return x.id})));toast('تم تصفير عداد المواد الجديدة',true);window.openMedicCenter()}catch(e){}};
+  window.exportMedicLibrary=function(){var text=(window.medicItems||[]).map(function(x,i){return (i+1)+'- '+x.name+' | '+x.type+' | '+x.category+' | '+x.target+' | '+(x.created||'')}).join('\n');if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){toast('تم نسخ سجل مواد الإسعاف',true)},function(){alert(text)})}else alert(text)};
 })();
 </script>
 </body></html>
