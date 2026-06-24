@@ -213,6 +213,27 @@
 .medicNotice{border:1px dashed rgba(240,206,122,.45);border-radius:16px;padding:12px;background:rgba(200,164,93,.08);color:var(--muted);font-size:13px;line-height:1.8}
 @media(max-width:900px){.medicHero{grid-template-columns:1fr}}
 
+
+/* ===== بطاقة خطة التدريب - إضافة آمنة بدون تغيير الهوية ===== */
+.trainingHero{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:stretch;margin-bottom:18px}
+.trainingPanel{border:1px solid var(--line);background:rgba(18,27,18,.82);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.trainingPanel h3{margin:0 0 10px;color:var(--gold2)}
+.trainingTabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 16px}
+.trainingTabs button{border:1px solid var(--line);background:rgba(200,164,93,.09);color:var(--paper);border-radius:999px;padding:8px 12px;cursor:pointer;font-family:inherit}
+.trainingTabs button.active,.trainingTabs button:hover{background:rgba(200,164,93,.22);color:var(--gold2)}
+.trainingPlanCard{border:1px solid var(--line);border-radius:18px;background:rgba(0,0,0,.18);padding:14px;display:grid;gap:8px}
+.trainingPlanCard h4{margin:0;color:var(--gold2);font-size:17px}
+.trainingPlanCard p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}
+.trainingMeta{display:flex;gap:6px;flex-wrap:wrap}
+.trainingMeta span{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--gold2);font-size:12px;background:rgba(200,164,93,.07)}
+.trainingToday{border:1px solid rgba(88,184,121,.42);background:linear-gradient(135deg,rgba(88,184,121,.12),rgba(12,22,13,.72));border-radius:20px;padding:16px}
+.trainingWeek{display:grid;gap:8px}
+.trainingDay{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--line);background:rgba(255,255,255,.035);border-radius:14px;padding:10px;color:var(--muted);font-size:13px}
+.trainingDay b{color:var(--gold2)}
+.trainingFileName{color:var(--gold2);font-size:12px;display:block;margin-top:4px}
+.trainingArchive{max-height:420px;overflow:auto;padding-left:4px}
+@media(max-width:900px){.trainingHero{grid-template-columns:1fr}.trainingDay{display:block}.trainingDay b{display:block;margin-bottom:4px}}
+
 /* v24: إخفاء التنبيهات العاجلة في لوحة القائد فقط دون حذف الحسابات */
 #leader .urgentBox,#leader .urgentList,#leader [data-leader-urgent],#leader .leaderUrgent{display:none!important}
 </style>
@@ -479,10 +500,10 @@ body.exam-editor-open-v7{
 }
 </style>
 </head><body>
-<header class="top no-print"><div class="topin"><div class="brand"><div class="mark">⌖</div><div><h1>نظام إدارة المقاتل الشجاع</h1><p>صيانة قوة طريف</p></div></div><nav class="nav"><button onclick="showPage('home')">الرئيسية</button><button onclick="showPage('leader')">لوحة القائد</button><button onclick="showPage('unitsLogin')">قاعدة بيانات متدربي القوة</button><button onclick="showPage('testsHub')">الاختبارات</button><button onclick="showPage('healthLogin')">الصحية</button><button onclick="showPage('medicLogin')">الإسعاف الميداني</button><button onclick="showPage('commLogin')">الاتصالات</button><button onclick="showPage('teacherLogin')">المعلم</button><button onclick="showPage('traineeLogin')">المتدربين</button><button onclick="showPage('reports')">التقارير</button></nav></div></header>
+<header class="top no-print"><div class="topin"><div class="brand"><div class="mark">⌖</div><div><h1>نظام إدارة المقاتل الشجاع</h1><p>صيانة قوة طريف</p></div></div><nav class="nav"><button onclick="showPage('home')">الرئيسية</button><button onclick="showPage('leader')">لوحة القائد</button><button onclick="showPage('unitsLogin')">قاعدة بيانات متدربي القوة</button><button onclick="showPage('testsHub')">الاختبارات</button><button onclick="showPage('trainingLogin')">خطة التدريب</button><button onclick="showPage('healthLogin')">الصحية</button><button onclick="showPage('medicLogin')">الإسعاف الميداني</button><button onclick="showPage('commLogin')">الاتصالات</button><button onclick="showPage('teacherLogin')">المعلم</button><button onclick="showPage('traineeLogin')">المتدربين</button><button onclick="showPage('reports')">التقارير</button></nav></div></header>
 <main>
-<section class="page active" id="home"><div class="hero"><div class="heroBox"><div class="eyebrow">BRAVE FIGHTER CONTROL SYSTEM V3</div><h2>نظام إدارة المقاتل الشجاع</h2><p>منظومة موحدة لإدارة متدربي القوة حسب الوحدات، متابعة الجاهزية، الاختبارات، الحالة الصحية، الاتصالات، بوابة المعلم، والتقارير.</p><div class="grid" style="margin-top:22px"><div class="card module" onclick="showPage('leader')"><div class="icon">⭐</div><h3>لوحة القائد</h3><p>جاهزية القوة والوحدات والتنبيهات والمتعثرين.</p></div><div class="card module" onclick="showPage('unitsLogin')"><div class="icon">🗂️</div><h3>قاعدة بيانات متدربي القوة</h3><p>الوحدات: الصيانة، الإمداد، النقل، الإشارة.</p></div><div class="card module" onclick="showPage('testsHub')"><div class="icon">📝</div><h3>الاختبارات</h3><p>اختبارات مستقلة لكل وحدة مع اسم مستخدم وكلمة مرور لكل بطاقة.</p></div><div class="card module" onclick="showPage('healthLogin')"><div class="icon">🩺</div><h3>اللوحة الصحية</h3><p>الخطوات، الوزن، النشاط، وطلبات المستوصف.</p></div><div class="card module" onclick="showPage('medicLogin')"><div class="icon">🚑</div><h3>الإسعاف الميداني</h3><p>مكتبة توعوية وصحية للمستندات والصور والفيديوهات والدروس.</p></div><div class="card module" onclick="showPage('commLogin')"><div class="icon">📡</div><h3>مركز الاتصالات</h3><p>رسائل واتساب ومراجع وملفات وصوتيات.</p></div><div class="card module" onclick="showPage('teacherLogin')"><div class="icon">🎓</div><h3>بوابة المعلم</h3><p>معايير التعليم، طرق التدريس، ومكتبة الملفات.</p></div><div class="card module" onclick="showPage('traineeLogin')"><div class="icon">🪖</div><h3>صفحة المتدربين</h3><p>بحث ذاتي آمن لعرض بيانات المتدرب واختباراته وطباعة تقريره بدون أسماء عامة.</p></div><div class="card module" onclick="showPage('reports')"><div class="icon">📊</div><h3>التقارير والإحصائيات</h3><p>تقارير A4 للقوة والوحدات والمعايير والوزن.</p></div></div></div></div></section>
-<section class="page" id="unitsLogin"></section><section class="page" id="unitsHub"></section><section class="page" id="testsHub"></section><section class="page" id="testUnitLogin"></section><section class="page" id="unitTests"></section><section class="page" id="unitLogin"></section><section class="page" id="unitDb"></section><section class="page" id="leader"></section><section class="page" id="teacherLogin"></section><section class="page" id="traineeLogin"></section><section class="page" id="healthLogin"></section><section class="page" id="medicLogin"></section><section class="page" id="commLogin"></section><section class="page" id="reports"></section>
+<section class="page active" id="home"><div class="hero"><div class="heroBox"><div class="eyebrow">BRAVE FIGHTER CONTROL SYSTEM V3</div><h2>نظام إدارة المقاتل الشجاع</h2><p>منظومة موحدة لإدارة متدربي القوة حسب الوحدات، متابعة الجاهزية، الاختبارات، الحالة الصحية، الاتصالات، بوابة المعلم، والتقارير.</p><div class="grid" style="margin-top:22px"><div class="card module" onclick="showPage('leader')"><div class="icon">⭐</div><h3>لوحة القائد</h3><p>جاهزية القوة والوحدات والتنبيهات والمتعثرين.</p></div><div class="card module" onclick="showPage('unitsLogin')"><div class="icon">🗂️</div><h3>قاعدة بيانات متدربي القوة</h3><p>الوحدات: الصيانة، الإمداد، النقل، الإشارة.</p></div><div class="card module" onclick="showPage('testsHub')"><div class="icon">📝</div><h3>الاختبارات</h3><p>اختبارات مستقلة لكل وحدة مع اسم مستخدم وكلمة مرور لكل بطاقة.</p></div><div class="card module" onclick="showPage('trainingLogin')"><div class="icon">📅</div><h3>خطة التدريب</h3><p>خطط يومية وأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.</p></div><div class="card module" onclick="showPage('healthLogin')"><div class="icon">🩺</div><h3>اللوحة الصحية</h3><p>الخطوات، الوزن، النشاط، وطلبات المستوصف.</p></div><div class="card module" onclick="showPage('medicLogin')"><div class="icon">🚑</div><h3>الإسعاف الميداني</h3><p>مكتبة توعوية وصحية للمستندات والصور والفيديوهات والدروس.</p></div><div class="card module" onclick="showPage('commLogin')"><div class="icon">📡</div><h3>مركز الاتصالات</h3><p>رسائل واتساب ومراجع وملفات وصوتيات.</p></div><div class="card module" onclick="showPage('teacherLogin')"><div class="icon">🎓</div><h3>بوابة المعلم</h3><p>معايير التعليم، طرق التدريس، ومكتبة الملفات.</p></div><div class="card module" onclick="showPage('traineeLogin')"><div class="icon">🪖</div><h3>صفحة المتدربين</h3><p>بحث ذاتي آمن لعرض بيانات المتدرب واختباراته وطباعة تقريره بدون أسماء عامة.</p></div><div class="card module" onclick="showPage('reports')"><div class="icon">📊</div><h3>التقارير والإحصائيات</h3><p>تقارير A4 للقوة والوحدات والمعايير والوزن.</p></div></div></div></div></section>
+<section class="page" id="unitsLogin"></section><section class="page" id="unitsHub"></section><section class="page" id="testsHub"></section><section class="page" id="testUnitLogin"></section><section class="page" id="unitTests"></section><section class="page" id="unitLogin"></section><section class="page" id="unitDb"></section><section class="page" id="leader"></section><section class="page" id="teacherLogin"></section><section class="page" id="traineeLogin"></section><section class="page" id="healthLogin"></section><section class="page" id="trainingLogin"></section><section class="page" id="medicLogin"></section><section class="page" id="commLogin"></section><section class="page" id="reports"></section>
 </main><div class="modalOverlay no-print" id="addModal"></div>
 <script>
 const units=[{id:'maintenance',name:'الصيانة',user:'maint',pass:'1111',icon:'⚙️'},{id:'supply',name:'الإمداد',user:'supply',pass:'2222',icon:'📦'},{id:'transport',name:'النقل',user:'transport',pass:'3333',icon:'🚚'},{id:'signal',name:'الإشارة',user:'signal',pass:'4444',icon:'📡'}];
@@ -521,6 +542,15 @@ let medicItems=[
   {type:'فيديو',name:'درس الإجهاد الحراري والجفاف.mp4',category:'الإجهاد الحراري',target:'جميع المتدربين',link:'',note:'توعية ميدانية مختصرة قبل التدريب.'}
 ];
 let medicNotices=[{date:new Date().toLocaleString('ar-SA'),title:'افتتاح مركز التوعية والإسعاف الميداني',body:'تم تجهيز مكتبة صحية ميدانية للمتدربين بإشراف المسعف الصحي.'}];
+let trainingPlans=[
+  {title:'خطة تدريب الصيانة الأسبوعية',unit:'الصيانة',start:'2026-07-01',end:'2026-07-07',type:'أسبوعية',status:'نشطة',supervisor:'رئيس رقباء التدريب',location:'ميدان التدريب',time:'07:00 - 10:00',desc:'صيانة ميدانية، سلامة مهنية، لياقة بدنية، واختبار قصير في نهاية الأسبوع.',fileName:'',fileType:'',link:'',created:new Date().toLocaleString('ar-SA')},
+  {title:'خطة الإمداد والجرد',unit:'الإمداد',start:'2026-07-01',end:'2026-07-05',type:'أسبوعية',status:'نشطة',supervisor:'مشرف الإمداد',location:'مستودع التدريب',time:'08:00 - 11:00',desc:'إجراءات الجرد، السلامة، تسليم واستلام المواد، وسيناريوهات ميدانية.',fileName:'',fileType:'',link:'',created:new Date().toLocaleString('ar-SA')},
+  {title:'برنامج السلامة والقيادة',unit:'النقل',start:'2026-07-02',end:'2026-07-06',type:'يومية',status:'مجدولة',supervisor:'مشرف النقل',location:'ساحة النقل',time:'07:30 - 09:30',desc:'فحص المركبة، السلامة المرورية، إجراءات البلاغات، وتمرين عملي.',fileName:'',fileType:'',link:'',created:new Date().toLocaleString('ar-SA')},
+  {title:'أساسيات الإشارة والاتصال',unit:'الإشارة',start:'2026-07-03',end:'2026-07-07',type:'أسبوعية',status:'نشطة',supervisor:'مشرف الإشارة',location:'معمل الاتصالات',time:'09:00 - 11:00',desc:'تشغيل الأجهزة، آداب الاتصال، الأعطال الشائعة، واختبار تطبيقي.',fileName:'',fileType:'',link:'',created:new Date().toLocaleString('ar-SA')}
+];
+let trainingNotices=[{date:new Date().toLocaleString('ar-SA'),title:'تم تجهيز مركز خطة التدريب',body:'يمكن الآن إضافة خطط يومية وأسبوعية وإرفاق PDF وWord وExcel لكل وحدة.'}];
+let currentTrainingFilter='الكل';
+
 let commLog=[];
 function bmi(t){let x=t.w/((t.h/100)**2);return x<25?'طبيعي':x<30?'وزن زائد':'سمنة'}
 function ready(t){return t.s.every(Boolean)}
@@ -741,6 +771,105 @@ function addLibraryItem(){let file=document.getElementById('libFile').files[0];l
 function renderLibrary(){let el=document.getElementById('libraryList');if(!el)return;el.innerHTML=libraryItems.map((x,i)=>`<div class="fileItem"><div><b>${x.name}</b><br><small>${x.type} - ${x.target}</small></div><div class="actionRow"><button class="btn" onclick="previewLibraryItem(${i})">معاينة</button><button class="btn" onclick="sendLibraryViaWhatsApp(${i})">إرسال واتساب</button></div></div>`).join('')}
 function previewLibraryItem(i){let x=libraryItems[i];if(!x)return;let src=x.link||'';let body=src?`<p><a href="${escapeHtml(src)}" target="_blank">فتح الرابط</a></p>`:`<div class="noteBox">لا توجد معاينة محفوظة للملف المحلي. يمكن معاينة الرابط أو اسم الملف قبل إرساله.</div>`;document.getElementById('addModal').style.display='block';document.getElementById('addModal').className='modalOverlay active';document.getElementById('addModal').innerHTML=`<div class="modal"><div class="head"><h2>معاينة المادة</h2><button class="btn" onclick="closeModal()">إغلاق</button></div><div class="card"><h3 style="color:var(--gold2)">${escapeHtml(x.name)}</h3><p>${escapeHtml(x.type)} - ${escapeHtml(x.target)}</p>${body}</div></div>`}
 function sendLibraryViaWhatsApp(i){let x=libraryItems[i];let msg=`مرفق لكم: ${x.name}\nالنوع: ${x.type}\n${x.link||'يرجى إرفاق الملف من الجهاز عند فتح واتساب.'}`;window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank')}
+
+
+function openTrainingCenter(){
+  currentTrainingFilter=currentTrainingFilter||'الكل';
+  let plans=currentTrainingFilter==='الكل'?trainingPlans:trainingPlans.filter(x=>x.unit===currentTrainingFilter);
+  let todayPlan=trainingPlans[0];
+  let activeCount=trainingPlans.filter(x=>x.status==='نشطة').length;
+  let fileCount=trainingPlans.filter(x=>x.fileName||x.link).length;
+  document.getElementById('trainingLogin').innerHTML=`<div class="head"><div><h2>📅 مركز خطة التدريب</h2><p>إدارة الخطط اليومية والأسبوعية لجميع الوحدات مع إرفاق مستندات Word وExcel وPDF</p></div><button class="btn" onclick="showPage('home')">رجوع</button></div>
+  <div class="trainingHero">
+    <div class="trainingToday">
+      <h3 style="color:var(--gold2);margin-top:0">تدريب اليوم</h3>
+      <h2 style="margin:6px 0;color:var(--paper)">${todayPlan?escapeHtml(todayPlan.title):'لا توجد خطة اليوم'}</h2>
+      <p style="color:var(--muted);line-height:1.8;margin:0">${todayPlan?escapeHtml(todayPlan.desc):'يمكن إضافة خطة تدريب جديدة من النموذج.'}</p>
+      <div class="trainingMeta" style="margin-top:12px">
+        <span>الوحدة: ${todayPlan?escapeHtml(todayPlan.unit):'—'}</span>
+        <span>الوقت: ${todayPlan?escapeHtml(todayPlan.time):'—'}</span>
+        <span>الموقع: ${todayPlan?escapeHtml(todayPlan.location):'—'}</span>
+      </div>
+    </div>
+    <div class="trainingPanel">
+      <h3>ملخص الخطط</h3>
+      <div class="kpis">
+        <div class="kpi"><b>${trainingPlans.length}</b><span>إجمالي الخطط</span></div>
+        <div class="kpi ok"><b>${activeCount}</b><span>خطط نشطة</span></div>
+        <div class="kpi warn"><b>${fileCount}</b><span>مرفقات</span></div>
+        <div class="kpi"><b>${new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})}</b><span>آخر تحديث</span></div>
+      </div>
+      <div class="medicNotice"><b style="color:var(--gold2)">آخر إشعار تدريبي:</b><br>${trainingNotices[0]?escapeHtml(trainingNotices[0].title)+' - '+escapeHtml(trainingNotices[0].date):'لا توجد إشعارات'}</div>
+    </div>
+  </div>
+  <div class="trainingTabs">
+    ${['الكل',...units.map(u=>u.name)].map(u=>`<button class="${currentTrainingFilter===u?'active':''}" onclick="setTrainingFilter('${u}')">${u}</button>`).join('')}
+  </div>
+  <div class="split">
+    <div class="card">
+      <h3 style="color:var(--gold2)">إضافة خطة تدريب</h3>
+      <div class="formgrid">
+        <div><label>عنوان الخطة</label><input id="trainingTitle" placeholder="مثال: خطة السير الطويل الأسبوعية"></div>
+        <div><label>الوحدة المستهدفة</label><select id="trainingUnit">${units.map(u=>`<option>${u.name}</option>`).join('')}<option>جميع الوحدات</option></select></div>
+        <div><label>نوع الخطة</label><select id="trainingType"><option>يومية</option><option>أسبوعية</option><option>شهرية</option><option>اختبار مرتبط</option><option>محاضرة</option></select></div>
+        <div><label>حالة الخطة</label><select id="trainingStatus"><option>نشطة</option><option>مجدولة</option><option>منتهية</option><option>أرشيف</option></select></div>
+        <div><label>تاريخ البداية</label><input id="trainingStart" type="date"></div>
+        <div><label>تاريخ النهاية</label><input id="trainingEnd" type="date"></div>
+        <div><label>الوقت</label><input id="trainingTime" placeholder="07:00 - 10:00"></div>
+        <div><label>الموقع</label><input id="trainingLocation" placeholder="ميدان التدريب"></div>
+        <div><label>المشرف</label><input id="trainingSupervisor" placeholder="اسم المشرف"></div>
+        <div><label>رفع ملف الخطة</label><input id="trainingFile" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*"></div>
+        <div style="grid-column:1/-1"><label>رابط اختياري للملف</label><input id="trainingLink" placeholder="ضع رابط Google Drive أو ملف داخل GitHub"></div>
+        <div style="grid-column:1/-1"><label>وصف الخطة</label><textarea id="trainingDesc" placeholder="اكتب أهداف الخطة والبرنامج اليومي أو الأسبوعي"></textarea></div>
+      </div>
+      <div class="actionRow" style="margin-top:12px"><button class="btn primary" onclick="addTrainingPlan()">حفظ الخطة</button><button class="btn" onclick="sendTrainingNotice()">إشعار الوحدات</button></div>
+      <div class="noteBox" style="margin-top:12px">ملاحظة: اختيار ملف من الجهاز يعرض اسم الملف داخل النظام فقط. لحفظ الملف فعلياً ارفعه إلى GitHub أو Google Drive ثم ضع الرابط في خانة الرابط.</div>
+    </div>
+    <div class="card"><h3 style="color:var(--gold2)">الخطط والمرفقات</h3><div id="trainingList" class="fileList trainingArchive"></div></div>
+  </div>
+  <h3 class="sectionTitle">خطة أسبوعية مختصرة</h3>
+  <div class="trainingWeek">
+    ${trainingWeekRows().map(x=>`<div class="trainingDay"><b>${x.day}</b><span>${x.text}</span></div>`).join('')}
+  </div>`;
+  renderTrainingList(plans);
+}
+function setTrainingFilter(unit){currentTrainingFilter=unit;openTrainingCenter()}
+function trainingWeekRows(){return [
+  {day:'الأحد',text:'لياقة بدنية + مراجعة جاهزية الأفراد'},
+  {day:'الإثنين',text:'رماية / تدريب تخصصي حسب الوحدة'},
+  {day:'الثلاثاء',text:'سير طويل أو مهارات ميدانية'},
+  {day:'الأربعاء',text:'واجبات عامة وسلامة مهنية'},
+  {day:'الخميس',text:'اختبار قصير + تقييم أسبوعي'}
+]}
+function addTrainingPlan(){
+  let file=document.getElementById('trainingFile')?.files?.[0];
+  let title=document.getElementById('trainingTitle').value||file?.name||'خطة تدريب جديدة';
+  let item={
+    title,
+    unit:document.getElementById('trainingUnit').value,
+    start:document.getElementById('trainingStart').value||'غير محدد',
+    end:document.getElementById('trainingEnd').value||'غير محدد',
+    type:document.getElementById('trainingType').value,
+    status:document.getElementById('trainingStatus').value,
+    supervisor:document.getElementById('trainingSupervisor').value||'غير محدد',
+    location:document.getElementById('trainingLocation').value||'غير محدد',
+    time:document.getElementById('trainingTime').value||'غير محدد',
+    desc:document.getElementById('trainingDesc').value||'خطة تدريب مضافة للنظام.',
+    fileName:file?.name||'',
+    fileType:file?.name?file.name.split('.').pop().toUpperCase():'',
+    link:document.getElementById('trainingLink').value||'',
+    created:new Date().toLocaleString('ar-SA')
+  };
+  trainingPlans.unshift(item);
+  trainingNotices.unshift({date:new Date().toLocaleString('ar-SA'),title:'تم نشر خطة تدريب جديدة: '+item.title,body:item.desc});
+  currentTrainingFilter='الكل';
+  openTrainingCenter();
+}
+function renderTrainingList(list){let el=document.getElementById('trainingList');if(!el)return;el.innerHTML=(list||trainingPlans).map((x,i)=>`<div class="trainingPlanCard"><h4>${escapeHtml(x.title)}</h4><p>${escapeHtml(x.desc||'')}</p><div class="trainingMeta"><span>${escapeHtml(x.unit)}</span><span>${escapeHtml(x.type)}</span><span>${escapeHtml(x.status)}</span><span>${escapeHtml(x.start)} إلى ${escapeHtml(x.end)}</span></div><p><b style="color:var(--gold2)">الوقت:</b> ${escapeHtml(x.time||'—')} | <b style="color:var(--gold2)">الموقع:</b> ${escapeHtml(x.location||'—')} | <b style="color:var(--gold2)">المشرف:</b> ${escapeHtml(x.supervisor||'—')}</p>${(x.fileName||x.link)?`<span class="trainingFileName">📎 ${escapeHtml(x.fileName||'رابط مرفق')} ${x.fileType?' - '+escapeHtml(x.fileType):''}</span>`:''}<div class="actionRow"><button class="btn" onclick="previewTrainingPlan(${trainingPlans.indexOf(x)})">معاينة</button><button class="btn" onclick="sendTrainingPlanWhatsApp(${trainingPlans.indexOf(x)})">واتساب</button><button class="btn danger" onclick="deleteTrainingPlan(${trainingPlans.indexOf(x)})">حذف</button></div></div>`).join('')||'<div class="noteBox">لا توجد خطط تدريب لهذا التصنيف.</div>'}
+function previewTrainingPlan(i){let x=trainingPlans[i];if(!x)return;let link=x.link?`<p><a href="${escapeHtml(x.link)}" target="_blank" style="color:var(--gold2)">فتح رابط المرفق</a></p>`:'<div class="noteBox">لا يوجد رابط محفوظ. إذا كان الملف محلياً، ارفعه إلى المستودع أو Google Drive ثم أضف الرابط.</div>';document.getElementById('addModal').style.display='flex';document.getElementById('addModal').className='modalOverlay active';document.getElementById('addModal').innerHTML=`<div class="modalBox"><div class="modalHead"><h3>معاينة خطة التدريب</h3><button class="modalClose" onclick="closeModal()">إغلاق</button></div><div class="card"><h3 style="color:var(--gold2)">${escapeHtml(x.title)}</h3><p style="color:var(--muted);line-height:1.8">${escapeHtml(x.desc||'')}</p><div class="trainingMeta"><span>${escapeHtml(x.unit)}</span><span>${escapeHtml(x.type)}</span><span>${escapeHtml(x.status)}</span><span>${escapeHtml(x.start)} إلى ${escapeHtml(x.end)}</span></div><p style="color:var(--muted)">الوقت: ${escapeHtml(x.time)} | الموقع: ${escapeHtml(x.location)} | المشرف: ${escapeHtml(x.supervisor)}</p>${x.fileName?`<p style="color:var(--gold2)">📎 ${escapeHtml(x.fileName)}</p>`:''}${link}</div></div>`}
+function sendTrainingPlanWhatsApp(i){let x=trainingPlans[i];if(!x)return;let msg=`🔔 خطة تدريب جديدة\n\nالعنوان: ${x.title}\nالوحدة: ${x.unit}\nالفترة: ${x.start} إلى ${x.end}\nالوقت: ${x.time}\nالموقع: ${x.location}\nالمشرف: ${x.supervisor}\n\n${x.desc||''}\n${x.link||'يرجى الدخول للنظام للاطلاع على المرفق.'}\n\nمركز التدريب`;window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank')}
+function sendTrainingNotice(){let title=document.getElementById('trainingTitle')?.value||'تنبيه خطة تدريب';let unit=document.getElementById('trainingUnit')?.value||'جميع الوحدات';let note=document.getElementById('trainingDesc')?.value||'يرجى متابعة مركز خطة التدريب داخل النظام.';trainingNotices.unshift({date:new Date().toLocaleString('ar-SA'),title,body:note});window.open('https://wa.me/?text='+encodeURIComponent(`🔔 إشعار تدريبي\n\n${title}\nالوحدة: ${unit}\n${note}\n\nمركز التدريب`),'_blank')}
+function deleteTrainingPlan(i){if(i<0)return;if(confirm('هل تريد حذف خطة التدريب؟')){trainingPlans.splice(i,1);openTrainingCenter()}}
 
 function openMedicCenter(){
   document.getElementById('medicLogin').innerHTML=`<div class="head"><div><h2>🚑 مركز التوعية والإسعاف الميداني</h2><p>مكتبة صحية ميدانية للمسعف: مستندات، صور، فيديوهات، دروس وتنبيهات للمتدربين</p></div><button class="btn" onclick="showPage('home')">رجوع</button></div>
@@ -1803,7 +1932,7 @@ window.addEventListener('load',()=>{
 });
 
 
-function renderAll(){renderUnitsLogin();renderUnitsHub();renderTestsHub();renderTestUnitLogin();renderUnitTests();renderUnitLogin();renderUnitDb();renderLeader();renderLogin('teacherLogin','بوابة المعلم','معايير التعليم وطرق التدريس والمراجع والكتب وملفات PDF وصوتيات.','teacher','1234','openTeacher');openTrainee();openHealth();renderLogin('medicLogin','مركز التوعية والإسعاف الميداني','خاص بالمسعف الصحي لإضافة المستندات والصور والفيديوهات والدروس والتنبيهات الصحية.','medic','5555','openMedicCenter');renderLogin('commLogin','مركز الاتصالات','الرسائل والتنبيهات والمراجع والمستندات عبر واتساب.','comm','1234','openComm');renderReports()}
+function renderAll(){renderUnitsLogin();renderUnitsHub();renderTestsHub();renderTestUnitLogin();renderUnitTests();renderUnitLogin();renderUnitDb();renderLeader();renderLogin('teacherLogin','بوابة المعلم','معايير التعليم وطرق التدريس والمراجع والكتب وملفات PDF وصوتيات.','teacher','1234','openTeacher');openTrainee();openHealth();renderLogin('trainingLogin','مركز خطة التدريب','خاص بإضافة خطط التدريب اليومية والأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.','plan','6666','openTrainingCenter');renderLogin('medicLogin','مركز التوعية والإسعاف الميداني','خاص بالمسعف الصحي لإضافة المستندات والصور والفيديوهات والدروس والتنبيهات الصحية.','medic','5555','openMedicCenter');renderLogin('commLogin','مركز الاتصالات','الرسائل والتنبيهات والمراجع والمستندات عبر واتساب.','comm','1234','openComm');renderReports()}
 renderAll();
 </script>
 <!-- V7: أزرار عائمة آمنة لا تكسر سكربت البطائق -->
