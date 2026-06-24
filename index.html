@@ -236,6 +236,29 @@
 
 /* v24: إخفاء التنبيهات العاجلة في لوحة القائد فقط دون حذف الحسابات */
 #leader .urgentBox,#leader .urgentList,#leader [data-leader-urgent],#leader .leaderUrgent{display:none!important}
+
+
+/* ===== بطاقة الطقس الميداني - إضافة آمنة بدون تغيير الهوية ===== */
+.weatherHero{display:grid;grid-template-columns:1fr .9fr;gap:16px;align-items:stretch;margin-bottom:18px}
+.weatherPanel{border:1px solid var(--line);background:rgba(18,27,18,.82);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.weatherPanel h3{margin:0 0 10px;color:var(--gold2)}
+.weatherStatus{border:1px solid var(--line);border-radius:22px;padding:18px;background:linear-gradient(135deg,rgba(200,164,93,.13),rgba(12,22,13,.78));min-height:210px}
+.weatherStatus .bigTemp{font-size:54px;font-weight:900;color:var(--gold2);line-height:1;margin:8px 0}
+.weatherMeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.weatherMeta span{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--gold2);font-size:12px;background:rgba(200,164,93,.07)}
+.weatherRisk{border-radius:18px;border:1px solid var(--line);padding:14px;text-align:center;font-weight:900;margin-top:12px}
+.weatherRisk.low{color:var(--ok);background:rgba(88,184,121,.10);border-color:rgba(88,184,121,.35)}
+.weatherRisk.medium{color:var(--gold2);background:rgba(217,150,56,.12);border-color:rgba(217,150,56,.38)}
+.weatherRisk.high{color:#ffd5d2;background:rgba(216,93,80,.13);border-color:rgba(216,93,80,.42)}
+.weatherRisk.extreme{color:#fff;background:rgba(216,93,80,.26);border-color:rgba(216,93,80,.7)}
+.weatherAdvice{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:14px}
+.weatherAdvice .miniCard{min-height:120px}
+.weatherLog{max-height:420px;overflow:auto}
+.weatherUnitGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:12px}
+.weatherUnitCard{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(0,0,0,.15)}
+.weatherUnitCard b{color:var(--gold2);display:block;margin-bottom:6px}
+.weatherUnitCard small{color:var(--muted);line-height:1.7}
+@media(max-width:900px){.weatherHero{grid-template-columns:1fr}.weatherStatus .bigTemp{font-size:42px}}
 </style>
 <style id="unit-login-size-only-safe">
 #unitLogin .login,
@@ -500,10 +523,10 @@ body.exam-editor-open-v7{
 }
 </style>
 </head><body>
-<header class="top no-print"><div class="topin"><div class="brand"><div class="mark">⌖</div><div><h1>نظام إدارة المقاتل الشجاع</h1><p>صيانة قوة طريف</p></div></div><nav class="nav"><button onclick="showPage('home')">الرئيسية</button><button onclick="showPage('leader')">لوحة القائد</button><button onclick="showPage('unitsLogin')">قاعدة بيانات متدربي القوة</button><button onclick="showPage('testsHub')">الاختبارات</button><button onclick="showPage('trainingLogin')">خطة التدريب</button><button onclick="showPage('healthLogin')">الصحية</button><button onclick="showPage('medicLogin')">الإسعاف الميداني</button><button onclick="showPage('commLogin')">الاتصالات</button><button onclick="showPage('teacherLogin')">المعلم</button><button onclick="showPage('traineeLogin')">المتدربين</button><button onclick="showPage('reports')">التقارير</button></nav></div></header>
+<header class="top no-print"><div class="topin"><div class="brand"><div class="mark">⌖</div><div><h1>نظام إدارة المقاتل الشجاع</h1><p>صيانة قوة طريف</p></div></div><nav class="nav"><button onclick="showPage('home')">الرئيسية</button><button onclick="showPage('leader')">لوحة القائد</button><button onclick="showPage('unitsLogin')">قاعدة بيانات متدربي القوة</button><button onclick="showPage('testsHub')">الاختبارات</button><button onclick="showPage('trainingLogin')">خطة التدريب</button><button onclick="showPage('weatherLogin')">الطقس الميداني</button><button onclick="showPage('healthLogin')">الصحية</button><button onclick="showPage('medicLogin')">الإسعاف الميداني</button><button onclick="showPage('commLogin')">الاتصالات</button><button onclick="showPage('teacherLogin')">المعلم</button><button onclick="showPage('traineeLogin')">المتدربين</button><button onclick="showPage('reports')">التقارير</button></nav></div></header>
 <main>
-<section class="page active" id="home"><div class="hero"><div class="heroBox"><div class="eyebrow">BRAVE FIGHTER CONTROL SYSTEM V3</div><h2>نظام إدارة المقاتل الشجاع</h2><p>منظومة موحدة لإدارة متدربي القوة حسب الوحدات، متابعة الجاهزية، الاختبارات، الحالة الصحية، الاتصالات، بوابة المعلم، والتقارير.</p><div class="grid" style="margin-top:22px"><div class="card module" onclick="showPage('leader')"><div class="icon">⭐</div><h3>لوحة القائد</h3><p>جاهزية القوة والوحدات والتنبيهات والمتعثرين.</p></div><div class="card module" onclick="showPage('unitsLogin')"><div class="icon">🗂️</div><h3>قاعدة بيانات متدربي القوة</h3><p>الوحدات: الصيانة، الإمداد، النقل، الإشارة.</p></div><div class="card module" onclick="showPage('testsHub')"><div class="icon">📝</div><h3>الاختبارات</h3><p>اختبارات مستقلة لكل وحدة مع اسم مستخدم وكلمة مرور لكل بطاقة.</p></div><div class="card module" onclick="showPage('trainingLogin')"><div class="icon">📅</div><h3>خطة التدريب</h3><p>خطط يومية وأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.</p></div><div class="card module" onclick="showPage('healthLogin')"><div class="icon">🩺</div><h3>اللوحة الصحية</h3><p>الخطوات، الوزن، النشاط، وطلبات المستوصف.</p></div><div class="card module" onclick="showPage('medicLogin')"><div class="icon">🚑</div><h3>الإسعاف الميداني</h3><p>مكتبة توعوية وصحية للمستندات والصور والفيديوهات والدروس.</p></div><div class="card module" onclick="showPage('commLogin')"><div class="icon">📡</div><h3>مركز الاتصالات</h3><p>رسائل واتساب ومراجع وملفات وصوتيات.</p></div><div class="card module" onclick="showPage('teacherLogin')"><div class="icon">🎓</div><h3>بوابة المعلم</h3><p>معايير التعليم، طرق التدريس، ومكتبة الملفات.</p></div><div class="card module" onclick="showPage('traineeLogin')"><div class="icon">🪖</div><h3>صفحة المتدربين</h3><p>بحث ذاتي آمن لعرض بيانات المتدرب واختباراته وطباعة تقريره بدون أسماء عامة.</p></div><div class="card module" onclick="showPage('reports')"><div class="icon">📊</div><h3>التقارير والإحصائيات</h3><p>تقارير A4 للقوة والوحدات والمعايير والوزن.</p></div></div></div></div></section>
-<section class="page" id="unitsLogin"></section><section class="page" id="unitsHub"></section><section class="page" id="testsHub"></section><section class="page" id="testUnitLogin"></section><section class="page" id="unitTests"></section><section class="page" id="unitLogin"></section><section class="page" id="unitDb"></section><section class="page" id="leader"></section><section class="page" id="teacherLogin"></section><section class="page" id="traineeLogin"></section><section class="page" id="healthLogin"></section><section class="page" id="trainingLogin"></section><section class="page" id="medicLogin"></section><section class="page" id="commLogin"></section><section class="page" id="reports"></section>
+<section class="page active" id="home"><div class="hero"><div class="heroBox"><div class="eyebrow">BRAVE FIGHTER CONTROL SYSTEM V3</div><h2>نظام إدارة المقاتل الشجاع</h2><p>منظومة موحدة لإدارة متدربي القوة حسب الوحدات، متابعة الجاهزية، الاختبارات، الحالة الصحية، الاتصالات، بوابة المعلم، والتقارير.</p><div class="grid" style="margin-top:22px"><div class="card module" onclick="showPage('leader')"><div class="icon">⭐</div><h3>لوحة القائد</h3><p>جاهزية القوة والوحدات والتنبيهات والمتعثرين.</p></div><div class="card module" onclick="showPage('unitsLogin')"><div class="icon">🗂️</div><h3>قاعدة بيانات متدربي القوة</h3><p>الوحدات: الصيانة، الإمداد، النقل، الإشارة.</p></div><div class="card module" onclick="showPage('testsHub')"><div class="icon">📝</div><h3>الاختبارات</h3><p>اختبارات مستقلة لكل وحدة مع اسم مستخدم وكلمة مرور لكل بطاقة.</p></div><div class="card module" onclick="showPage('trainingLogin')"><div class="icon">📅</div><h3>خطة التدريب</h3><p>خطط يومية وأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.</p></div><div class="card module" onclick="showPage('weatherLogin')"><div class="icon">🌦️</div><h3>الطقس الميداني</h3><p>تقدير المخاطر الجوية للتدريب: حرارة، رياح، رؤية، غبار، وإجهاد حراري.</p></div><div class="card module" onclick="showPage('healthLogin')"><div class="icon">🩺</div><h3>اللوحة الصحية</h3><p>الخطوات، الوزن، النشاط، وطلبات المستوصف.</p></div><div class="card module" onclick="showPage('medicLogin')"><div class="icon">🚑</div><h3>الإسعاف الميداني</h3><p>مكتبة توعوية وصحية للمستندات والصور والفيديوهات والدروس.</p></div><div class="card module" onclick="showPage('commLogin')"><div class="icon">📡</div><h3>مركز الاتصالات</h3><p>رسائل واتساب ومراجع وملفات وصوتيات.</p></div><div class="card module" onclick="showPage('teacherLogin')"><div class="icon">🎓</div><h3>بوابة المعلم</h3><p>معايير التعليم، طرق التدريس، ومكتبة الملفات.</p></div><div class="card module" onclick="showPage('traineeLogin')"><div class="icon">🪖</div><h3>صفحة المتدربين</h3><p>بحث ذاتي آمن لعرض بيانات المتدرب واختباراته وطباعة تقريره بدون أسماء عامة.</p></div><div class="card module" onclick="showPage('reports')"><div class="icon">📊</div><h3>التقارير والإحصائيات</h3><p>تقارير A4 للقوة والوحدات والمعايير والوزن.</p></div></div></div></div></section>
+<section class="page" id="unitsLogin"></section><section class="page" id="unitsHub"></section><section class="page" id="testsHub"></section><section class="page" id="testUnitLogin"></section><section class="page" id="unitTests"></section><section class="page" id="unitLogin"></section><section class="page" id="unitDb"></section><section class="page" id="leader"></section><section class="page" id="teacherLogin"></section><section class="page" id="traineeLogin"></section><section class="page" id="healthLogin"></section><section class="page" id="trainingLogin"></section><section class="page" id="weatherLogin"></section><section class="page" id="medicLogin"></section><section class="page" id="commLogin"></section><section class="page" id="reports"></section>
 </main><div class="modalOverlay no-print" id="addModal"></div>
 <script>
 const units=[{id:'maintenance',name:'الصيانة',user:'maint',pass:'1111',icon:'⚙️'},{id:'supply',name:'الإمداد',user:'supply',pass:'2222',icon:'📦'},{id:'transport',name:'النقل',user:'transport',pass:'3333',icon:'🚚'},{id:'signal',name:'الإشارة',user:'signal',pass:'4444',icon:'📡'}];
@@ -1932,7 +1955,96 @@ window.addEventListener('load',()=>{
 });
 
 
-function renderAll(){renderUnitsLogin();renderUnitsHub();renderTestsHub();renderTestUnitLogin();renderUnitTests();renderUnitLogin();renderUnitDb();renderLeader();renderLogin('teacherLogin','بوابة المعلم','معايير التعليم وطرق التدريس والمراجع والكتب وملفات PDF وصوتيات.','teacher','1234','openTeacher');openTrainee();openHealth();renderLogin('trainingLogin','مركز خطة التدريب','خاص بإضافة خطط التدريب اليومية والأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.','plan','6666','openTrainingCenter');renderLogin('medicLogin','مركز التوعية والإسعاف الميداني','خاص بالمسعف الصحي لإضافة المستندات والصور والفيديوهات والدروس والتنبيهات الصحية.','medic','5555','openMedicCenter');renderLogin('commLogin','مركز الاتصالات','الرسائل والتنبيهات والمراجع والمستندات عبر واتساب.','comm','1234','openComm');renderReports()}
+
+
+/* ===== مركز الطقس الميداني ===== */
+let weatherRecords=[{date:new Date().toLocaleString('ar-SA'),unit:'جميع الوحدات',temp:34,humidity:28,wind:18,visibility:9,condition:'صحو',risk:'منخفضة',note:'الوضع مناسب للتدريب مع متابعة الترطيب.'}];
+let weatherNotices=[{date:new Date().toLocaleString('ar-SA'),title:'تم تجهيز بطاقة الطقس الميداني',body:'يمكن الآن إدخال حالة الطقس وتقييم المخاطر قبل التدريب.'}];
+function weatherRiskLevel(temp,humidity,wind,visibility,condition){
+  temp=Number(temp)||0; humidity=Number(humidity)||0; wind=Number(wind)||0; visibility=Number(visibility)||0; condition=String(condition||'');
+  let score=0;
+  if(temp>=43)score+=4; else if(temp>=38)score+=3; else if(temp>=34)score+=2; else if(temp>=30)score+=1;
+  if(humidity>=60)score+=2; else if(humidity>=40)score+=1;
+  if(wind>=45)score+=3; else if(wind>=30)score+=2; else if(wind>=20)score+=1;
+  if(visibility>0 && visibility<2)score+=3; else if(visibility>0 && visibility<5)score+=2; else if(visibility>0 && visibility<8)score+=1;
+  if(/غبار|عاصفة|مطر|ضباب|سيول/.test(condition))score+=2;
+  if(score>=8)return {txt:'خطورة عالية جداً',cls:'extreme',advice:'إيقاف أو تأجيل التدريب الميداني غير الضروري، وإبلاغ الوحدات فوراً.'};
+  if(score>=5)return {txt:'خطورة عالية',cls:'high',advice:'تقليل الجهد، زيادة فترات الراحة، وتجهيز الإسعاف والماء.'};
+  if(score>=3)return {txt:'متوسطة',cls:'medium',advice:'التدريب ممكن مع متابعة الحرارة والترطيب والرياح.'};
+  return {txt:'منخفضة',cls:'low',advice:'الوضع مناسب للتدريب مع الالتزام بتعليمات السلامة.'};
+}
+function openWeatherCenter(){
+  let last=weatherRecords[0]||{};
+  let risk=weatherRiskLevel(last.temp,last.humidity,last.wind,last.visibility,last.condition);
+  document.getElementById('weatherLogin').innerHTML=`<div class="head"><div><h2>🌦️ مركز الطقس الميداني</h2><p>تقييم حالة الطقس قبل التدريب والرماية والسير الطويل لجميع الوحدات</p></div><button class="btn" onclick="showPage('home')">رجوع</button></div>
+  <div class="weatherHero">
+    <div class="weatherStatus">
+      <h3>الحالة الحالية</h3>
+      <div class="bigTemp">${escapeHtml(last.temp||'--')}°</div>
+      <p style="color:var(--muted);line-height:1.8">${escapeHtml(last.condition||'لم يتم إدخال الحالة بعد')} - آخر تحديث: ${escapeHtml(last.date||'—')}</p>
+      <div class="weatherMeta"><span>الرطوبة: ${escapeHtml(last.humidity||'--')}%</span><span>الرياح: ${escapeHtml(last.wind||'--')} كم/س</span><span>الرؤية: ${escapeHtml(last.visibility||'--')} كم</span><span>النطاق: ${escapeHtml(last.unit||'جميع الوحدات')}</span></div>
+      <div class="weatherRisk ${risk.cls}">مستوى الخطورة: ${risk.txt}</div>
+    </div>
+    <div class="weatherPanel">
+      <h3>مؤشرات القيادة</h3>
+      <div class="kpis">
+        <div class="kpi"><b>${weatherRecords.length}</b><span>تحديثات الطقس</span></div>
+        <div class="kpi warn"><b>${last.temp||'--'}°</b><span>درجة الحرارة</span></div>
+        <div class="kpi"><b>${last.wind||'--'}</b><span>سرعة الرياح</span></div>
+        <div class="kpi"><b>${last.visibility||'--'}</b><span>مدى الرؤية</span></div>
+      </div>
+      <div class="noteBox"><b style="color:var(--gold2)">توصية النظام:</b><br>${escapeHtml(risk.advice)}</div>
+    </div>
+  </div>
+  <div class="split">
+    <div class="card"><h3 style="color:var(--gold2)">إدخال تحديث طقس ميداني</h3>
+      <div class="formgrid">
+        <div><label>الوحدة/النطاق</label><select id="weatherUnit"><option>جميع الوحدات</option>${units.map(u=>`<option>${u.name}</option>`).join('')}</select></div>
+        <div><label>حالة الطقس</label><select id="weatherCondition"><option>صحو</option><option>غبار</option><option>رياح نشطة</option><option>عاصفة رملية</option><option>ضباب</option><option>مطر</option><option>حرارة مرتفعة</option></select></div>
+        <div><label>درجة الحرارة °C</label><input id="weatherTemp" type="number" placeholder="مثال: 38"></div>
+        <div><label>الرطوبة %</label><input id="weatherHumidity" type="number" placeholder="مثال: 35"></div>
+        <div><label>سرعة الرياح كم/س</label><input id="weatherWind" type="number" placeholder="مثال: 22"></div>
+        <div><label>مدى الرؤية كم</label><input id="weatherVisibility" type="number" placeholder="مثال: 8"></div>
+        <div style="grid-column:1/-1"><label>ملاحظة ميدانية</label><textarea id="weatherNote" placeholder="مثال: يوصى بتقليل زمن السير الطويل وزيادة نقاط الماء"></textarea></div>
+      </div>
+      <div class="actionRow" style="margin-top:12px"><button class="btn primary" onclick="addWeatherRecord()">حفظ تحديث الطقس</button><button class="btn" onclick="sendWeatherWhatsApp()">إشعار الوحدات واتساب</button></div>
+    </div>
+    <div class="card"><h3 style="color:var(--gold2)">سجل تحديثات الطقس</h3><div id="weatherLog" class="fileList weatherLog"></div></div>
+  </div>
+  <h3 class="sectionTitle">إرشادات الطقس حسب النشاط</h3>
+  <div class="weatherAdvice">
+    <div class="miniCard"><h4>🏃 السير الطويل</h4><p>راقب الحرارة والرطوبة، وفر نقاط ماء، وقلل الحمل عند ارتفاع الخطورة.</p></div>
+    <div class="miniCard"><h4>🎯 الرماية</h4><p>انتبه للرياح والغبار ومدى الرؤية قبل فتح ميدان الرماية.</p></div>
+    <div class="miniCard"><h4>🩺 الإسعاف</h4><p>عند الحرارة العالية جهّز أملاح الإماهة، تبريد، ونقطة فرز للحالات.</p></div>
+    <div class="miniCard"><h4>🚚 النقل</h4><p>عند الغبار أو الضباب تنبيه السائقين وخفض السرعة وتأمين التحرك.</p></div>
+  </div>
+  <h3 class="sectionTitle">تأثير الطقس على الوحدات</h3>
+  <div class="weatherUnitGrid">${units.map(u=>`<div class="weatherUnitCard"><b>${u.icon} ${u.name}</b><small>تطبق عليها آخر توصية طقس حسب النطاق المحدد. يمكن إرسال إشعار مباشر لأفراد الوحدة من زر واتساب.</small></div>`).join('')}</div>`;
+  renderWeatherLog();
+}
+function addWeatherRecord(){
+  let temp=document.getElementById('weatherTemp').value;
+  let humidity=document.getElementById('weatherHumidity').value;
+  let wind=document.getElementById('weatherWind').value;
+  let visibility=document.getElementById('weatherVisibility').value;
+  let condition=document.getElementById('weatherCondition').value;
+  let unit=document.getElementById('weatherUnit').value;
+  let note=document.getElementById('weatherNote').value||'';
+  let risk=weatherRiskLevel(temp,humidity,wind,visibility,condition);
+  weatherRecords.unshift({date:new Date().toLocaleString('ar-SA'),unit,temp,humidity,wind,visibility,condition,risk:risk.txt,note});
+  weatherNotices.unshift({date:new Date().toLocaleString('ar-SA'),title:'تحديث طقس ميداني - '+unit,body:risk.txt});
+  alert('تم حفظ تحديث الطقس. مستوى الخطورة: '+risk.txt);
+  openWeatherCenter();
+}
+function renderWeatherLog(){
+  let el=document.getElementById('weatherLog'); if(!el)return;
+  el.innerHTML=weatherRecords.map((x,i)=>{let r=weatherRiskLevel(x.temp,x.humidity,x.wind,x.visibility,x.condition);return `<div class="fileItem"><div><b>${escapeHtml(x.condition)} - ${escapeHtml(x.risk||r.txt)}</b><br><small>${escapeHtml(x.unit)} | حرارة ${escapeHtml(x.temp)}° | رياح ${escapeHtml(x.wind)} كم/س | رؤية ${escapeHtml(x.visibility)} كم</small><br><small>${escapeHtml(x.note||'لا توجد ملاحظات')} - ${escapeHtml(x.date)}</small></div><div class="actionRow"><button class="btn" onclick="previewWeatherRecord(${i})">معاينة</button><button class="btn" onclick="sendWeatherWhatsApp(${i})">واتساب</button><button class="btn danger" onclick="deleteWeatherRecord(${i})">حذف</button></div></div>`}).join('')||'<div class="noteBox">لا توجد تحديثات طقس بعد.</div>';
+}
+function previewWeatherRecord(i){let x=weatherRecords[i]; if(!x)return; let r=weatherRiskLevel(x.temp,x.humidity,x.wind,x.visibility,x.condition); alert('تحديث الطقس\nالنطاق: '+x.unit+'\nالحالة: '+x.condition+'\nالحرارة: '+x.temp+'°\nالرطوبة: '+x.humidity+'%\nالرياح: '+x.wind+' كم/س\nالرؤية: '+x.visibility+' كم\nالخطورة: '+r.txt+'\nالتوصية: '+r.advice+'\nالملاحظة: '+(x.note||'لا يوجد'));}
+function deleteWeatherRecord(i){if(confirm('هل تريد حذف تحديث الطقس؟')){weatherRecords.splice(i,1);openWeatherCenter();}}
+function sendWeatherWhatsApp(i){let x=typeof i==='number'?weatherRecords[i]:weatherRecords[0]; if(!x){alert('لا يوجد تحديث طقس للإرسال');return;} let r=weatherRiskLevel(x.temp,x.humidity,x.wind,x.visibility,x.condition); let msg='🌦️ تحديث الطقس الميداني%0A%0Aالنطاق: '+encodeURIComponent(x.unit)+'%0Aالحالة: '+encodeURIComponent(x.condition)+'%0Aالحرارة: '+encodeURIComponent(x.temp)+'°C%0Aالرطوبة: '+encodeURIComponent(x.humidity)+'%25%0Aالرياح: '+encodeURIComponent(x.wind)+' كم/س%0Aالرؤية: '+encodeURIComponent(x.visibility)+' كم%0Aمستوى الخطورة: '+encodeURIComponent(r.txt)+'%0Aالتوصية: '+encodeURIComponent(r.advice)+'%0A%0Aمركز التدريب - صيانة قوة طريف'; window.open('https://wa.me/?text='+msg,'_blank');}
+
+function renderAll(){renderUnitsLogin();renderUnitsHub();renderTestsHub();renderTestUnitLogin();renderUnitTests();renderUnitLogin();renderUnitDb();renderLeader();renderLogin('teacherLogin','بوابة المعلم','معايير التعليم وطرق التدريس والمراجع والكتب وملفات PDF وصوتيات.','teacher','1234','openTeacher');openTrainee();openHealth();renderLogin('trainingLogin','مركز خطة التدريب','خاص بإضافة خطط التدريب اليومية والأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.','plan','6666','openTrainingCenter');renderLogin('weatherLogin','مركز الطقس الميداني','خاص بإدخال تحديثات الطقس وتقدير المخاطر قبل التدريب والرماية والسير الطويل.','weather','7777','openWeatherCenter');renderLogin('medicLogin','مركز التوعية والإسعاف الميداني','خاص بالمسعف الصحي لإضافة المستندات والصور والفيديوهات والدروس والتنبيهات الصحية.','medic','5555','openMedicCenter');renderLogin('commLogin','مركز الاتصالات','الرسائل والتنبيهات والمراجع والمستندات عبر واتساب.','comm','1234','openComm');renderReports()}
 renderAll();
 </script>
 <!-- V7: أزرار عائمة آمنة لا تكسر سكربت البطائق -->
