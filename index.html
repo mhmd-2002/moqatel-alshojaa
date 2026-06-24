@@ -259,6 +259,27 @@
 .weatherUnitCard b{color:var(--gold2);display:block;margin-bottom:6px}
 .weatherUnitCard small{color:var(--muted);line-height:1.7}
 @media(max-width:900px){.weatherHero{grid-template-columns:1fr}.weatherStatus .bigTemp{font-size:42px}}
+/* ===== تحسين وضوح مؤشرات الطقس وإلغاء الدخول ===== */
+.weatherClearGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0 16px}
+.weatherClearCard{background:rgba(8,13,8,.64);border:1px solid var(--line);border-radius:20px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.weatherClearCard .wIcon{font-size:28px;display:block;margin-bottom:6px}
+.weatherClearCard b{display:block;font-size:34px;color:var(--paper);line-height:1.15;margin-bottom:5px}
+.weatherClearCard span{display:block;color:var(--muted);font-size:13px}
+.weatherDecision{border:1px solid var(--line);border-radius:24px;padding:20px;background:linear-gradient(135deg,rgba(200,164,93,.12),rgba(12,22,13,.82));box-shadow:var(--shadow);margin-bottom:16px}
+.weatherDecisionHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.weatherDecisionHead h3{margin:0;color:var(--gold2);font-size:24px}
+.weatherRiskBig{border-radius:18px;padding:16px;text-align:center;font-weight:900;font-size:22px;border:1px solid var(--line);min-width:210px}
+.weatherRiskBig.low{color:var(--ok);background:rgba(88,184,121,.12);border-color:rgba(88,184,121,.40)}
+.weatherRiskBig.medium{color:var(--gold2);background:rgba(217,150,56,.14);border-color:rgba(217,150,56,.45)}
+.weatherRiskBig.high{color:#ffd5d2;background:rgba(216,93,80,.16);border-color:rgba(216,93,80,.50)}
+.weatherRiskBig.extreme{color:#fff;background:rgba(216,93,80,.30);border-color:rgba(216,93,80,.75)}
+.weatherActivityGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:14px}
+.weatherActivity{border:1px solid var(--line);border-radius:16px;padding:13px;background:rgba(0,0,0,.16)}
+.weatherActivity b{display:block;color:var(--gold2);margin-bottom:6px}
+.weatherActivity small{color:var(--muted);line-height:1.6}
+.weatherOpenNote{border:1px dashed rgba(240,206,122,.38);background:rgba(200,164,93,.08);border-radius:14px;padding:10px;color:var(--muted);font-size:13px;line-height:1.7;margin-bottom:14px}
+@media(max-width:700px){.weatherClearCard b{font-size:28px}.weatherDecisionHead{display:block}.weatherRiskBig{margin-top:12px}}
+
 </style>
 <style id="unit-login-size-only-safe">
 #unitLogin .login,
@@ -1976,24 +1997,36 @@ function weatherRiskLevel(temp,humidity,wind,visibility,condition){
 function openWeatherCenter(){
   let last=weatherRecords[0]||{};
   let risk=weatherRiskLevel(last.temp,last.humidity,last.wind,last.visibility,last.condition);
-  document.getElementById('weatherLogin').innerHTML=`<div class="head"><div><h2>🌦️ مركز الطقس الميداني</h2><p>تقييم حالة الطقس قبل التدريب والرماية والسير الطويل لجميع الوحدات</p></div><button class="btn" onclick="showPage('home')">رجوع</button></div>
-  <div class="weatherHero">
-    <div class="weatherStatus">
-      <h3>الحالة الحالية</h3>
-      <div class="bigTemp">${escapeHtml(last.temp||'--')}°</div>
-      <p style="color:var(--muted);line-height:1.8">${escapeHtml(last.condition||'لم يتم إدخال الحالة بعد')} - آخر تحديث: ${escapeHtml(last.date||'—')}</p>
-      <div class="weatherMeta"><span>الرطوبة: ${escapeHtml(last.humidity||'--')}%</span><span>الرياح: ${escapeHtml(last.wind||'--')} كم/س</span><span>الرؤية: ${escapeHtml(last.visibility||'--')} كم</span><span>النطاق: ${escapeHtml(last.unit||'جميع الوحدات')}</span></div>
-      <div class="weatherRisk ${risk.cls}">مستوى الخطورة: ${risk.txt}</div>
+  let temp=escapeHtml(last.temp||'--');
+  let humidity=escapeHtml(last.humidity||'--');
+  let wind=escapeHtml(last.wind||'--');
+  let visibility=escapeHtml(last.visibility||'--');
+  let unit=escapeHtml(last.unit||'جميع الوحدات');
+  let condition=escapeHtml(last.condition||'لم يتم إدخال الحالة بعد');
+  let lastDate=escapeHtml(last.date||'—');
+  let walking=risk.cls==='high'||risk.cls==='extreme'?'تحذير / تقليل المدة':(risk.cls==='medium'?'مسموح بحذر':'مناسب');
+  let shooting=(Number(last.wind)>35||Number(last.visibility)<4||String(last.condition||'').includes('غبار')||String(last.condition||'').includes('عاصفة'))?'تحذير حسب الرؤية والرياح':'مناسب';
+  let fitness=(Number(last.temp)>=40||risk.cls==='extreme')?'تجنب أوقات الذروة':(risk.cls==='medium'||risk.cls==='high'?'مسموح مع ترطيب':'مناسب');
+  let field=(Number(last.visibility)<3||String(last.condition||'').includes('ضباب')||String(last.condition||'').includes('عاصفة'))?'تقييد الحركة الميدانية':'مناسب';
+  document.getElementById('weatherLogin').innerHTML=`<div class="head"><div><h2>🌦️ مركز الطقس الميداني</h2><p>مؤشرات واضحة وفورية بدون اسم مستخدم أو كلمة مرور</p></div><button class="btn" onclick="showPage('home')">رجوع</button></div>
+  <div class="weatherOpenNote">هذه البطاقة مفتوحة مباشرة للقائد والمعلم والمتدرب لأنها معلومات تشغيلية سريعة، أما إدخال تحديث الطقس فيبقى من داخل نفس الصفحة دون بوابة دخول.</div>
+  <div class="weatherClearGrid">
+    <div class="weatherClearCard"><span class="wIcon">🌡️</span><b>${temp}°</b><span>درجة الحرارة</span></div>
+    <div class="weatherClearCard"><span class="wIcon">💧</span><b>${humidity}%</b><span>الرطوبة</span></div>
+    <div class="weatherClearCard"><span class="wIcon">💨</span><b>${wind}</b><span>سرعة الرياح كم/س</span></div>
+    <div class="weatherClearCard"><span class="wIcon">👁️</span><b>${visibility}</b><span>مدى الرؤية كم</span></div>
+  </div>
+  <div class="weatherDecision">
+    <div class="weatherDecisionHead">
+      <div><h3>قرار التدريب الميداني</h3><p style="color:var(--muted);line-height:1.8;margin:8px 0 0">الحالة: ${condition} | النطاق: ${unit} | آخر تحديث: ${lastDate}</p></div>
+      <div class="weatherRiskBig ${risk.cls}">${risk.txt}</div>
     </div>
-    <div class="weatherPanel">
-      <h3>مؤشرات القيادة</h3>
-      <div class="kpis">
-        <div class="kpi"><b>${weatherRecords.length}</b><span>تحديثات الطقس</span></div>
-        <div class="kpi warn"><b>${last.temp||'--'}°</b><span>درجة الحرارة</span></div>
-        <div class="kpi"><b>${last.wind||'--'}</b><span>سرعة الرياح</span></div>
-        <div class="kpi"><b>${last.visibility||'--'}</b><span>مدى الرؤية</span></div>
-      </div>
-      <div class="noteBox"><b style="color:var(--gold2)">توصية النظام:</b><br>${escapeHtml(risk.advice)}</div>
+    <div class="noteBox" style="margin-top:14px"><b style="color:var(--gold2)">توصية النظام:</b><br>${escapeHtml(risk.advice)}</div>
+    <div class="weatherActivityGrid">
+      <div class="weatherActivity"><b>🚶 السير الطويل</b><small>${escapeHtml(walking)}</small></div>
+      <div class="weatherActivity"><b>🎯 الرماية</b><small>${escapeHtml(shooting)}</small></div>
+      <div class="weatherActivity"><b>🏃 اللياقة البدنية</b><small>${escapeHtml(fitness)}</small></div>
+      <div class="weatherActivity"><b>🚚 التدريب الميداني</b><small>${escapeHtml(field)}</small></div>
     </div>
   </div>
   <div class="split">
@@ -2044,7 +2077,7 @@ function previewWeatherRecord(i){let x=weatherRecords[i]; if(!x)return; let r=we
 function deleteWeatherRecord(i){if(confirm('هل تريد حذف تحديث الطقس؟')){weatherRecords.splice(i,1);openWeatherCenter();}}
 function sendWeatherWhatsApp(i){let x=typeof i==='number'?weatherRecords[i]:weatherRecords[0]; if(!x){alert('لا يوجد تحديث طقس للإرسال');return;} let r=weatherRiskLevel(x.temp,x.humidity,x.wind,x.visibility,x.condition); let msg='🌦️ تحديث الطقس الميداني%0A%0Aالنطاق: '+encodeURIComponent(x.unit)+'%0Aالحالة: '+encodeURIComponent(x.condition)+'%0Aالحرارة: '+encodeURIComponent(x.temp)+'°C%0Aالرطوبة: '+encodeURIComponent(x.humidity)+'%25%0Aالرياح: '+encodeURIComponent(x.wind)+' كم/س%0Aالرؤية: '+encodeURIComponent(x.visibility)+' كم%0Aمستوى الخطورة: '+encodeURIComponent(r.txt)+'%0Aالتوصية: '+encodeURIComponent(r.advice)+'%0A%0Aمركز التدريب - صيانة قوة طريف'; window.open('https://wa.me/?text='+msg,'_blank');}
 
-function renderAll(){renderUnitsLogin();renderUnitsHub();renderTestsHub();renderTestUnitLogin();renderUnitTests();renderUnitLogin();renderUnitDb();renderLeader();renderLogin('teacherLogin','بوابة المعلم','معايير التعليم وطرق التدريس والمراجع والكتب وملفات PDF وصوتيات.','teacher','1234','openTeacher');openTrainee();openHealth();renderLogin('trainingLogin','مركز خطة التدريب','خاص بإضافة خطط التدريب اليومية والأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.','plan','6666','openTrainingCenter');renderLogin('weatherLogin','مركز الطقس الميداني','خاص بإدخال تحديثات الطقس وتقدير المخاطر قبل التدريب والرماية والسير الطويل.','weather','7777','openWeatherCenter');renderLogin('medicLogin','مركز التوعية والإسعاف الميداني','خاص بالمسعف الصحي لإضافة المستندات والصور والفيديوهات والدروس والتنبيهات الصحية.','medic','5555','openMedicCenter');renderLogin('commLogin','مركز الاتصالات','الرسائل والتنبيهات والمراجع والمستندات عبر واتساب.','comm','1234','openComm');renderReports()}
+function renderAll(){renderUnitsLogin();renderUnitsHub();renderTestsHub();renderTestUnitLogin();renderUnitTests();renderUnitLogin();renderUnitDb();renderLeader();renderLogin('teacherLogin','بوابة المعلم','معايير التعليم وطرق التدريس والمراجع والكتب وملفات PDF وصوتيات.','teacher','1234','openTeacher');openTrainee();openHealth();renderLogin('trainingLogin','مركز خطة التدريب','خاص بإضافة خطط التدريب اليومية والأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.','plan','6666','openTrainingCenter');openWeatherCenter();renderLogin('medicLogin','مركز التوعية والإسعاف الميداني','خاص بالمسعف الصحي لإضافة المستندات والصور والفيديوهات والدروس والتنبيهات الصحية.','medic','5555','openMedicCenter');renderLogin('commLogin','مركز الاتصالات','الرسائل والتنبيهات والمراجع والمستندات عبر واتساب.','comm','1234','openComm');renderReports()}
 renderAll();
 </script>
 <!-- V7: أزرار عائمة آمنة لا تكسر سكربت البطائق -->
