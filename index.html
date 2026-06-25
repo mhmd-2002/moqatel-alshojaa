@@ -606,11 +606,46 @@ body.exam-editor-open-v7{
 @media(max-width:900px){.realPreviewGrid{grid-template-columns:1fr}.previewFrame,.previewFrame iframe{min-height:300px;height:auto}.previewInfo{grid-template-columns:1fr 1fr}.kbActions{justify-content:flex-start}}
 @media(max-width:560px){.previewInfo{grid-template-columns:1fr}.modalBox{width:96vw!important;padding:14px!important}.previewFrame{min-height:240px}.previewFrame iframe{min-height:260px}}
 </style>
+
+<style id="innovation-center-v1">
+/* ===== مركز الابتكار والتطوير - إضافة آمنة بدون تغيير الهوية ===== */
+.innovationHero{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:stretch;margin-bottom:18px}
+.innovationPanel{border:1px solid var(--line);background:rgba(18,27,18,.82);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.innovationPanel h3{margin:0 0 10px;color:var(--gold2)}
+.innovationBanner{border:1px solid rgba(240,206,122,.42);background:linear-gradient(135deg,rgba(200,164,93,.16),rgba(12,22,13,.82));border-radius:22px;padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.innovationBanner:before{content:"🚀";position:absolute;left:18px;top:18px;font-size:58px;opacity:.16}
+.innovationBanner h3{margin:0 0 8px;color:var(--gold2);font-size:26px}
+.innovationBanner p{margin:0;color:var(--muted);line-height:1.9}
+.innovationKpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:14px 0 20px}
+.innovationKpi{background:rgba(17,24,15,.84);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.innovationKpi b{display:block;font-size:27px;color:var(--paper);margin-bottom:5px}.innovationKpi span{font-size:12px;color:var(--muted)}
+.innovationKpi.ok b{color:var(--ok)}.innovationKpi.warn b{color:var(--warn)}.innovationKpi.gold b{color:var(--gold2)}
+.innovationFormGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.innovationFormGrid .full{grid-column:1/-1}
+.innovationCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.innovationIdea{border:1px solid var(--line);border-radius:20px;background:rgba(0,0,0,.16);padding:15px;box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.innovationIdea h4{margin:0 0 8px;color:var(--gold2);font-size:18px}.innovationIdea p{margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.innovationMeta{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.innovationMeta span{border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--gold2);font-size:12px;background:rgba(200,164,93,.07)}
+.innovationStatus{display:inline-block;border-radius:999px;padding:5px 10px;font-size:12px;border:1px solid var(--line);font-weight:700}
+.innovationStatus.new{color:var(--gold2);background:rgba(200,164,93,.10);border-color:rgba(240,206,122,.35)}
+.innovationStatus.study{color:var(--warn);background:rgba(217,150,56,.12);border-color:rgba(217,150,56,.42)}
+.innovationStatus.work{color:#cfe7ff;background:rgba(80,150,220,.12);border-color:rgba(80,150,220,.42)}
+.innovationStatus.done{color:var(--ok);background:rgba(88,184,121,.12);border-color:rgba(88,184,121,.42)}
+.innovationStatus.reject{color:#ffd5d2;background:rgba(216,93,80,.12);border-color:rgba(216,93,80,.42)}
+.innovationProgress{height:9px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:10px 0}.innovationProgress span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px}
+.innovationTools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.innovationTools .btn{padding:8px 10px;font-size:12px}
+.innovationEmpty{border:1px dashed var(--line);background:rgba(200,164,93,.06);border-radius:18px;padding:18px;text-align:center;color:var(--muted);line-height:1.8}
+.innovationFilters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.monthIdea{border:1px solid rgba(88,184,121,.40);background:linear-gradient(135deg,rgba(88,184,121,.12),rgba(12,22,13,.72));border-radius:18px;padding:14px}
+.monthIdea b{display:block;color:var(--gold2);font-size:18px;margin-bottom:6px}.monthIdea small{color:var(--muted);line-height:1.7}
+@media(max-width:900px){.innovationHero{grid-template-columns:1fr}.innovationBanner h3{font-size:22px}}
+@media print{#innovationCenter .innovationFormGrid,#innovationCenter .innovationTools,#innovationCenter .btn,#innovationCenter .innovationFilters{display:none!important}}
+</style>
 </head><body>
-<header class="top no-print"><div class="topin"><div class="brand"><div class="mark">⌖</div><div><h1>نظام إدارة المقاتل الشجاع</h1><p>صيانة قوة طريف</p></div></div><nav class="nav"><button onclick="showPage('home')">الرئيسية</button><button onclick="showPage('leader')">لوحة القائد</button><button onclick="showPage('unitsLogin')">قاعدة بيانات متدربي القوة</button><button onclick="showPage('testsHub')">الاختبارات</button><button onclick="showPage('trainingLogin')">خطة التدريب</button><button onclick="showPage('weatherLogin')">الطقس الميداني</button><button onclick="showPage('healthLogin')">الصحية</button><button onclick="showPage('medicLogin')">الإسعاف الميداني</button><button onclick="showPage('commLogin')">الاتصالات</button><button onclick="showPage('teacherLogin')">المعلم</button><button onclick="showPage('traineeLogin')">المتدربين</button><button onclick="showPage('reports')">التقارير</button></nav></div></header>
+<header class="top no-print"><div class="topin"><div class="brand"><div class="mark">⌖</div><div><h1>نظام إدارة المقاتل الشجاع</h1><p>صيانة قوة طريف</p></div></div><nav class="nav"><button onclick="showPage('home')">الرئيسية</button><button onclick="showPage('leader')">لوحة القائد</button><button onclick="showPage('unitsLogin')">قاعدة بيانات متدربي القوة</button><button onclick="showPage('testsHub')">الاختبارات</button><button onclick="showPage('trainingLogin')">خطة التدريب</button><button onclick="showPage('weatherLogin')">الطقس الميداني</button><button onclick="showPage('healthLogin')">الصحية</button><button onclick="showPage('medicLogin')">الإسعاف الميداني</button><button onclick="showPage('innovationCenter')">الابتكار والتطوير</button><button onclick="showPage('commLogin')">الاتصالات</button><button onclick="showPage('teacherLogin')">المعلم</button><button onclick="showPage('traineeLogin')">المتدربين</button><button onclick="showPage('reports')">التقارير</button></nav></div></header>
 <main>
-<section class="page active" id="home"><div class="hero"><div class="heroBox"><div class="eyebrow">BRAVE FIGHTER CONTROL SYSTEM V3</div><h2>نظام إدارة المقاتل الشجاع</h2><p>منظومة موحدة لإدارة متدربي القوة حسب الوحدات، متابعة الجاهزية، الاختبارات، الحالة الصحية، الاتصالات، بوابة المعلم، والتقارير.</p><div class="grid" style="margin-top:22px"><div class="card module" onclick="showPage('leader')"><div class="icon">⭐</div><h3>لوحة القائد</h3><p>جاهزية القوة والوحدات والتنبيهات والمتعثرين.</p></div><div class="card module" onclick="showPage('unitsLogin')"><div class="icon">🗂️</div><h3>قاعدة بيانات متدربي القوة</h3><p>الوحدات: الصيانة، الإمداد، النقل، الإشارة، كتيبة الدبابات، كتيبة المشاة، كتيبة المهندسين، الشرطة العسكرية، سرية القيادة، التشغيل والصيانة.</p></div><div class="card module" onclick="showPage('testsHub')"><div class="icon">📝</div><h3>الاختبارات</h3><p>اختبارات مستقلة لكل وحدة مع اسم مستخدم وكلمة مرور لكل بطاقة.</p></div><div class="card module" onclick="showPage('trainingLogin')"><div class="icon">📅</div><h3>خطة التدريب</h3><p>خطط يومية وأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.</p></div><div class="card module" onclick="showPage('weatherLogin')"><div class="icon">🌦️</div><h3>الطقس الميداني</h3><p>تقدير المخاطر الجوية للتدريب: حرارة، رياح، رؤية، غبار، وإجهاد حراري.</p></div><div class="card module" onclick="showPage('healthLogin')"><div class="icon">🩺</div><h3>اللوحة الصحية</h3><p>الخطوات، الوزن، النشاط، وطلبات المستوصف.</p></div><div class="card module" onclick="showPage('medicLogin')"><div class="icon">🚑</div><h3>الإسعاف الميداني</h3><p>مكتبة توعوية وصحية للمستندات والصور والفيديوهات والدروس.</p></div><div class="card module" onclick="showPage('commLogin')"><div class="icon">📡</div><h3>مركز الاتصالات</h3><p>رسائل واتساب ومراجع وملفات وصوتيات.</p></div><div class="card module" onclick="showPage('teacherLogin')"><div class="icon">🎓</div><h3>بوابة المعلم</h3><p>معايير التعليم، طرق التدريس، ومكتبة الملفات.</p></div><div class="card module" onclick="showPage('traineeLogin')"><div class="icon">🪖</div><h3>صفحة المتدربين</h3><p>بحث ذاتي آمن لعرض بيانات المتدرب واختباراته وطباعة تقريره بدون أسماء عامة.</p></div><div class="card module" onclick="showPage('reports')"><div class="icon">📊</div><h3>التقارير والإحصائيات</h3><p>تقارير A4 للقوة والوحدات والمعايير والوزن.</p></div></div></div></div></section>
-<section class="page" id="unitsLogin"></section><section class="page" id="unitsHub"></section><section class="page" id="testsHub"></section><section class="page" id="testUnitLogin"></section><section class="page" id="unitTests"></section><section class="page" id="unitLogin"></section><section class="page" id="unitDb"></section><section class="page" id="leader"></section><section class="page" id="teacherLogin"></section><section class="page" id="traineeLogin"></section><section class="page" id="healthLogin"></section><section class="page" id="trainingLogin"></section><section class="page" id="weatherLogin"></section><section class="page" id="medicLogin"></section><section class="page" id="commLogin"></section><section class="page" id="reports"></section><section class="page" id="loginPage"></section><section class="page" id="userAdmin"></section>
+<section class="page active" id="home"><div class="hero"><div class="heroBox"><div class="eyebrow">BRAVE FIGHTER CONTROL SYSTEM V3</div><h2>نظام إدارة المقاتل الشجاع</h2><p>منظومة موحدة لإدارة متدربي القوة حسب الوحدات، متابعة الجاهزية، الاختبارات، الحالة الصحية، الاتصالات، بوابة المعلم، والتقارير.</p><div class="grid" style="margin-top:22px"><div class="card module" onclick="showPage('leader')"><div class="icon">⭐</div><h3>لوحة القائد</h3><p>جاهزية القوة والوحدات والتنبيهات والمتعثرين.</p></div><div class="card module" onclick="showPage('unitsLogin')"><div class="icon">🗂️</div><h3>قاعدة بيانات متدربي القوة</h3><p>الوحدات: الصيانة، الإمداد، النقل، الإشارة، كتيبة الدبابات، كتيبة المشاة، كتيبة المهندسين، الشرطة العسكرية، سرية القيادة، التشغيل والصيانة.</p></div><div class="card module" onclick="showPage('testsHub')"><div class="icon">📝</div><h3>الاختبارات</h3><p>اختبارات مستقلة لكل وحدة مع اسم مستخدم وكلمة مرور لكل بطاقة.</p></div><div class="card module" onclick="showPage('trainingLogin')"><div class="icon">📅</div><h3>خطة التدريب</h3><p>خطط يومية وأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.</p></div><div class="card module" onclick="showPage('weatherLogin')"><div class="icon">🌦️</div><h3>الطقس الميداني</h3><p>تقدير المخاطر الجوية للتدريب: حرارة، رياح، رؤية، غبار، وإجهاد حراري.</p></div><div class="card module" onclick="showPage('healthLogin')"><div class="icon">🩺</div><h3>اللوحة الصحية</h3><p>الخطوات، الوزن، النشاط، وطلبات المستوصف.</p></div><div class="card module" onclick="showPage('medicLogin')"><div class="icon">🚑</div><h3>الإسعاف الميداني</h3><p>مكتبة توعوية وصحية للمستندات والصور والفيديوهات والدروس.</p></div><div class="card module" onclick="showPage('innovationCenter')"><div class="icon">🚀</div><h3>مركز الابتكار والتطوير</h3><p>استقبال الاقتراحات، متابعة المبادرات، قياس نسبة الإنجاز، وإبراز فكرة الشهر.</p></div><div class="card module" onclick="showPage('commLogin')"><div class="icon">📡</div><h3>مركز الاتصالات</h3><p>رسائل واتساب ومراجع وملفات وصوتيات.</p></div><div class="card module" onclick="showPage('teacherLogin')"><div class="icon">🎓</div><h3>بوابة المعلم</h3><p>معايير التعليم، طرق التدريس، ومكتبة الملفات.</p></div><div class="card module" onclick="showPage('traineeLogin')"><div class="icon">🪖</div><h3>صفحة المتدربين</h3><p>بحث ذاتي آمن لعرض بيانات المتدرب واختباراته وطباعة تقريره بدون أسماء عامة.</p></div><div class="card module" onclick="showPage('reports')"><div class="icon">📊</div><h3>التقارير والإحصائيات</h3><p>تقارير A4 للقوة والوحدات والمعايير والوزن.</p></div></div></div></div></section>
+<section class="page" id="unitsLogin"></section><section class="page" id="unitsHub"></section><section class="page" id="testsHub"></section><section class="page" id="testUnitLogin"></section><section class="page" id="unitTests"></section><section class="page" id="unitLogin"></section><section class="page" id="unitDb"></section><section class="page" id="leader"></section><section class="page" id="teacherLogin"></section><section class="page" id="traineeLogin"></section><section class="page" id="healthLogin"></section><section class="page" id="trainingLogin"></section><section class="page" id="weatherLogin"></section><section class="page" id="medicLogin"></section><section class="page" id="innovationCenter"></section><section class="page" id="commLogin"></section><section class="page" id="reports"></section><section class="page" id="loginPage"></section><section class="page" id="userAdmin"></section>
 </main><div class="modalOverlay no-print" id="addModal"></div>
 <script>
 const units=[{id:'maintenance',name:'الصيانة',user:'maint',pass:'1111',icon:'⚙️'},{id:'supply',name:'الإمداد',user:'supply',pass:'2222',icon:'📦'},{id:'transport',name:'النقل',user:'transport',pass:'3333',icon:'🚚'},{id:'signal',name:'الإشارة',user:'signal',pass:'4444',icon:'📡'},{id:'tank_battalion',name:'كتيبة الدبابات',user:'tank',pass:'5555',icon:'🛡️'},{id:'infantry_battalion',name:'كتيبة المشاة',user:'infantry',pass:'6666',icon:'🪖'},{id:'engineer_battalion',name:'كتيبة المهندسين',user:'engineer',pass:'7777',icon:'⚙️'},{id:'military_police',name:'الشرطة العسكرية',user:'mp',pass:'8888',icon:'🚔'},{id:'command_company',name:'سرية القيادة',user:'command',pass:'9999',icon:'🎖️'},{id:'operation_maintenance',name:'التشغيل والصيانة',user:'opsmaint',pass:'1010',icon:'🔧'}];
@@ -1332,6 +1367,41 @@ function printHealthTable(unitName){
   }
 }
 </style>
+
+<style id="innovation-center-v1">
+/* ===== مركز الابتكار والتطوير - إضافة آمنة بدون تغيير الهوية ===== */
+.innovationHero{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:stretch;margin-bottom:18px}
+.innovationPanel{border:1px solid var(--line);background:rgba(18,27,18,.82);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.innovationPanel h3{margin:0 0 10px;color:var(--gold2)}
+.innovationBanner{border:1px solid rgba(240,206,122,.42);background:linear-gradient(135deg,rgba(200,164,93,.16),rgba(12,22,13,.82));border-radius:22px;padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.innovationBanner:before{content:"🚀";position:absolute;left:18px;top:18px;font-size:58px;opacity:.16}
+.innovationBanner h3{margin:0 0 8px;color:var(--gold2);font-size:26px}
+.innovationBanner p{margin:0;color:var(--muted);line-height:1.9}
+.innovationKpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:14px 0 20px}
+.innovationKpi{background:rgba(17,24,15,.84);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.innovationKpi b{display:block;font-size:27px;color:var(--paper);margin-bottom:5px}.innovationKpi span{font-size:12px;color:var(--muted)}
+.innovationKpi.ok b{color:var(--ok)}.innovationKpi.warn b{color:var(--warn)}.innovationKpi.gold b{color:var(--gold2)}
+.innovationFormGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.innovationFormGrid .full{grid-column:1/-1}
+.innovationCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.innovationIdea{border:1px solid var(--line);border-radius:20px;background:rgba(0,0,0,.16);padding:15px;box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.innovationIdea h4{margin:0 0 8px;color:var(--gold2);font-size:18px}.innovationIdea p{margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.innovationMeta{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.innovationMeta span{border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--gold2);font-size:12px;background:rgba(200,164,93,.07)}
+.innovationStatus{display:inline-block;border-radius:999px;padding:5px 10px;font-size:12px;border:1px solid var(--line);font-weight:700}
+.innovationStatus.new{color:var(--gold2);background:rgba(200,164,93,.10);border-color:rgba(240,206,122,.35)}
+.innovationStatus.study{color:var(--warn);background:rgba(217,150,56,.12);border-color:rgba(217,150,56,.42)}
+.innovationStatus.work{color:#cfe7ff;background:rgba(80,150,220,.12);border-color:rgba(80,150,220,.42)}
+.innovationStatus.done{color:var(--ok);background:rgba(88,184,121,.12);border-color:rgba(88,184,121,.42)}
+.innovationStatus.reject{color:#ffd5d2;background:rgba(216,93,80,.12);border-color:rgba(216,93,80,.42)}
+.innovationProgress{height:9px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:10px 0}.innovationProgress span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px}
+.innovationTools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.innovationTools .btn{padding:8px 10px;font-size:12px}
+.innovationEmpty{border:1px dashed var(--line);background:rgba(200,164,93,.06);border-radius:18px;padding:18px;text-align:center;color:var(--muted);line-height:1.8}
+.innovationFilters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.monthIdea{border:1px solid rgba(88,184,121,.40);background:linear-gradient(135deg,rgba(88,184,121,.12),rgba(12,22,13,.72));border-radius:18px;padding:14px}
+.monthIdea b{display:block;color:var(--gold2);font-size:18px;margin-bottom:6px}.monthIdea small{color:var(--muted);line-height:1.7}
+@media(max-width:900px){.innovationHero{grid-template-columns:1fr}.innovationBanner h3{font-size:22px}}
+@media print{#innovationCenter .innovationFormGrid,#innovationCenter .innovationTools,#innovationCenter .btn,#innovationCenter .innovationFilters{display:none!important}}
+</style>
 </head><body><h2>جدول التقارير الصحية - وحدة ${unitName}</h2><table><thead><tr><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>الوحدة</th><th>الطول</th><th>الوزن</th><th>BMI</th><th>حالة الوزن</th><th>الخطوات</th><th>الدقائق</th><th>الحالة الصحية</th><th>التاريخ</th><th>الوقت</th><th>الملاحظات</th><th>المرفق</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
   let w=window.open('','_blank');w.document.write(html);w.document.close();w.focus();setTimeout(()=>w.print(),300);
 }
@@ -1514,6 +1584,41 @@ function printStudentReport(){let html=document.getElementById('studentReport').
   }
 }
 </style>
+
+<style id="innovation-center-v1">
+/* ===== مركز الابتكار والتطوير - إضافة آمنة بدون تغيير الهوية ===== */
+.innovationHero{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:stretch;margin-bottom:18px}
+.innovationPanel{border:1px solid var(--line);background:rgba(18,27,18,.82);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.innovationPanel h3{margin:0 0 10px;color:var(--gold2)}
+.innovationBanner{border:1px solid rgba(240,206,122,.42);background:linear-gradient(135deg,rgba(200,164,93,.16),rgba(12,22,13,.82));border-radius:22px;padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.innovationBanner:before{content:"🚀";position:absolute;left:18px;top:18px;font-size:58px;opacity:.16}
+.innovationBanner h3{margin:0 0 8px;color:var(--gold2);font-size:26px}
+.innovationBanner p{margin:0;color:var(--muted);line-height:1.9}
+.innovationKpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:14px 0 20px}
+.innovationKpi{background:rgba(17,24,15,.84);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.innovationKpi b{display:block;font-size:27px;color:var(--paper);margin-bottom:5px}.innovationKpi span{font-size:12px;color:var(--muted)}
+.innovationKpi.ok b{color:var(--ok)}.innovationKpi.warn b{color:var(--warn)}.innovationKpi.gold b{color:var(--gold2)}
+.innovationFormGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.innovationFormGrid .full{grid-column:1/-1}
+.innovationCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.innovationIdea{border:1px solid var(--line);border-radius:20px;background:rgba(0,0,0,.16);padding:15px;box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.innovationIdea h4{margin:0 0 8px;color:var(--gold2);font-size:18px}.innovationIdea p{margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.innovationMeta{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.innovationMeta span{border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--gold2);font-size:12px;background:rgba(200,164,93,.07)}
+.innovationStatus{display:inline-block;border-radius:999px;padding:5px 10px;font-size:12px;border:1px solid var(--line);font-weight:700}
+.innovationStatus.new{color:var(--gold2);background:rgba(200,164,93,.10);border-color:rgba(240,206,122,.35)}
+.innovationStatus.study{color:var(--warn);background:rgba(217,150,56,.12);border-color:rgba(217,150,56,.42)}
+.innovationStatus.work{color:#cfe7ff;background:rgba(80,150,220,.12);border-color:rgba(80,150,220,.42)}
+.innovationStatus.done{color:var(--ok);background:rgba(88,184,121,.12);border-color:rgba(88,184,121,.42)}
+.innovationStatus.reject{color:#ffd5d2;background:rgba(216,93,80,.12);border-color:rgba(216,93,80,.42)}
+.innovationProgress{height:9px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:10px 0}.innovationProgress span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px}
+.innovationTools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.innovationTools .btn{padding:8px 10px;font-size:12px}
+.innovationEmpty{border:1px dashed var(--line);background:rgba(200,164,93,.06);border-radius:18px;padding:18px;text-align:center;color:var(--muted);line-height:1.8}
+.innovationFilters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.monthIdea{border:1px solid rgba(88,184,121,.40);background:linear-gradient(135deg,rgba(88,184,121,.12),rgba(12,22,13,.72));border-radius:18px;padding:14px}
+.monthIdea b{display:block;color:var(--gold2);font-size:18px;margin-bottom:6px}.monthIdea small{color:var(--muted);line-height:1.7}
+@media(max-width:900px){.innovationHero{grid-template-columns:1fr}.innovationBanner h3{font-size:22px}}
+@media print{#innovationCenter .innovationFormGrid,#innovationCenter .innovationTools,#innovationCenter .btn,#innovationCenter .innovationFilters{display:none!important}}
+</style>
 </head><body>${html}
 </body></html>`);w.document.close();setTimeout(()=>w.print(),300)}
 function renderReports(){let f=forceStats();document.getElementById('reports').innerHTML=`<div class="head"><div><h2>التقارير والإحصائيات</h2><p>طباعة تقارير A4 للقوة والوحدات والمعايير</p></div><button class="btn" onclick="showPage('home')">رجوع</button></div><div class="panelGrid"><div class="miniCard"><h4>تقرير القوة</h4><p>جاهزية القوة: ${f.pct}% - ${f.status}</p><button class="btn primary" onclick="printForceReport()">طباعة</button></div>${units.map(u=>`<div class="miniCard"><h4>تقرير ${u.name}</h4><p>يطبع جدول الوحدة كاملًا.</p><button class="btn primary" onclick="printUnitTable('${u.name}')">طباعة</button></div>`).join('')}</div>`}
@@ -1676,6 +1781,41 @@ function printForceReport(){let rows=units.map(u=>{let st=unitStats(u.name);retu
     font-size:12px!important;
   }
 }
+</style>
+
+<style id="innovation-center-v1">
+/* ===== مركز الابتكار والتطوير - إضافة آمنة بدون تغيير الهوية ===== */
+.innovationHero{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:stretch;margin-bottom:18px}
+.innovationPanel{border:1px solid var(--line);background:rgba(18,27,18,.82);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.innovationPanel h3{margin:0 0 10px;color:var(--gold2)}
+.innovationBanner{border:1px solid rgba(240,206,122,.42);background:linear-gradient(135deg,rgba(200,164,93,.16),rgba(12,22,13,.82));border-radius:22px;padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.innovationBanner:before{content:"🚀";position:absolute;left:18px;top:18px;font-size:58px;opacity:.16}
+.innovationBanner h3{margin:0 0 8px;color:var(--gold2);font-size:26px}
+.innovationBanner p{margin:0;color:var(--muted);line-height:1.9}
+.innovationKpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:14px 0 20px}
+.innovationKpi{background:rgba(17,24,15,.84);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.innovationKpi b{display:block;font-size:27px;color:var(--paper);margin-bottom:5px}.innovationKpi span{font-size:12px;color:var(--muted)}
+.innovationKpi.ok b{color:var(--ok)}.innovationKpi.warn b{color:var(--warn)}.innovationKpi.gold b{color:var(--gold2)}
+.innovationFormGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.innovationFormGrid .full{grid-column:1/-1}
+.innovationCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.innovationIdea{border:1px solid var(--line);border-radius:20px;background:rgba(0,0,0,.16);padding:15px;box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.innovationIdea h4{margin:0 0 8px;color:var(--gold2);font-size:18px}.innovationIdea p{margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.innovationMeta{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.innovationMeta span{border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--gold2);font-size:12px;background:rgba(200,164,93,.07)}
+.innovationStatus{display:inline-block;border-radius:999px;padding:5px 10px;font-size:12px;border:1px solid var(--line);font-weight:700}
+.innovationStatus.new{color:var(--gold2);background:rgba(200,164,93,.10);border-color:rgba(240,206,122,.35)}
+.innovationStatus.study{color:var(--warn);background:rgba(217,150,56,.12);border-color:rgba(217,150,56,.42)}
+.innovationStatus.work{color:#cfe7ff;background:rgba(80,150,220,.12);border-color:rgba(80,150,220,.42)}
+.innovationStatus.done{color:var(--ok);background:rgba(88,184,121,.12);border-color:rgba(88,184,121,.42)}
+.innovationStatus.reject{color:#ffd5d2;background:rgba(216,93,80,.12);border-color:rgba(216,93,80,.42)}
+.innovationProgress{height:9px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:10px 0}.innovationProgress span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px}
+.innovationTools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.innovationTools .btn{padding:8px 10px;font-size:12px}
+.innovationEmpty{border:1px dashed var(--line);background:rgba(200,164,93,.06);border-radius:18px;padding:18px;text-align:center;color:var(--muted);line-height:1.8}
+.innovationFilters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.monthIdea{border:1px solid rgba(88,184,121,.40);background:linear-gradient(135deg,rgba(88,184,121,.12),rgba(12,22,13,.72));border-radius:18px;padding:14px}
+.monthIdea b{display:block;color:var(--gold2);font-size:18px;margin-bottom:6px}.monthIdea small{color:var(--muted);line-height:1.7}
+@media(max-width:900px){.innovationHero{grid-template-columns:1fr}.innovationBanner h3{font-size:22px}}
+@media print{#innovationCenter .innovationFormGrid,#innovationCenter .innovationTools,#innovationCenter .btn,#innovationCenter .innovationFilters{display:none!important}}
 </style>
 </head><body><h2 style="text-align:center">تقرير جاهزية القوة</h2><table><thead><tr><th>الوحدة</th><th>الإجمالي</th><th>المجتازون</th><th>غير المجتازين</th><th>النسبة</th><th>الحالة</th><th>وزن زائد</th><th>سمنة</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);w.document.close();setTimeout(()=>w.print(),300)}
 
@@ -1993,6 +2133,41 @@ function printCertificate(unitId,examId,resultId){let e=getExam(unitId,examId);l
   }
 }
 </style>
+
+<style id="innovation-center-v1">
+/* ===== مركز الابتكار والتطوير - إضافة آمنة بدون تغيير الهوية ===== */
+.innovationHero{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:stretch;margin-bottom:18px}
+.innovationPanel{border:1px solid var(--line);background:rgba(18,27,18,.82);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.innovationPanel h3{margin:0 0 10px;color:var(--gold2)}
+.innovationBanner{border:1px solid rgba(240,206,122,.42);background:linear-gradient(135deg,rgba(200,164,93,.16),rgba(12,22,13,.82));border-radius:22px;padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.innovationBanner:before{content:"🚀";position:absolute;left:18px;top:18px;font-size:58px;opacity:.16}
+.innovationBanner h3{margin:0 0 8px;color:var(--gold2);font-size:26px}
+.innovationBanner p{margin:0;color:var(--muted);line-height:1.9}
+.innovationKpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:14px 0 20px}
+.innovationKpi{background:rgba(17,24,15,.84);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.innovationKpi b{display:block;font-size:27px;color:var(--paper);margin-bottom:5px}.innovationKpi span{font-size:12px;color:var(--muted)}
+.innovationKpi.ok b{color:var(--ok)}.innovationKpi.warn b{color:var(--warn)}.innovationKpi.gold b{color:var(--gold2)}
+.innovationFormGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.innovationFormGrid .full{grid-column:1/-1}
+.innovationCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.innovationIdea{border:1px solid var(--line);border-radius:20px;background:rgba(0,0,0,.16);padding:15px;box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.innovationIdea h4{margin:0 0 8px;color:var(--gold2);font-size:18px}.innovationIdea p{margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.innovationMeta{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.innovationMeta span{border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--gold2);font-size:12px;background:rgba(200,164,93,.07)}
+.innovationStatus{display:inline-block;border-radius:999px;padding:5px 10px;font-size:12px;border:1px solid var(--line);font-weight:700}
+.innovationStatus.new{color:var(--gold2);background:rgba(200,164,93,.10);border-color:rgba(240,206,122,.35)}
+.innovationStatus.study{color:var(--warn);background:rgba(217,150,56,.12);border-color:rgba(217,150,56,.42)}
+.innovationStatus.work{color:#cfe7ff;background:rgba(80,150,220,.12);border-color:rgba(80,150,220,.42)}
+.innovationStatus.done{color:var(--ok);background:rgba(88,184,121,.12);border-color:rgba(88,184,121,.42)}
+.innovationStatus.reject{color:#ffd5d2;background:rgba(216,93,80,.12);border-color:rgba(216,93,80,.42)}
+.innovationProgress{height:9px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:10px 0}.innovationProgress span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px}
+.innovationTools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.innovationTools .btn{padding:8px 10px;font-size:12px}
+.innovationEmpty{border:1px dashed var(--line);background:rgba(200,164,93,.06);border-radius:18px;padding:18px;text-align:center;color:var(--muted);line-height:1.8}
+.innovationFilters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.monthIdea{border:1px solid rgba(88,184,121,.40);background:linear-gradient(135deg,rgba(88,184,121,.12),rgba(12,22,13,.72));border-radius:18px;padding:14px}
+.monthIdea b{display:block;color:var(--gold2);font-size:18px;margin-bottom:6px}.monthIdea small{color:var(--muted);line-height:1.7}
+@media(max-width:900px){.innovationHero{grid-template-columns:1fr}.innovationBanner h3{font-size:22px}}
+@media print{#innovationCenter .innovationFormGrid,#innovationCenter .innovationTools,#innovationCenter .btn,#innovationCenter .innovationFilters{display:none!important}}
+</style>
 </head><body><div class="cert"><h1>شهادة اجتياز</h1><h2>نظام إدارة المقاتل الشجاع</h2><p>تُمنح هذه الشهادة للمتدرب</p><div class="name">${escapeHtml(r.rank)} / ${escapeHtml(r.name)}</div><div class="row"><div class="box">الرقم العسكري: ${escapeHtml(r.num)}</div><div class="box">الوحدة: ${escapeHtml(r.unit)}</div></div><p>لاجتيازه اختبار: <b>${escapeHtml(e.title)}</b></p><p>الدرجة: ${r.score} من ${r.total} - النسبة: ${r.percent}%</p><div class="footer"><span>التاريخ: ${r.date}</span><span>مركز التدريب</span></div></div>
 </body></html>`;let w=window.open('','_blank');w.document.write(html);w.document.close();setTimeout(()=>w.print(),300)}
 function openExamResults(unitId,examId){let e=getExam(unitId,examId);if(!e)return;let rows=(e.results||[]).map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.rank)}</td><td>${escapeHtml(r.num)}</td><td>${r.score}/${r.total}</td><td>${r.percent}%</td><td>${r.passed?'ناجح':'راسب'}</td><td>${r.violations||0}</td><td>${r.date}</td></tr>`).join('')||'<tr><td colspan="9">لا توجد نتائج حتى الآن</td></tr>';let modal=document.getElementById('addModal');modal.className='modalOverlay active examFullScreen';modal.style.display='block';modal.innerHTML=`<div class="examEditorPanel"><div class="head"><div><h2>نتائج ${escapeHtml(e.title)}</h2><p>وحدة ${unitNameById(unitId)}</p></div><button class="btn" onclick="closeExamEditor()">إغلاق</button></div><div class="card"><table><thead><tr><th>م</th><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>الدرجة</th><th>النسبة</th><th>النتيجة</th><th>التاريخ</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;}
@@ -2114,7 +2289,64 @@ function previewWeatherRecord(i){let x=weatherRecords[i]; if(!x)return; let r=we
 function deleteWeatherRecord(i){if(confirm('هل تريد حذف تحديث الطقس؟')){weatherRecords.splice(i,1);openWeatherCenter();}}
 function sendWeatherWhatsApp(i){let x=typeof i==='number'?weatherRecords[i]:weatherRecords[0]; if(!x){alert('لا يوجد تحديث طقس للإرسال');return;} let r=weatherRiskLevel(x.temp,x.humidity,x.wind,x.visibility,x.condition); let msg='🌦️ تحديث الطقس الميداني%0A%0Aالنطاق: '+encodeURIComponent(x.unit)+'%0Aالحالة: '+encodeURIComponent(x.condition)+'%0Aالحرارة: '+encodeURIComponent(x.temp)+'°C%0Aالرطوبة: '+encodeURIComponent(x.humidity)+'%25%0Aالرياح: '+encodeURIComponent(x.wind)+' كم/س%0Aالرؤية: '+encodeURIComponent(x.visibility)+' كم%0Aمستوى الخطورة: '+encodeURIComponent(r.txt)+'%0Aالتوصية: '+encodeURIComponent(r.advice)+'%0A%0Aمركز التدريب - صيانة قوة طريف'; window.open('https://wa.me/?text='+msg,'_blank');}
 
-function renderAll(){renderUnitsLogin();renderUnitsHub();renderTestsHub();renderTestUnitLogin();renderUnitTests();renderUnitLogin();renderUnitDb();renderLeader();renderLogin('teacherLogin','بوابة المعلم','معايير التعليم وطرق التدريس والمراجع والكتب وملفات PDF وصوتيات.','teacher','1234','openTeacher');openTrainee();openHealth();renderLogin('trainingLogin','مركز خطة التدريب','خاص بإضافة خطط التدريب اليومية والأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.','plan','6666','openTrainingCenter');openWeatherCenter();renderLogin('medicLogin','مركز التوعية والإسعاف الميداني','خاص بالمسعف الصحي لإضافة المستندات والصور والفيديوهات والدروس والتنبيهات الصحية.','medic','5555','openMedicCenter');renderLogin('commLogin','مركز الاتصالات','الرسائل والتنبيهات والمراجع والمستندات عبر واتساب.','comm','1234','openComm');renderReports()}
+
+/* ===== مركز الابتكار والتطوير V1 ===== */
+const INNOVATION_KEY='moqatel_innovation_center_v1';
+let innovationIdeas=[];
+function loadInnovationIdeas(){
+  try{innovationIdeas=JSON.parse(localStorage.getItem(INNOVATION_KEY)||'[]')||[]}catch(e){innovationIdeas=[]}
+  if(!innovationIdeas.length){
+    innovationIdeas=[
+      {id:'INN-'+Date.now()+'-1',date:new Date().toLocaleDateString('ar-SA'),name:'إدارة التدريب',rank:'—',num:'—',unit:'الصيانة',category:'النظام الإلكتروني',title:'إضافة عداد الخطوات للمتدربين',desc:'تطوير صفحة الصحة بحيث تسجل وقت المشي والخطوات وتعرضها للقائد.',benefits:'رفع جودة متابعة النشاط والجاهزية الصحية.',priority:'عالية',status:'تم التنفيذ',progress:100,rating:5,decision:'معتمد',fileName:''},
+      {id:'INN-'+Date.now()+'-2',date:new Date().toLocaleDateString('ar-SA'),name:'المسعف الصحي',rank:'—',num:'—',unit:'جميع الوحدات',category:'الإسعاف الميداني',title:'مكتبة إسعافات قابلة للمعاينة',desc:'تجميع المستندات والصور والفيديوهات الخاصة بالإسعاف الميداني في بطاقة مستقلة.',benefits:'تسهيل نشر التوعية الصحية للوحدات.',priority:'متوسطة',status:'قيد الدراسة',progress:45,rating:4,decision:'قيد المراجعة',fileName:''}
+    ];
+    saveInnovationIdeas();
+  }
+}
+function saveInnovationIdeas(){try{localStorage.setItem(INNOVATION_KEY,JSON.stringify(innovationIdeas))}catch(e){console.warn(e)}}
+function innovationStatusClass(s){if(s==='تم التنفيذ')return'done';if(s==='تحت التنفيذ')return'work';if(s==='قيد الدراسة')return'study';if(s==='مرفوض')return'reject';return'new'}
+function innovationProgressByStatus(s){return s==='تم التنفيذ'?100:s==='تحت التنفيذ'?70:s==='قيد الدراسة'?45:s==='مرفوض'?0:15}
+function renderInnovationCenter(){
+  loadInnovationIdeas();
+  const el=document.getElementById('innovationCenter');if(!el)return;
+  const total=innovationIdeas.length,done=innovationIdeas.filter(x=>x.status==='تم التنفيذ').length,study=innovationIdeas.filter(x=>x.status==='قيد الدراسة').length,work=innovationIdeas.filter(x=>x.status==='تحت التنفيذ').length,newCount=innovationIdeas.filter(x=>x.status==='جديد').length;
+  const pct=total?Math.round(done/total*100):0;
+  const unitCounts={};innovationIdeas.forEach(x=>{unitCounts[x.unit]=(unitCounts[x.unit]||0)+1});
+  const bestUnit=Object.entries(unitCounts).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+  const bestIdea=innovationIdeas.slice().sort((a,b)=>(b.rating||0)-(a.rating||0))[0];
+  el.innerHTML=`<div class="head"><div><h2>🚀 مركز الابتكار والتطوير</h2><p>كل فكرة تصنع مقاتلاً أفضل — استقبال الاقتراحات ومتابعة المبادرات والتحسين المستمر.</p></div><div class="actionRow"><button class="btn" onclick="showPage('home')">رجوع للرئيسية</button><button class="btn primary" onclick="printInnovationReport()">🖨️ طباعة تقرير A4</button></div></div>
+  <div class="innovationBanner"><h3>مختبر الابتكار العسكري</h3><p>هذه الصفحة مخصصة لتحويل ملاحظات الوحدات إلى مبادرات قابلة للمتابعة والتنفيذ، مع حفظ الاقتراحات محلياً داخل المتصفح حالياً، ويمكن ربطها لاحقاً بورقة Google Sheets باسم <b style="color:var(--gold2)">الاقتراحات</b>.</p></div>
+  <div class="innovationKpis">
+    <div class="innovationKpi gold"><b>${total}</b><span>إجمالي الاقتراحات</span></div><div class="innovationKpi ok"><b>${done}</b><span>تم التنفيذ</span></div><div class="innovationKpi warn"><b>${study}</b><span>قيد الدراسة</span></div><div class="innovationKpi"><b>${work}</b><span>تحت التنفيذ</span></div><div class="innovationKpi"><b>${newCount}</b><span>بانتظار القرار</span></div><div class="innovationKpi ok"><b>${pct}%</b><span>نسبة الإنجاز</span></div><div class="innovationKpi gold"><b>${escapeHtml(bestUnit)}</b><span>أفضل وحدة مشاركة</span></div>
+  </div>
+  <div class="innovationHero">
+    <div class="innovationPanel"><h3>💡 تقديم اقتراح جديد</h3><div class="innovationFormGrid">
+      <div><label>الاسم</label><input id="innName" placeholder="اختياري"></div><div><label>الرتبة</label><select id="innRank"><option>—</option>${ranks.map(r=>`<option>${r}</option>`).join('')}</select></div><div><label>الرقم العسكري</label><input id="innNum" placeholder="اختياري"></div><div><label>الوحدة</label><select id="innUnit"><option>جميع الوحدات</option>${units.map(u=>`<option>${u.name}</option>`).join('')}</select></div><div><label>التصنيف</label><select id="innCategory"><option>التدريب</option><option>السلامة</option><option>الإسعاف الميداني</option><option>الاختبارات</option><option>النظام الإلكتروني</option><option>بنك المعلومات</option><option>خطة التدريب</option><option>الطقس الميداني</option><option>الاتصالات</option><option>أخرى</option></select></div><div><label>الأولوية</label><select id="innPriority"><option>عالية</option><option>متوسطة</option><option>تطوير مستقبلي</option></select></div><div class="full"><label>عنوان الاقتراح *</label><input id="innTitle" placeholder="مثال: تحسين عرض نتائج الاختبارات"></div><div class="full"><label>وصف الفكرة *</label><textarea id="innDesc" placeholder="اكتب المشكلة أو الفكرة المقترحة"></textarea></div><div class="full"><label>الفوائد المتوقعة</label><textarea id="innBenefits" placeholder="كيف ستفيد الفكرة التدريب أو الجاهزية؟"></textarea></div><div class="full"><label>مرفق اختياري</label><input id="innFile" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*,video/*,audio/*"></div>
+    </div><div class="actionRow" style="margin-top:14px"><button class="btn primary" onclick="addInnovationIdea()">إرسال الاقتراح</button><button class="btn" onclick="clearInnovationForm()">تفريغ النموذج</button></div></div>
+    <div class="innovationPanel"><h3>🏆 فكرة الشهر</h3>${bestIdea?`<div class="monthIdea"><b>${escapeHtml(bestIdea.title)}</b><small>${escapeHtml(bestIdea.category)} — ${escapeHtml(bestIdea.unit)}<br>الحالة: ${escapeHtml(bestIdea.status)} — التقييم: ${'⭐'.repeat(bestIdea.rating||0)}</small></div>`:'<div class="innovationEmpty">لا توجد أفكار بعد.</div>'}<h3 style="margin-top:16px">📌 مراحل الاقتراح</h3><div class="noteBox">تم الاستلام ← المراجعة ← اعتماد القائد ← التنفيذ ← الاختبار ← تم التنفيذ</div><h3 style="margin-top:16px">🔍 البحث والتصفية</h3><div class="innovationFilters"><input id="innSearch" placeholder="بحث بالعنوان أو الاسم" oninput="renderInnovationList()"><select id="innStatusFilter" onchange="renderInnovationList()"><option value="all">كل الحالات</option><option>جديد</option><option>قيد الدراسة</option><option>تحت التنفيذ</option><option>تم التنفيذ</option><option>مرفوض</option></select></div></div>
+  </div>
+  <div class="innovationPanel"><h3>📊 لوحة متابعة الاقتراحات</h3><div id="innovationList" class="innovationCards"></div></div>`;
+  renderInnovationList();
+}
+function addInnovationIdea(){
+  const title=(document.getElementById('innTitle')||{}).value?.trim();const desc=(document.getElementById('innDesc')||{}).value?.trim();
+  if(!title||!desc){alert('فضلاً أدخل عنوان الاقتراح ووصف الفكرة');return}
+  const file=(document.getElementById('innFile')||{}).files?.[0];
+  innovationIdeas.unshift({id:'INN-'+Date.now(),date:new Date().toLocaleDateString('ar-SA'),name:(document.getElementById('innName').value||'غير محدد'),rank:document.getElementById('innRank').value,num:(document.getElementById('innNum').value||'—'),unit:document.getElementById('innUnit').value,category:document.getElementById('innCategory').value,title,desc,benefits:document.getElementById('innBenefits').value||'—',priority:document.getElementById('innPriority').value,status:'جديد',progress:15,rating:0,decision:'بانتظار القرار',fileName:file?file.name:''});
+  saveInnovationIdeas();clearInnovationForm();renderInnovationCenter();alert('✅ تم استلام الاقتراح وسيتم مراجعته من قبل إدارة التدريب');
+}
+function clearInnovationForm(){['innName','innNum','innTitle','innDesc','innBenefits'].forEach(id=>{let e=document.getElementById(id);if(e)e.value=''});let f=document.getElementById('innFile');if(f)f.value=''}
+function renderInnovationList(){
+  const box=document.getElementById('innovationList');if(!box)return;let q=(document.getElementById('innSearch')?.value||'').trim().toLowerCase();let st=document.getElementById('innStatusFilter')?.value||'all';
+  let list=innovationIdeas.filter(x=>(st==='all'||x.status===st)&&(!q||[x.title,x.name,x.unit,x.category,x.desc].join(' ').toLowerCase().includes(q)));
+  box.innerHTML=list.map((x,i)=>`<div class="innovationIdea"><div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><h4>💡 ${escapeHtml(x.title)}</h4><span class="innovationStatus ${innovationStatusClass(x.status)}">${escapeHtml(x.status)}</span></div><p>${escapeHtml(x.desc)}</p><div class="innovationMeta"><span>${escapeHtml(x.unit)}</span><span>${escapeHtml(x.category)}</span><span>${escapeHtml(x.priority)}</span><span>${escapeHtml(x.date)}</span>${x.fileName?`<span>📎 ${escapeHtml(x.fileName)}</span>`:''}</div><p><b style="color:var(--gold2)">الفائدة:</b> ${escapeHtml(x.benefits||'—')}</p><div class="innovationProgress"><span style="width:${Number(x.progress||0)}%"></span></div><small style="color:var(--muted)">نسبة الإنجاز: ${Number(x.progress||0)}% — القرار: ${escapeHtml(x.decision||'بانتظار القرار')} — التقييم: ${x.rating?('⭐'.repeat(x.rating)):'لم يقيّم'}</small><div class="innovationTools"><button class="btn" onclick="updateInnovationStatus('${x.id}','قيد الدراسة')">قيد الدراسة</button><button class="btn" onclick="updateInnovationStatus('${x.id}','تحت التنفيذ')">تحت التنفيذ</button><button class="btn primary" onclick="updateInnovationStatus('${x.id}','تم التنفيذ')">تم التنفيذ</button><button class="btn" onclick="rateInnovation('${x.id}')">تقييم</button><button class="btn danger" onclick="deleteInnovationIdea('${x.id}')">حذف</button></div></div>`).join('')||'<div class="innovationEmpty">لا توجد اقتراحات مطابقة. أضف اقتراحاً جديداً ليظهر هنا.</div>';
+}
+function updateInnovationStatus(id,status){let x=innovationIdeas.find(a=>a.id===id);if(!x)return;x.status=status;x.progress=innovationProgressByStatus(status);x.decision=status==='تم التنفيذ'?'معتمد ومنفذ':status==='تحت التنفيذ'?'معتمد وتحت التنفيذ':status==='قيد الدراسة'?'قيد المراجعة':'بانتظار القرار';saveInnovationIdeas();renderInnovationCenter()}
+function rateInnovation(id){let v=prompt('أدخل تقييم القائد من 1 إلى 5','5');v=Math.max(1,Math.min(5,parseInt(v||'0',10)||0));let x=innovationIdeas.find(a=>a.id===id);if(x){x.rating=v;saveInnovationIdeas();renderInnovationCenter()}}
+function deleteInnovationIdea(id){if(confirm('هل تريد حذف هذا الاقتراح؟')){innovationIdeas=innovationIdeas.filter(x=>x.id!==id);saveInnovationIdeas();renderInnovationCenter()}}
+function printInnovationReport(){showPage('innovationCenter');setTimeout(()=>window.print(),200)}
+
+function renderAll(){renderUnitsLogin();renderUnitsHub();renderTestsHub();renderTestUnitLogin();renderUnitTests();renderUnitLogin();renderUnitDb();renderLeader();renderLogin('teacherLogin','بوابة المعلم','معايير التعليم وطرق التدريس والمراجع والكتب وملفات PDF وصوتيات.','teacher','1234','openTeacher');openTrainee();openHealth();renderLogin('trainingLogin','مركز خطة التدريب','خاص بإضافة خطط التدريب اليومية والأسبوعية لجميع الوحدات مع إرفاق PDF وWord وExcel.','plan','6666','openTrainingCenter');openWeatherCenter();renderLogin('medicLogin','مركز التوعية والإسعاف الميداني','خاص بالمسعف الصحي لإضافة المستندات والصور والفيديوهات والدروس والتنبيهات الصحية.','medic','5555','openMedicCenter');renderInnovationCenter();renderLogin('commLogin','مركز الاتصالات','الرسائل والتنبيهات والمراجع والمستندات عبر واتساب.','comm','1234','openComm');renderReports()}
 renderAll();
 </script>
 <!-- V7: أزرار عائمة آمنة لا تكسر سكربت البطائق -->
@@ -2279,7 +2511,42 @@ renderAll();
   '</div>';}
   function resultsTable(unitId){var rows=allUnitResults(unitId);if(!rows.length)return '<div class="noteBox">لا توجد نتائج مسجلة حتى الآن.</div>';return '<div class="table-wrap"><table><thead><tr><th>م</th><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>الاختبار</th><th>الدرجة</th><th>النسبة</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>'+rows.map(function(x,i){var r=x.result,e=x.exam;return '<tr><td>'+(i+1)+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.rank)+'</td><td>'+esc(r.num)+'</td><td>'+esc(e.title)+'</td><td>'+esc(r.score)+'/'+esc(r.total)+'</td><td>'+esc(r.percent)+'%</td><td>'+(r.passed?'<span class="pass">ناجح</span>':'<span class="fail">راسب</span>')+'</td><td>'+esc(r.date)+'</td></tr>'}).join('')+'</tbody></table></div>';}
   window.exportUnitResultsExcel=function(unitId){unitId=normalizeUnit(unitId);var rows=allUnitResults(unitId);var csv='الاسم,الرتبة,الرقم العسكري,الوحدة,الاختبار,الدرجة,الإجمالي,النسبة,الحالة,التاريخ\n';rows.forEach(function(x){var r=x.result,e=x.exam;csv+=[r.name,r.rank,r.num,unitTitle(unitId),e.title,r.score,r.total,r.percent,(r.passed?'ناجح':'راسب'),r.date].map(function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'}).join(',')+'\n'});var blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='نتائج-'+unitTitle(unitId)+'.csv';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},1000)};
-  window.exportUnitResultsPDF=function(unitId){unitId=normalizeUnit(unitId);var w=window.open('','_blank');var html='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>نتائج '+esc(unitTitle(unitId))+'</title><style>@page{size:A4 landscape;margin:8mm}body{font-family:Tahoma;color:#111}h1{text-align:center}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #333;padding:6px;text-align:center}th{background:#eee}</style></head><body><h1>نتائج اختبارات وحدة '+esc(unitTitle(unitId))+'</h1>'+resultsTable(unitId).replace(/class="[^"]*"/g,'')+'</body></html>';w.document.write(html);w.document.close();setTimeout(function(){w.print()},300)};
+  window.exportUnitResultsPDF=function(unitId){unitId=normalizeUnit(unitId);var w=window.open('','_blank');var html='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>نتائج '+esc(unitTitle(unitId))+'</title><style>@page{size:A4 landscape;margin:8mm}body{font-family:Tahoma;color:#111}h1{text-align:center}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #333;padding:6px;text-align:center}th{background:#eee}</style>
+<style id="innovation-center-v1">
+/* ===== مركز الابتكار والتطوير - إضافة آمنة بدون تغيير الهوية ===== */
+.innovationHero{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:stretch;margin-bottom:18px}
+.innovationPanel{border:1px solid var(--line);background:rgba(18,27,18,.82);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.innovationPanel h3{margin:0 0 10px;color:var(--gold2)}
+.innovationBanner{border:1px solid rgba(240,206,122,.42);background:linear-gradient(135deg,rgba(200,164,93,.16),rgba(12,22,13,.82));border-radius:22px;padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.innovationBanner:before{content:"🚀";position:absolute;left:18px;top:18px;font-size:58px;opacity:.16}
+.innovationBanner h3{margin:0 0 8px;color:var(--gold2);font-size:26px}
+.innovationBanner p{margin:0;color:var(--muted);line-height:1.9}
+.innovationKpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:14px 0 20px}
+.innovationKpi{background:rgba(17,24,15,.84);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.innovationKpi b{display:block;font-size:27px;color:var(--paper);margin-bottom:5px}.innovationKpi span{font-size:12px;color:var(--muted)}
+.innovationKpi.ok b{color:var(--ok)}.innovationKpi.warn b{color:var(--warn)}.innovationKpi.gold b{color:var(--gold2)}
+.innovationFormGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.innovationFormGrid .full{grid-column:1/-1}
+.innovationCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.innovationIdea{border:1px solid var(--line);border-radius:20px;background:rgba(0,0,0,.16);padding:15px;box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.innovationIdea h4{margin:0 0 8px;color:var(--gold2);font-size:18px}.innovationIdea p{margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.innovationMeta{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.innovationMeta span{border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--gold2);font-size:12px;background:rgba(200,164,93,.07)}
+.innovationStatus{display:inline-block;border-radius:999px;padding:5px 10px;font-size:12px;border:1px solid var(--line);font-weight:700}
+.innovationStatus.new{color:var(--gold2);background:rgba(200,164,93,.10);border-color:rgba(240,206,122,.35)}
+.innovationStatus.study{color:var(--warn);background:rgba(217,150,56,.12);border-color:rgba(217,150,56,.42)}
+.innovationStatus.work{color:#cfe7ff;background:rgba(80,150,220,.12);border-color:rgba(80,150,220,.42)}
+.innovationStatus.done{color:var(--ok);background:rgba(88,184,121,.12);border-color:rgba(88,184,121,.42)}
+.innovationStatus.reject{color:#ffd5d2;background:rgba(216,93,80,.12);border-color:rgba(216,93,80,.42)}
+.innovationProgress{height:9px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:10px 0}.innovationProgress span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px}
+.innovationTools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.innovationTools .btn{padding:8px 10px;font-size:12px}
+.innovationEmpty{border:1px dashed var(--line);background:rgba(200,164,93,.06);border-radius:18px;padding:18px;text-align:center;color:var(--muted);line-height:1.8}
+.innovationFilters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.monthIdea{border:1px solid rgba(88,184,121,.40);background:linear-gradient(135deg,rgba(88,184,121,.12),rgba(12,22,13,.72));border-radius:18px;padding:14px}
+.monthIdea b{display:block;color:var(--gold2);font-size:18px;margin-bottom:6px}.monthIdea small{color:var(--muted);line-height:1.7}
+@media(max-width:900px){.innovationHero{grid-template-columns:1fr}.innovationBanner h3{font-size:22px}}
+@media print{#innovationCenter .innovationFormGrid,#innovationCenter .innovationTools,#innovationCenter .btn,#innovationCenter .innovationFilters{display:none!important}}
+</style>
+</head><body><h1>نتائج اختبارات وحدة '+esc(unitTitle(unitId))+'</h1>'+resultsTable(unitId).replace(/class="[^"]*"/g,'')+'</body></html>';w.document.write(html);w.document.close();setTimeout(function(){w.print()},300)};
   function examCards(unitId){var exams=getExams(unitId).filter(function(e){return e && (e.sent || (e.questions||[]).length>0 || e.status==='جاهز')});if(!exams.length)return '<div class="card"><h3 style="color:var(--gold2)">لا توجد اختبارات جاهزة</h3><p style="color:var(--muted)">بعد حفظ الأسئلة أو إرسال الاختبار للوحدة سيظهر هنا تلقائياً.</p></div>';return exams.map(function(e){var direct=window.buildExamLink(unitId,e.id);var res=e.results||[];var pass=res.filter(function(r){return r.passed}).length;return '<div class="card unitTraineeExamCard"><h3>'+esc(e.title||'اختبار بدون عنوان')+'</h3><span class="unitTraineeStatus">'+esc(stText(e))+'</span><div class="meta">عدد الأسئلة: '+((e.questions||[]).length)+'<br>الموعد: '+esc(e.startDate||'-')+' '+esc(e.startTime||'')+'<br>المدة: '+esc(e.duration||30)+' دقيقة<br>النتائج: '+res.length+' مختبر / '+pass+' ناجح</div><div class="unitTraineeLinkBox">'+esc(direct)+'</div><div class="actionRow" style="margin-top:12px"><button class="btn primary" onclick="openTraineeExam(\''+unitId+'\',\''+e.id+'\')">دخول الاختبار</button><button class="btn" onclick="copyExamLink(\''+unitId+'\',\''+e.id+'\')">نسخ رابط الاختبار</button></div></div>'}).join('')}
   window.openUnitTraineeExamPage=function(unitId){unitId=normalizeUnit(unitId);var u=unitObj(unitId);var page=ensurePage();page.innerHTML='<div class="unitTraineeHero"><div class="head" style="margin-bottom:0"><div><h2>'+(u.icon||'📝')+' صفحة مختبرين وحدة '+esc(u.name)+'</h2><p>الاختبارات المخصصة لهذه الوحدة تظهر هنا تلقائياً بعد حفظ الأسئلة أو الإرسال.</p></div><div class="actionRow no-print"><button class="btn" onclick="showPage(\'testsHub\')">رجوع للاختبارات</button><button class="btn primary" onclick="copyUnitTraineePageLink(\''+unitId+'\')">نسخ رابط صفحة الوحدة</button></div></div><div class="unitTraineeLinkBox">'+esc(window.buildUnitTraineePageLink(unitId))+'</div></div>'+dash(unitId)+'<div class="unitTraineeExamGrid">'+examCards(unitId)+'</div><h3 class="sectionTitle">لوحة نتائج الوحدة</h3><div class="actionRow no-print"><button class="btn" onclick="exportUnitResultsPDF(\''+unitId+'\')">تصدير PDF</button><button class="btn" onclick="exportUnitResultsExcel(\''+unitId+'\')">تصدير Excel</button></div>'+resultsTable(unitId);if(typeof showPage==='function')showPage('unitTraineeExamPage')};
   var oldRenderUnitTests=window.renderUnitTests;
@@ -2292,7 +2559,42 @@ renderAll();
   window.addQuestionToExam=function(){if(typeof oldAddQ==='function')oldAddQ.apply(this,arguments);try{var e=examById(examEditor.unitId,examEditor.examId);if(e){e.status=e.sent?'جاهز':'قيد الإعداد';if(typeof saveExamStore==='function')saveExamStore()}}catch(err){}};
   var oldSubmit=window.submitTraineeExam;
   window.submitTraineeExam=function(ev,unitId,examId){try{var e=examById(unitId,examId);if(e){var fd=new FormData(ev.target);var num=String(fd.get('num')||'').trim();if((e.results||[]).some(function(r){return String(r.num)===num})){var code=prompt('هذا الرقم العسكري سبق أن اختبر. أدخل رمز القائد للسماح بالإعادة:');if(code!==RETAKE_CODE){ev.preventDefault();toast('تم منع إعادة الاختبار بدون إذن القائد',false);return} e.results=e.results.filter(function(r){return String(r.num)!==num}); if(typeof saveExamStore==='function')saveExamStore();}}}catch(err){} if(typeof oldSubmit==='function')return oldSubmit.apply(this,arguments)};
-  window.printUnitTable=function(unitName){var st=unitStats(unitName);var rows=st.list.map(function(t){return '<tr><td>'+esc(t.name)+'</td><td>'+esc(t.rank)+'</td><td>'+esc(t.num)+'</td><td>'+esc(t.phone||'—')+'</td><td>'+esc(t.unit)+'</td>'+skills.map(function(s,i){return '<td>'+(t.s[i]?'✅ اجتاز':'❌ لم يجتاز')+'</td>'}).join('')+'<td>'+esc(bmi(t))+'</td><td>'+(ready(t)?'جاهز':'غير جاهز')+'</td></tr>'}).join('');var html='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>طباعة جدول '+esc(unitName)+'</title><style>@page{size:A4 landscape;margin:7mm}body{font-family:Tahoma,Arial,sans-serif;color:#000;margin:0}h1{text-align:center;margin:0 0 4px;font-size:18px}.sub{text-align:center;margin-bottom:10px;font-size:12px}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border:1px solid #333;padding:4px;text-align:center;white-space:nowrap}th{background:#e6e6e6;font-weight:bold}</style></head><body><h1>جدول متدربي وحدة '+esc(unitName)+'</h1><div class="sub">نظام إدارة المقاتل الشجاع - صيانة قوة طريف</div><table><thead><tr><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>رقم الجوال</th><th>الوحدة</th>'+skills.map(function(s){return '<th>'+esc(s)+'</th>'}).join('')+'<th>حالة الوزن</th><th>الجاهزية</th></tr></thead><tbody>'+rows+'</tbody></table></body></html>';var w=window.open('','_blank');w.document.write(html);w.document.close();setTimeout(function(){w.print()},300)};
+  window.printUnitTable=function(unitName){var st=unitStats(unitName);var rows=st.list.map(function(t){return '<tr><td>'+esc(t.name)+'</td><td>'+esc(t.rank)+'</td><td>'+esc(t.num)+'</td><td>'+esc(t.phone||'—')+'</td><td>'+esc(t.unit)+'</td>'+skills.map(function(s,i){return '<td>'+(t.s[i]?'✅ اجتاز':'❌ لم يجتاز')+'</td>'}).join('')+'<td>'+esc(bmi(t))+'</td><td>'+(ready(t)?'جاهز':'غير جاهز')+'</td></tr>'}).join('');var html='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>طباعة جدول '+esc(unitName)+'</title><style>@page{size:A4 landscape;margin:7mm}body{font-family:Tahoma,Arial,sans-serif;color:#000;margin:0}h1{text-align:center;margin:0 0 4px;font-size:18px}.sub{text-align:center;margin-bottom:10px;font-size:12px}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border:1px solid #333;padding:4px;text-align:center;white-space:nowrap}th{background:#e6e6e6;font-weight:bold}</style>
+<style id="innovation-center-v1">
+/* ===== مركز الابتكار والتطوير - إضافة آمنة بدون تغيير الهوية ===== */
+.innovationHero{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:stretch;margin-bottom:18px}
+.innovationPanel{border:1px solid var(--line);background:rgba(18,27,18,.82);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.innovationPanel h3{margin:0 0 10px;color:var(--gold2)}
+.innovationBanner{border:1px solid rgba(240,206,122,.42);background:linear-gradient(135deg,rgba(200,164,93,.16),rgba(12,22,13,.82));border-radius:22px;padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.innovationBanner:before{content:"🚀";position:absolute;left:18px;top:18px;font-size:58px;opacity:.16}
+.innovationBanner h3{margin:0 0 8px;color:var(--gold2);font-size:26px}
+.innovationBanner p{margin:0;color:var(--muted);line-height:1.9}
+.innovationKpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:14px 0 20px}
+.innovationKpi{background:rgba(17,24,15,.84);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.innovationKpi b{display:block;font-size:27px;color:var(--paper);margin-bottom:5px}.innovationKpi span{font-size:12px;color:var(--muted)}
+.innovationKpi.ok b{color:var(--ok)}.innovationKpi.warn b{color:var(--warn)}.innovationKpi.gold b{color:var(--gold2)}
+.innovationFormGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.innovationFormGrid .full{grid-column:1/-1}
+.innovationCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.innovationIdea{border:1px solid var(--line);border-radius:20px;background:rgba(0,0,0,.16);padding:15px;box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.innovationIdea h4{margin:0 0 8px;color:var(--gold2);font-size:18px}.innovationIdea p{margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.innovationMeta{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.innovationMeta span{border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--gold2);font-size:12px;background:rgba(200,164,93,.07)}
+.innovationStatus{display:inline-block;border-radius:999px;padding:5px 10px;font-size:12px;border:1px solid var(--line);font-weight:700}
+.innovationStatus.new{color:var(--gold2);background:rgba(200,164,93,.10);border-color:rgba(240,206,122,.35)}
+.innovationStatus.study{color:var(--warn);background:rgba(217,150,56,.12);border-color:rgba(217,150,56,.42)}
+.innovationStatus.work{color:#cfe7ff;background:rgba(80,150,220,.12);border-color:rgba(80,150,220,.42)}
+.innovationStatus.done{color:var(--ok);background:rgba(88,184,121,.12);border-color:rgba(88,184,121,.42)}
+.innovationStatus.reject{color:#ffd5d2;background:rgba(216,93,80,.12);border-color:rgba(216,93,80,.42)}
+.innovationProgress{height:9px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:10px 0}.innovationProgress span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:999px}
+.innovationTools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.innovationTools .btn{padding:8px 10px;font-size:12px}
+.innovationEmpty{border:1px dashed var(--line);background:rgba(200,164,93,.06);border-radius:18px;padding:18px;text-align:center;color:var(--muted);line-height:1.8}
+.innovationFilters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.monthIdea{border:1px solid rgba(88,184,121,.40);background:linear-gradient(135deg,rgba(88,184,121,.12),rgba(12,22,13,.72));border-radius:18px;padding:14px}
+.monthIdea b{display:block;color:var(--gold2);font-size:18px;margin-bottom:6px}.monthIdea small{color:var(--muted);line-height:1.7}
+@media(max-width:900px){.innovationHero{grid-template-columns:1fr}.innovationBanner h3{font-size:22px}}
+@media print{#innovationCenter .innovationFormGrid,#innovationCenter .innovationTools,#innovationCenter .btn,#innovationCenter .innovationFilters{display:none!important}}
+</style>
+</head><body><h1>جدول متدربي وحدة '+esc(unitName)+'</h1><div class="sub">نظام إدارة المقاتل الشجاع - صيانة قوة طريف</div><table><thead><tr><th>الاسم</th><th>الرتبة</th><th>الرقم العسكري</th><th>رقم الجوال</th><th>الوحدة</th>'+skills.map(function(s){return '<th>'+esc(s)+'</th>'}).join('')+'<th>حالة الوزن</th><th>الجاهزية</th></tr></thead><tbody>'+rows+'</tbody></table></body></html>';var w=window.open('','_blank');w.document.write(html);w.document.close();setTimeout(function(){w.print()},300)};
   window.renderLeader=function(){try{var f=forceStats();var totalSkillChecks=trainees.length*skills.length;var totalPassedSkills=trainees.reduce(function(sum,t){return sum+t.s.filter(Boolean).length},0);var op=totalSkillChecks?Math.round(totalPassedSkills/totalSkillChecks*100):0;var urows=getUnitList().map(function(u){return {unit:u,st:unitStats(u.name)}}).sort(function(a,b){return b.st.pct-a.st.pct});var over=trainees.filter(function(t){return bmi(t)==='وزن زائد'}).length;var obese=trainees.filter(function(t){return bmi(t)==='سمنة'}).length;var urgent=[];skills.forEach(function(s,i){trainees.filter(function(t){return !t.s[i]}).slice(0,4).forEach(function(t){urgent.push({name:t.name,unit:t.unit,rank:t.rank,reason:s,type:'تدريب'})})});trainees.filter(function(t){return bmi(t)==='سمنة'}).forEach(function(t){urgent.push({name:t.name,unit:t.unit,rank:t.rank,reason:'سمنة',type:'صحي'})});urgent=urgent.slice(0,12);var html='<div class="head"><div><h2>لوحة القائد الاستراتيجية</h2><p>جاهزية القوة، ترتيب الوحدات، والمؤشرات التشغيلية</p></div><button class="btn no-print" onclick="showPage(\'home\')">رجوع</button></div>'+'<div class="kpis"><div class="kpi"><b>'+f.total+'</b><span>إجمالي القوة</span></div><div class="kpi ok"><b>'+f.passed+'</b><span>جاهزون بالكامل</span></div><div class="kpi bad"><b>'+f.fail+'</b><span>يحتاجون متابعة</span></div><div class="kpi ok"><b>'+f.pct+'%</b><span>جاهزية القوة</span></div><div class="kpi"><b>'+op+'%</b><span>القوة التشغيلية</span></div><div class="kpi"><b>'+f.status+'</b><span>حالة القوة</span></div><div class="kpi warn"><b>'+over+'</b><span>وزن زائد</span></div><div class="kpi bad"><b>'+obese+'</b><span>سمنة</span></div></div>'+'<h3 class="sectionTitle">جاهزية الوحدات وترتيبها</h3><div class="grid">'+urows.map(function(r,i){return '<div class="card"><h3 style="color:var(--gold2)">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':'▫️')+' '+(r.unit.icon||'')+' '+esc(r.unit.name)+'</h3><div class="kpis"><div class="kpi"><b>'+r.st.total+'</b><span>الأفراد</span></div><div class="kpi"><b>'+r.st.pct+'%</b><span>جاهزية الوحدة</span></div><div class="kpi bad"><b>'+r.st.fail+'</b><span>غير جاهزين</span></div></div><p style="color:var(--muted);font-size:12px;margin-top:10px">الحالة: '+esc(r.st.status)+'</p></div>'}).join('')+'</div>';var el=$id('leader');if(el)el.innerHTML=html}catch(err){console.error(err)}};
   function route(){var h=decodeURIComponent(location.hash||'');var m;if(!h)return;m=h.match(/^#exams-([^?]+)/);if(m){setTimeout(function(){openUnitTraineeExamPage(normalizeUnit(m[1]))},100);return}m=h.match(/^#exam-([^?]+)\?id=([^&]+)/);if(m){setTimeout(function(){openTraineeExam(normalizeUnit(m[1]),m[2])},100);return}m=h.match(/^#exam\?unit=([^&]+)&id=([^&]+)/);if(m){setTimeout(function(){openTraineeExam(normalizeUnit(m[1]),m[2])},100)}}
   window.addEventListener('hashchange',route);
