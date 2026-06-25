@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>رابط المتدربين الصحي - نظام إدارة المقاتل الشجاع</title>
+<style>
+:root{--deep:#10150f;--panel:rgba(18,27,18,.82);--panel2:rgba(28,42,28,.86);--gold:#c8a45d;--gold2:#f0ce7a;--paper:#fff8e9;--muted:#d7c7a5;--line:rgba(240,206,122,.28);--ok:#58b879;--bad:#d85d50;--warn:#d99638;--blue:#68a7ff;--shadow:0 16px 45px rgba(0,0,0,.32)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Tahoma,Arial,sans-serif;color:var(--paper);overflow-x:hidden}
+body{background:#111}
+body:before{content:"";position:fixed;inset:0;z-index:-3;background:url('background.png') center/cover no-repeat}
+body:after{content:"";position:fixed;inset:0;z-index:-2;background:linear-gradient(90deg,rgba(9,15,9,.78),rgba(15,22,13,.50),rgba(9,15,9,.80))}
+.top{position:sticky;top:0;z-index:50;background:rgba(12,20,12,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topin{max-width:1150px;margin:auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}.mark{width:46px;height:46px;border:2px solid var(--gold);display:grid;place-items:center;color:var(--gold2);font-weight:900;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.brand h1{font-size:20px;margin:0;color:var(--paper)}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--paper);padding:10px 15px;border-radius:12px;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;touch-action:manipulation}
+.btn.primary{background:var(--gold);color:#161a12;font-weight:800;border-color:var(--gold)}
+.btn.danger{background:rgba(216,93,80,.18);border-color:rgba(216,93,80,.55)}
+.btn.okbtn{background:rgba(88,184,121,.18);border-color:rgba(88,184,121,.55)}
+.btn:hover{filter:brightness(1.08)}.page{max-width:1150px;margin:auto;padding:28px 16px 70px}
+.heroBox{background:linear-gradient(135deg,rgba(18,27,18,.75),rgba(18,27,18,.42));border:1px solid var(--line);box-shadow:var(--shadow);border-radius:24px;padding:28px;margin-bottom:18px}
+.eyebrow{color:var(--gold2);letter-spacing:1.5px;font-size:12px}.heroBox h2{font-size:clamp(28px,5vw,48px);margin:10px 0;line-height:1.25}.heroBox p{color:var(--muted);line-height:1.9;margin:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow);backdrop-filter:blur(5px)}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:start}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field label{display:block;color:var(--gold2);font-size:13px;margin-bottom:7px;font-weight:700}
+input,select,textarea{width:100%;border:1px solid var(--line);background:rgba(8,13,8,.72);color:var(--paper);border-radius:12px;padding:12px;font-family:inherit;font-size:15px}
+select option{background:#10150f;color:#fff8e9}textarea{min-height:86px;resize:vertical}.full{grid-column:1/-1}
+.hint{color:var(--muted);font-size:13px;line-height:1.8;margin-top:12px}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.kpi{background:rgba(17,24,15,.84);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center}
+.kpi b{display:block;font-size:26px;color:var(--paper);margin-bottom:5px}.kpi span{font-size:12px;color:var(--muted)}
+.kpi.ok b{color:var(--ok)}.kpi.bad b{color:var(--bad)}.kpi.warn b{color:var(--warn)}.kpi.blue b{color:var(--blue)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.notice{border:1px dashed var(--line);background:rgba(200,164,93,.10);border-radius:16px;padding:12px;color:var(--muted);line-height:1.8;font-size:13px}
+.success{border-color:rgba(88,184,121,.45);background:rgba(88,184,121,.12);color:#d9ffe3}.error{border-color:rgba(216,93,80,.45);background:rgba(216,93,80,.12);color:#ffd6d2}.preview{display:none;margin-top:14px}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 10px;margin:3px;color:var(--gold2);font-size:12px}
+.walkBox{margin:14px 0;border:1px solid var(--line);background:rgba(17,24,15,.72);border-radius:20px;padding:16px}
+.walkTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.walkTitle h3{margin:0;color:var(--gold2);font-size:17px}.walkState{border:1px solid var(--line);border-radius:999px;padding:7px 12px;color:var(--muted);font-size:12px}
+.walkKpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}.walkKpi{background:rgba(8,13,8,.65);border:1px solid var(--line);border-radius:16px;padding:13px;text-align:center}.walkKpi b{display:block;font-size:24px;color:var(--gold2);margin-bottom:4px}.walkKpi span{font-size:12px;color:var(--muted)}
+.walkBtns{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.walkMsg{margin-top:10px;color:var(--muted);font-size:13px;line-height:1.8;text-align:center}.progress{height:12px;border:1px solid var(--line);background:rgba(8,13,8,.70);border-radius:999px;overflow:hidden;margin-top:12px}.progress i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+@media(max-width:860px){.grid{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.topin{justify-content:center;text-align:center}.brand{justify-content:center}.kpis{grid-template-columns:repeat(2,1fr)}.walkBtns{grid-template-columns:1fr 1fr}.walkKpis{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:460px){.kpis{grid-template-columns:1fr}.heroBox,.card{padding:16px}.page{padding-inline:10px}.actions .btn{width:100%;text-align:center}.walkKpis{grid-template-columns:1fr}.walkBtns{grid-template-columns:1fr}.walkBtns .btn{width:100%}}
+</style>
+</head>
+<body>
+<header class="top"><div class="topin"><div class="brand"><div class="mark">⌖</div><div><h1>نظام إدارة المقاتل الشجاع</h1><p>صيانة قوة طريف</p></div></div><a class="btn" href="index.html">العودة للرئيسية</a></div></header>
+<main class="page">
+  <section class="heroBox">
+    <div class="eyebrow">TRAINEE HEALTH ENTRY</div>
+    <h2>رابط المتدربين الصحي</h2>
+    <p>هذه الصفحة مخصصة للمتدرب فقط لإرسال بياناته الصحية اليومية. تم دمج عداد الخطوات والمؤقت داخل نفس الصفحة، ويتم حفظ البيانات في Google Sheets بنفس الربط الحالي.</p>
+  </section>
+  <section class="grid">
+    <div class="card">
+      <h3 style="color:var(--gold2);margin-top:0">تعبئة التقرير الصحي</h3>
+      <form id="healthForm">
+        <div class="formgrid">
+          <div class="field"><label>الاسم *</label><input id="name" required placeholder="اكتب الاسم الثلاثي"></div>
+          <div class="field"><label>الرتبة *</label><select id="rank" required><option value="">اختر الرتبة</option><option>لواء</option><option>عميد</option><option>عقيد</option><option>مقدم</option><option>رائد</option><option>نقيب</option><option>ملازم أول</option><option>ملازم</option><option>رئيس رقباء</option><option>رقيب أول</option><option>رقيب</option><option>وكيل رقيب</option><option>عريف</option><option>جندي أول</option><option>جندي</option></select></div>
+          <div class="field"><label>الرقم العسكري *</label><input id="militaryId" required inputmode="numeric" placeholder="مثال: 1001"></div>
+          <div class="field"><label>الوحدة *</label><select id="unit" required><option value="">اختر الوحدة</option><option>الصيانة</option><option>الإمداد</option><option>النقل</option><option>الإشارة</option><option>كتيبة الدبابات</option><option>كتيبة المشاة</option><option>كتيبة المهندسين</option><option>الشرطة العسكرية</option><option>سرية القيادة</option><option>التشغيل والصيانة</option></select></div>
+          <div class="field"><label>الطول سم *</label><input id="height" required type="number" min="100" max="230" placeholder="مثال: 175"></div>
+          <div class="field"><label>الوزن كجم *</label><input id="weight" required type="number" min="30" max="220" step="0.1" placeholder="مثال: 82"></div>
+          <div class="field"><label>عدد الخطوات *</label><input id="steps" required type="number" min="0" max="100000" placeholder="سيتم تعبئته من العداد"></div>
+          <div class="field"><label>الدقائق الرياضية</label><input id="minutes" type="number" min="0" max="600" placeholder="يتم تعبئته من المؤقت"></div>
+        </div>
+
+        <div class="walkBox">
+          <div class="walkTitle">
+            <h3>🚶 عداد الخطوات والمؤقت</h3>
+            <div class="walkState" id="walkState">الحالة: متوقف</div>
+          </div>
+          <div class="walkKpis">
+            <div class="walkKpi"><b id="liveSteps">0</b><span>خطوة مباشرة</span></div>
+            <div class="walkKpi"><b id="walkTimer">00:00:00</b><span>مدة المشي</span></div>
+            <div class="walkKpi"><b id="walkPercent">0%</b><span>من هدف 10000</span></div>
+          </div>
+          <div class="progress"><i id="walkBar"></i></div>
+          <div class="walkBtns">
+            <button class="btn" type="button" onclick="requestMotionPermission()">تفعيل الحساسات</button>
+            <button class="btn primary" type="button" onclick="startWalk()">بدء المشي</button>
+            <button class="btn" type="button" onclick="pauseWalk()">إيقاف مؤقت</button>
+            <button class="btn okbtn" type="button" onclick="manualStep()">+ خطوة</button>
+            <button class="btn danger" type="button" onclick="resetWalk()">تصفير العداد</button>
+          </div>
+          <div class="walkMsg" id="walkMsg">في iPhone اضغط تفعيل الحساسات أولاً. إذا لم يعمل الحساس استخدم زر + خطوة للاختبار أو أدخل الخطوات يدوياً.</div>
+        </div>
+
+        <div class="formgrid">
+          <div class="field"><label>الحالة الصحية *</label><select id="healthStatus" required><option>جيد</option><option>إرهاق بسيط</option><option>إصابة</option><option>مراجعة مستوصف</option><option>أخرى</option></select></div>
+          <div class="field"><label>صورة الخطوات، اختياري</label><input id="attachment" type="file" accept="image/*"></div>
+          <div class="field full"><label>ملاحظات</label><textarea id="notes" placeholder="اكتب أي ملاحظة صحية أو تدريبية"></textarea></div>
+        </div>
+        <div class="actions"><button class="btn primary" type="submit">حفظ التقرير الصحي</button><button class="btn" type="button" onclick="resetForm()">مسح الحقول</button></div>
+        <div id="msg" class="notice" style="display:none"></div>
+      </form>
+    </div>
+    <aside class="card">
+      <h3 style="color:var(--gold2);margin-top:0">معاينة التقرير</h3>
+      <div class="kpis">
+        <div class="kpi"><b id="bmiOut">—</b><span>BMI</span></div>
+        <div class="kpi" id="weightKpi"><b id="weightStatusOut">—</b><span>حالة الوزن</span></div>
+        <div class="kpi ok"><b id="stepsOut">0</b><span>الخطوات</span></div>
+        <div class="kpi"><b id="activityOut">—</b><span>النشاط</span></div>
+        <div class="kpi blue"><b id="distanceOut">0.00</b><span>المسافة كم</span></div>
+        <div class="kpi warn"><b id="caloriesOut">0</b><span>السعرات</span></div>
+      </div>
+      <div class="hint">عداد الخطوات يعبئ حقلي عدد الخطوات والدقائق تلقائياً، ثم يتم إرسالها مع التقرير الصحي إلى Google Sheets.</div>
+      <div class="notice" style="margin-top:14px">ارفع هذا الملف باسم <b>trainee-health.html</b> بدل الملف الحالي ليبقى الرابط نفسه:<br><span class="pill">https://mhmd-2002.github.io/moqatel-alshojaa/trainee-health.html</span></div>
+      <div id="lastPayload" class="preview notice"></div>
+    </aside>
+  </section>
+</main>
+<script>
+const HEALTH_WEB_APP_URL="https://script.google.com/macros/s/AKfycbySnvZfImMqJfiu17yNvLjVga4AWy7N57GSjF0pwmX3zkbeFjwuCfEtoQ8DMqM_6GlUoA/exec";
+
+let liveSteps=0,isWalking=false,startedAt=0,elapsedBeforePause=0,timerInterval=null;
+let lastStepTime=0,lastMagnitude=0,peakReady=true,lastMotionTime=0,motionReady=false;
+let walkStartTime='',walkEndTime='';
+const STOP_AFTER_MS=12000,MIN_STEP_GAP_MS=320,STEP_THRESHOLD=1.12;
+
+function $(id){return document.getElementById(id)}
+function toEnglishDigits(v){return String(v||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d))}
+function pad(n){return String(n).padStart(2,'0')}
+function nowTime(){const d=new Date();return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`}
+function formatDuration(ms){const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return `${pad(h)}:${pad(m)}:${pad(sec)}`}
+function elapsedMs(){return isWalking?elapsedBeforePause+(Date.now()-startedAt):elapsedBeforePause}
+function distance(steps){return ((Number(steps)||0)*0.00075).toFixed(2)}
+function calories(steps,weight){return Math.round((Number(steps)||0)*(Number(weight)||75)*0.0005)}
+function setWalkMsg(text){$('walkMsg').textContent=text}
+function setWalkState(text){$('walkState').textContent='الحالة: '+text}
+
+function calcBMI(){
+  const h=Number(toEnglishDigits($('height').value))/100;
+  const w=Number(toEnglishDigits($('weight').value));
+  const steps=Number(toEnglishDigits($('steps').value))||0;
+  const minutes=Number(toEnglishDigits($('minutes').value))||0;
+  let bmi='', status='—', cls='kpi';
+  if(h>0&&w>0){bmi=Math.round((w/(h*h))*10)/10; status=bmi<25?'وزن طبيعي':bmi<30?'وزن زائد':'سمنة'; cls=bmi<25?'kpi ok':bmi<30?'kpi warn':'kpi bad'}
+  $('bmiOut').textContent=bmi||'—';
+  $('weightStatusOut').textContent=status;
+  $('weightKpi').className=cls;
+  $('stepsOut').textContent=steps;
+  $('activityOut').textContent=(steps>=7000||minutes>=30)?'نشط':'منخفض';
+  $('distanceOut').textContent=distance(steps);
+  $('caloriesOut').textContent=calories(steps,w);
+  return {bmi,weightStatus:status};
+}
+['height','weight','steps','minutes'].forEach(id=>$(id).addEventListener('input',()=>{syncFromInputs();calcBMI()}));
+
+function syncFromInputs(){
+  const s=Number(toEnglishDigits($('steps').value))||0;
+  liveSteps=s;
+  $('liveSteps').textContent=liveSteps;
+  const pct=Math.min(100,Math.round(liveSteps/10000*100));
+  $('walkPercent').textContent=pct+'%';
+  $('walkBar').style.width=pct+'%';
+}
+
+function updateInputsFromCounter(){
+  $('steps').value=liveSteps;
+  const mins=Math.max(0,Math.round(elapsedMs()/60000));
+  $('minutes').value=mins;
+  syncFromInputs();
+  calcBMI();
+}
+
+function updateTimer(){
+  if(!isWalking) return;
+  $('walkTimer').textContent=formatDuration(elapsedMs());
+  updateInputsFromCounter();
+  if(Date.now()-lastMotionTime>STOP_AFTER_MS && liveSteps>0) pauseWalk(true);
+}
+
+async function requestMotionPermission(){
+  try{
+    if(typeof DeviceMotionEvent==='undefined'){
+      setWalkMsg('⚠️ هذا المتصفح لا يدعم حساس الحركة. استخدم الإدخال اليدوي أو زر + خطوة.');
+      return;
+    }
+    if(typeof DeviceMotionEvent.requestPermission==='function'){
+      const permission=await DeviceMotionEvent.requestPermission();
+      if(permission!=='granted'){
+        setWalkMsg('❌ لم يتم السماح للحساسات. افتح الصفحة من Safari على iPhone واضغط السماح.');
+        return;
+      }
+    }
+    if(!motionReady){
+      window.addEventListener('devicemotion',onMotion,{passive:true});
+      motionReady=true;
+    }
+    setWalkMsg('✅ تم تفعيل حساسات الحركة. اضغط بدء المشي وامشِ والجوال معك.');
+  }catch(e){
+    setWalkMsg('⚠️ تعذر تفعيل الحساسات. استخدم Safari/Chrome عبر رابط HTTPS أو أدخل الخطوات يدوياً.');
+  }
+}
+
+function startWalk(){
+  if(isWalking) return;
+  if(!motionReady && typeof DeviceMotionEvent!=='undefined' && typeof DeviceMotionEvent.requestPermission!=='function'){
+    window.addEventListener('devicemotion',onMotion,{passive:true});
+    motionReady=true;
+  }
+  isWalking=true; startedAt=Date.now(); lastMotionTime=Date.now();
+  if(!walkStartTime) walkStartTime=nowTime();
+  setWalkState('يمشي');
+  setWalkMsg('🚶 بدأ المؤقت. سيتم تعبئة الخطوات والدقائق في التقرير تلقائياً.');
+  clearInterval(timerInterval);
+  timerInterval=setInterval(updateTimer,250);
+  updateTimer();
+}
+
+function pauseWalk(auto=false){
+  if(!isWalking) return;
+  elapsedBeforePause += Date.now()-startedAt;
+  isWalking=false;
+  clearInterval(timerInterval);
+  walkEndTime=nowTime();
+  $('walkTimer').textContent=formatDuration(elapsedBeforePause);
+  updateInputsFromCounter();
+  setWalkState(auto?'توقف تلقائي':'إيقاف مؤقت');
+  setWalkMsg(auto?'⏸️ توقف المؤقت تلقائياً بسبب عدم وجود حركة.':'⏸️ تم إيقاف المؤقت مؤقتاً.');
+}
+
+function resetWalk(){
+  liveSteps=0;isWalking=false;startedAt=0;elapsedBeforePause=0;lastStepTime=0;lastMagnitude=0;peakReady=true;lastMotionTime=0;walkStartTime='';walkEndTime='';
+  clearInterval(timerInterval);
+  $('walkTimer').textContent='00:00:00';
+  $('steps').value=0;$('minutes').value=0;
+  setWalkState('متوقف');
+  setWalkMsg('تم تصفير العداد. اضغط بدء المشي عند الاستعداد.');
+  syncFromInputs();calcBMI();
+}
+
+function manualStep(){
+  liveSteps++;
+  lastMotionTime=Date.now();
+  if(!isWalking) setWalkMsg('تمت إضافة خطوة يدوياً للاختبار. لتشغيل الوقت اضغط بدء المشي.');
+  updateInputsFromCounter();
+}
+
+function onMotion(event){
+  if(!isWalking) return;
+  const a=event.accelerationIncludingGravity;
+  if(!a) return;
+  const magnitude=Math.sqrt((a.x||0)**2+(a.y||0)**2+(a.z||0)**2);
+  const delta=Math.abs(magnitude-lastMagnitude);
+  lastMagnitude=magnitude;
+  if(delta>0.35) lastMotionTime=Date.now();
+  const now=Date.now();
+  if(delta>STEP_THRESHOLD && peakReady && (now-lastStepTime)>MIN_STEP_GAP_MS){
+    liveSteps++;
+    lastStepTime=now;
+    lastMotionTime=now;
+    peakReady=false;
+    updateInputsFromCounter();
+  }
+  if(delta<0.45) peakReady=true;
+}
+
+function nowParts(){const d=new Date();return {date:d.toLocaleDateString('ar-SA'),time:d.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'}),timestamp:d.toISOString()}}
+function buildPayload(){
+  const c=calcBMI(), n=nowParts(), file=$('attachment').files[0];
+  return {
+    type:'health_save',source:'trainee-health.html',timestamp:n.timestamp,date:n.date,time:n.time,
+    name:$('name').value.trim(),rank:$('rank').value.trim(),militaryId:toEnglishDigits($('militaryId').value).trim(),unit:$('unit').value.trim(),
+    height:Number(toEnglishDigits($('height').value))||'',weight:Number(toEnglishDigits($('weight').value))||'',bmi:c.bmi,weightStatus:c.weightStatus,
+    steps:Number(toEnglishDigits($('steps').value))||0,minutes:Number(toEnglishDigits($('minutes').value))||0,
+    healthStatus:$('healthStatus').value,notes:$('notes').value.trim(),attachment:file?file.name:'',
+    walkStartTime:walkStartTime,walkEndTime:walkEndTime||nowTime(),walkDuration:$('walkTimer').textContent
+  };
+}
+function setMsg(text,type){const el=$('msg');el.style.display='block';el.className='notice '+(type||'');el.textContent=text}
+async function submitPayload(payload){
+  try{
+    const r=await fetch(HEALTH_WEB_APP_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    let txt=''; try{txt=await r.text()}catch(e){}
+    return {ok:r.ok,text:txt};
+  }catch(err){
+    await fetch(HEALTH_WEB_APP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    return {ok:true,text:'تم الإرسال بطريقة متوافقة مع المتصفح'};
+  }
+}
+$('healthForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(isWalking) pauseWalk(false);
+  const payload=buildPayload();
+  if(!payload.name||!payload.rank||!payload.militaryId||!payload.unit||!payload.height||!payload.weight){setMsg('أكمل الحقول المطلوبة أولاً.','error');return}
+  if(!payload.steps){setMsg('أدخل عدد الخطوات أو استخدم عداد الخطوات قبل الحفظ.','error');return}
+  setMsg('جاري حفظ التقرير الصحي...','');
+  try{
+    await submitPayload(payload);
+    localStorage.setItem('lastHealthReport',JSON.stringify(payload));
+    $('lastPayload').style.display='block';
+    $('lastPayload').textContent='آخر تقرير محفوظ: '+payload.name+' - '+payload.unit+' - '+payload.steps+' خطوة - '+payload.minutes+' دقيقة';
+    setMsg('تم حفظ التقرير الصحي بنجاح. ستظهر البيانات في Google Sheets حسب الوحدة المحددة.','success');
+    $('healthForm').reset();resetWalk();calcBMI();
+  }catch(err){setMsg('تعذر الحفظ. تأكد من رابط Apps Script أو اتصال الإنترنت.','error')}
+});
+function resetForm(){$('healthForm').reset();resetWalk();calcBMI();$('msg').style.display='none'}
+syncFromInputs();calcBMI();
+</script>
+</body>
+</html>
